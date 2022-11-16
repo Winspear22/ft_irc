@@ -1,5 +1,5 @@
 NAME = ircserv
-SRCS = srcs/main.cpp 
+SRCS = srcs/main.cpp srcs/MyServer.cpp
 
 INCLUDE= irc.hpp
 
@@ -7,7 +7,7 @@ OBJS = $(SRCS:.cpp=.o)
 DEPS = $(SRCS:.cpp=.d)
 
 CC= c++
-FLAGS= -Wall -Wextra -Werror -std=c++98
+FLAGS= -Wall -Wextra -Werror -std=c++98 -g3
 
 %.o:				%.cpp
 	@$(CC) $(FLAGS) -MMD -c $< -o $@ -I $(INCLUDE)
