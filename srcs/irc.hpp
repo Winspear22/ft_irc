@@ -23,4 +23,51 @@
 /*poll*/
 # include <poll.h>
 
+/*atoi*/
+# include <stdlib.h>
+
+//# include "MyServer.hpp"
+/*===============================================================================================================*/
+/*                                                DEFINES                                                        */
+/*===============================================================================================================*/
+
+/*                                             RETURN VALUES                                                     */
+
+# define FAILURE -1
+# define SUCCESS 0
+# define EXIT_SUCCESS 0
+# define EXIT_FAILIURE -1
+
+/*                                             ERRORS CODES                                                      */
+
+# define ERROR_SERVER -1
+# define ERROR_WRONG_PORT 1
+# define ERROR_SOCKET_CREATION 2
+# define ERROR_SOCKET_OPTIONS 3
+# define ERROR_SOCKET_BINDING 4
+# define ERROR_LISTENING 5
+# define ERROR_NONBLOCKING 6
+
+/*											   SERVER_STATUS													 */
+# define SERVER_ON 0
+# define SERVER_OFF 1
+
+/*                                             TEXTE COLORS                                                      */
+
+# define RED "\033[1;31m"
+# define GREEN "\033[1;32m"
+# define YELLOW "\033[1;33m"
+# define BLUE "\033[1;34m"
+# define PURPLE "\033[1;35m"
+# define CYAN "\033[1;36m"
+# define WHITE "\033[1;37m"
+# define NORMAL "\033[0m"
+
+/*===============================================================================================================*/
+/*                                                FUNCTIONS                                                      */
+/*===============================================================================================================*/
+
+/*                                              errors_handler.cpp                                                */
+int errors_handlers_msg( int error_code );
+
 #endif
