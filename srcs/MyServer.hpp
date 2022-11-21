@@ -6,24 +6,42 @@
 class MyServer
 {
 public:
-    MyServer(/* ARG */);
-    //MyServer( std::string port, std::string password );
-    MyServer( const MyServer & copy);
-    ~MyServer( void );
+    MyServer( int port, std::string password );
+	MyServer( const MyServer & copy);
     MyServer & operator=( const MyServer & server );
-    //std::ostream & operator<<( std::ostream & o );
+    ~MyServer( void );
 
     void        SetPort( char *str );
     void        SetPassword( char *str );
+	void		SetServerStatus( int ServerStatus );
 
     int         GetPort( void );
+	int			GetServerStatus( void );
     std::string GetPassword( void );
 
+	int			CreateSocketFd( void );
+	int			SetSocketOptions( void );
+	int			BindSocketFd( void );
+	int			ListenToSockedFd( void );
+	int			SetSocketFdToNonBlocking( void );
+	void		AcceptClientsConnections( void );
+	void		SelectClients( void );
+	int			AcceptNewClientsConnections( void );
+	void		RecvMsg( int fd );
+	//void		RecvAndSend( void );
+
 private:
-    int         _port;
-    std::string _password;
+    MyServer(/* ARG */);
+
+
+    int         	_port;
+    std::string 	_password;
+	bool			_server_status;
+	int				_socketfd;
+	int				_acceptsocket;
+	//id_t			_one_client_has_connected; // Switch for accept to deal with error messages loops
+	sockaddr_in		_sockadress;
 };
 
-std::ostream & operator<<( std::ostream & o, MyServer rhs );
 
 # endif
