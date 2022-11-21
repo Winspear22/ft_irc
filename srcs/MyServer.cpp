@@ -104,7 +104,7 @@ int			MyServer::BindSocketFd( void )
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
 		return (ERROR_SOCKET_BINDING);
-	std::cout << "BIND(); WORKED." << std::endl;
+	std::cout << GREEN << "BIND(); WORKED." << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
@@ -115,6 +115,7 @@ int			MyServer::ListenToSockedFd( void )
 	ret = listen(this->_socketfd, 10);
 	if (ret == ERROR_SERVER)
 		return (ERROR_LISTENING);
+	std::cout << GREEN << "listen(); works !" << std::endl;
 	return (SUCCESS);
 }
 
@@ -122,8 +123,63 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 {
 	int ret;
 	/*COMPRENDRE LE FLAG F_SETFL*/
+	/*Si on retire cette partie, la connexion devient bloquante*/
 	ret = fcntl(this->_socketfd, F_SETFL, O_NONBLOCK);
 	if (ret == ERROR_SERVER)
 		return (ERROR_NONBLOCKING);
+	std::cout << GREEN << "fcntl(); works !" << std::endl;
 	return (SUCCESS);
+}
+
+void			MyServer::AcceptClientsConnections( void )
+{
+	//int ret;
+	int sockadress_len;
+
+	sockadress_len = sizeof(this->_sockadress);
+	std::cout << BLUE << "je suis avant le accept." << std::endl;
+	this->_acceptsocket = accept(this->_socketfd, (struct sockaddr *)&this->_sockadress, (socklen_t * )&sockadress_len);
+	std::cout << BLUE << "je suis apres le accept." << std::endl;
+	if (this->_acceptsocket == ERROR_SERVER)
+		SelectClients();
+		//loop_errors_handlers_msg(ERROR_ACCEPT);
+	if (this->_acceptsocket >= 0)
+	{
+		std::cout << GREEN << "Accept success !" << NORMAL << std::endl;
+		SelectClients();
+	}
+}
+
+void			MyServer::SelectClients( void )
+{
+	fd_set	fds;
+	fd_set	readfds;
+	//fd_set	writefds;
+	int		maximum_clients;
+	int		ret_select;
+
+	FD_ZERO(&fds);
+	FD_SET(this->_socketfd, &fds);
+	readfds = fds;
+	maximum_clients = this->_socketfd;
+	std::cout << PURPLE << "je suis avant le select." << std::endl;
+	ret_select = select(maximum_clients + 1, &readfds, NULL, NULL, NULL);
+	std::cout << PURPLE << "je suis apres le select." << std::endl;
+	if (ret_select == ERROR_SERVER)
+		loop_errors_handlers_msg(ERROR_SELECT);
+}
+
+void			MyServer::RecvAndSend( void )
+{
+	char buff[999999];
+	char msg_sent[42] = "\033[1;35mSalut les amis. Ca marche !\033[0m";
+	int ret_send;
+	int ret_recv;
+	/*ON NE MET PAS DE PROTECTION CAR TANT QUE RIEN N'EST SEND OU RECV, IL RENVOIT -1 EN PERMANENCE*/
+	ret_recv = recv(this->_acceptsocket, buff, strlen(buff), 0);
+	if (ret_recv == ERROR_SERVER)
+		loop_errors_handlers_msg(ERROR_RECV);
+	ret_send = send(this->_acceptsocket, msg_sent, strlen(msg_sent), 0);
+	if (ret_send == ERROR_SERVER)
+		loop_errors_handlers_msg(ERROR_SEND);
 }

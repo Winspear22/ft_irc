@@ -30,9 +30,26 @@ int errors_handlers_msg( int error_code )
 	}
 	if (error_code == ERROR_NONBLOCKING)
     {
-		std::cout << RED << "Error." << WHITE << " fcntl(); " << RED << "had an error and returned -1. The socket was not set to non-blocking status."<< NORMAL << std::endl;
+		std::cout << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The socket was not set to non-blocking status."<< NORMAL << std::endl;
 		return (FAILURE);
 	}
 	return (SUCCESS);
 
 }
+
+/*DANS LE WHILE, POUR EVITER D'AVOIR DES RETURN QUI FONT SORTIR DE LA BOUCLE
+IL FAUR AVOIR DES FONCTIONS VOID POUR PAS AVOIR DE RETURN FAILURE QUI VONT NOUS
+SORTIR DE LA BOUCLE*/
+void loop_errors_handlers_msg( int error_code )
+{
+	if (error_code == ERROR_ACCEPT)
+		std::cout << RED << "Error." << WHITE << " Accept(); " << RED << "had an error and returned -1. No connection was accepted." << NORMAL << std::endl;
+	if (error_code == ERROR_RECV)
+		std::cout << RED << "Error." << WHITE << " Recv(); " << RED << "had an error and returned -1. Nothing was received." << NORMAL << std::endl;
+	if (error_code == ERROR_SEND)
+		std::cout << RED << "Error." << WHITE << " Send(); " << RED << "had an error and returned -1. Nothing was sent." << NORMAL << std::endl;
+	if (error_code == ERROR_SELECT)
+		std::cout << RED << "Error." << WHITE << " Select(); " << RED << "had an error and returned -1. No client was selected." << NORMAL << std::endl;
+	
+}
+

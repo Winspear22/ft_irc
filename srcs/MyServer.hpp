@@ -24,6 +24,9 @@ public:
 	int			BindSocketFd( void );
 	int			ListenToSockedFd( void );
 	int			SetSocketFdToNonBlocking( void );
+	void		AcceptClientsConnections( void );
+	void		SelectClients( void );
+	void		RecvAndSend( void );
 
 private:
     MyServer(/* ARG */);
@@ -33,6 +36,7 @@ private:
     std::string 	_password;
 	bool			_server_status;
 	int				_socketfd;
+	int				_acceptsocket;
 	sockaddr_in		_sockadress;
 };
 

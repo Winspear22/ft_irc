@@ -43,19 +43,17 @@ int main(int argc, char **argv)
         std::cout << RED << "Use the following configuration : " << WHITE << "./ircserv <port> <password>" << NORMAL << std::endl;
         return (EXIT_FAILIURE);
     }
-    else
+    MyServer Irc_Serveur(atoi(argv[1]), argv[2]);
+	ServerStatus = SERVER_ON;
+	signal(SIGINT, signal_handler);
+	if (check_serveur_args(Irc_Serveur) == FAILURE)
+		return (FAILURE);
+	if (check_serveur_creation(Irc_Serveur) == FAILURE)
+		return (FAILURE);
+    while (ServerStatus != SERVER_OFF)
     {
-        MyServer Irc_Serveur(atoi(argv[1]), argv[2]);
-		ServerStatus = SERVER_ON;
-		signal(SIGINT, signal_handler);
-		if (check_serveur_args(Irc_Serveur) == FAILURE)
-			return (FAILURE);
-		if (check_serveur_creation(Irc_Serveur) == FAILURE)
-			return (FAILURE);
-        while (ServerStatus != SERVER_OFF)
-        {
-
-        }
+		Irc_Serveur.AcceptClientsConnections();
+		Irc_Serveur.RecvAndSend();
     }
     return (EXIT_SUCCESS);
 }
@@ -106,6 +104,11 @@ int main(int argc, char *argv[])
         perror("listen");
         exit(EXIT_FAILURE);
     }
+	if (fcntl(server_fd, F_SETFL, O_NONBLOCK) < 0)
+	{
+        perror("fcntl");
+        exit(EXIT_FAILURE);
+    }
     if ((new_socket
          = accept(server_fd, (struct sockaddr*)&address,
                   (socklen_t*)&addrlen))
@@ -113,6 +116,8 @@ int main(int argc, char *argv[])
         perror("accept");
         exit(EXIT_FAILURE);
     }
+	else 
+		std::cout << GREEN << "Accept success !" << NORMAL << std::endl;
     valread = read(new_socket, buffer, 1024);
     printf("%s\n", buffer);
     send(new_socket, hello, strlen(hello), 0);
@@ -125,8 +130,4 @@ int main(int argc, char *argv[])
     (void)valread;
     return 0;
 }
-
-
-
 */
-

@@ -26,6 +26,9 @@
 /*atoi*/
 # include <stdlib.h>
 
+/*strlen*/
+# include <string.h>
+
 //# include "MyServer.hpp"
 /*===============================================================================================================*/
 /*                                                DEFINES                                                        */
@@ -47,7 +50,10 @@
 # define ERROR_SOCKET_BINDING 4
 # define ERROR_LISTENING 5
 # define ERROR_NONBLOCKING 6
-
+# define ERROR_ACCEPT 7
+# define ERROR_RECV 8
+# define ERROR_SEND 9
+# define ERROR_SELECT 10
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
 # define SERVER_OFF 1
@@ -69,5 +75,6 @@
 
 /*                                              errors_handler.cpp                                                */
 int errors_handlers_msg( int error_code );
+void loop_errors_handlers_msg( int error_code );
 
 #endif
