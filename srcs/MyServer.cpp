@@ -131,23 +131,82 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 	return (SUCCESS);
 }
 
+void			MyServer::set_pollfd( std::vector<struct pollfd> &fds )
+{
+	fds.clear();
+	fds.push_back(pollfd());
+	fds.back().fd = this->_socketfd;
+	fds.back().events = POLLIN;
+	fds.back().revents = 0;
+}
+
+void	MyServer::serv_accept(std::vector<pollfd> &fds)
+{
+	int				new_client_fd;
+	struct sockaddr	cs;
+	socklen_t		cs_len = sizeof(cs);
+	new_client_fd = accept(this->_socketfd, &cs, &cs_len);
+	if (new_client_fd == -1)
+		return ;
+	Clients *new_client = new Clients(new_client_fd, *reinterpret_cast<struct sockaddr_in*>(&cs), "MyServerName");
+	this->_clients_list.insert(std::make_pair(new_client, new_client_fd));
+/*	if (serv->getUsers().size() > serv->getConfig()->getMaxUsers())
+	{
+		new_client->disconnect();
+		fds.push_back(pollfd());
+		fds.back().fd = new_client_fd;
+		fds.back().events = 0;
+		fds.back().revents = 0;
+		return ;
+	}*/
+
+	fds.push_back(pollfd());
+	fds.back().fd = new_client_fd;
+	fds.back().events = POLLIN;
+	fds.back().revents = POLLIN;
+
+	std::cout << "New Client on socket #" << new_client_fd << "." << std::endl;
+}
+
+
 void			MyServer::AcceptClientsConnections( void )
 {
-	//int ret;
-	int sockadress_len;
+	std::vector<struct pollfd> fds;
+	int timeout;
+	unsigned int i;
+	int ret_poll;
 
-	sockadress_len = sizeof(this->_sockadress);
-	std::cout << BLUE << "je suis avant le accept." << std::endl;
-	this->_acceptsocket = accept(this->_socketfd, (struct sockaddr *)&this->_sockadress, (socklen_t * )&sockadress_len);
-	std::cout << BLUE << "je suis apres le accept." << std::endl;
-	if (this->_acceptsocket == ERROR_SERVER)
-		SelectClients();
-		//loop_errors_handlers_msg(ERROR_ACCEPT);
-	if (this->_acceptsocket >= 0)
+	/*CREER UNE FONCTION QUI INITIALISE MES FDS*/
+	timeout = (3 * 3 * 1000);
+	i = 0;
+	set_pollfd(fds);
+	ret_poll = poll(fds.data(), fds.size(), timeout);
+	if (ret_poll == TIMEOUT) // REGLER LE RETURN ;
+		return ;
+	if (ret_poll == -1) // REGLER LE RETURN ;
+		return ;
+	while (i < fds.size())
 	{
-		std::cout << GREEN << "Accept success !" << NORMAL << std::endl;
-		SelectClients();
+		if (fds[i].revents == POLLIN)
+		{
+			if (i == 0)
+			{
+				std::cout << "SERVER ACCEPT" << std::endl;
+				serv_accept(fds);		
+			}
+			if (i != 0)
+					std::cout << "SERVER RECEIVE" << std::endl;
+					/*SERVER RECEIVE*/
+		}
+		if (fds[i].revents == POLLHUP || fds[i].revents == POLLERR || fds[i].revents == POLLNVAL)
+		{	
+				std::cout << "Invalid event on socket #" << fds[i].fd << "." << std::endl;
+				//serv->getUser(fds[n].fd)->disconnect();
+		}
+		i++;
 	}
+		/*RM DECO
+		RM CHANS */
 }
 
 void			MyServer::SelectClients( void )

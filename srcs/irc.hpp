@@ -29,6 +29,11 @@
 /*strlen*/
 # include <string.h>
 
+/*vector*/
+# include <vector>
+
+/*map*/
+# include <map>
 //# include "MyServer.hpp"
 /*===============================================================================================================*/
 /*                                                DEFINES                                                        */
@@ -54,6 +59,7 @@
 # define ERROR_RECV 8
 # define ERROR_SEND 9
 # define ERROR_SELECT 10
+# define TIMEOUT 0
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
 # define SERVER_OFF 1

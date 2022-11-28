@@ -35,6 +35,65 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 	return (SUCCESS);
 }
 
+
+/*static void	set_pollfd(Server *serv, std::vector<struct pollfd> &fds)
+{
+    std::map<sockfd, Client*>::const_iterator it
+	fds.clear();
+
+	if (serv == NULL)
+		return ;
+    it = serv->getUsers().begin();
+	fds.push_back(pollfd());
+	fds.back().fd = serv->getListener();
+	fds.back().events = POLLIN;
+	fds.back().revents = 0;
+
+	while (it != serv->getUsers().end())
+	{
+		fds.push_back(pollfd());
+		fds.back().fd = it->first;
+		fds.back().events = POLLIN;
+		fds.back().revents = 0;
+		if (it->second->getLastcom() >= serv->getConfig()->getPing())
+			it->second->send_to("PING " + it->second->getNickname());
+        ++it;
+	}
+}
+
+void	server_loop(Server *serv)
+{
+	std::vector<struct pollfd> fds;
+
+	while (serv != NULL && server_running)
+	{
+		set_pollfd(serv, fds);
+
+		poll(fds.data(), fds.size(), serv->getConfig()->getTimeout());
+		for (size_t n = 0; n < fds.size(); n++)
+		{
+			if (fds[n].revents != 0)
+			{
+				if (fds[n].revents & POLLIN)
+				{
+					if (n == 0)		// The listening socket is at index 0.
+						serv_accept(serv, fds);
+					else if (n != 0)
+						serv_receive(fds[n].fd, serv);
+				}
+				if (fds[n].revents & POLLHUP || fds[n].revents & POLLERR || fds[n].revents & POLLNVAL)
+				{	
+					std::cout << "Invalid event on socket #" << fds[n].fd << "." << std::endl;
+					serv->getUser(fds[n].fd)->disconnect();
+				}
+			}
+		}
+		rm_deco_users(serv);
+		rm_empty_chans(serv);
+	}
+}
+*/
+
 int main(int argc, char **argv)
 {
     if (argc != 3)
@@ -53,81 +112,7 @@ int main(int argc, char **argv)
     while (ServerStatus != SERVER_OFF)
     {
 		Irc_Serveur.AcceptClientsConnections();
-		Irc_Serveur.RecvAndSend();
+	//	Irc_Serveur.RecvAndSend();
     }
     return (EXIT_SUCCESS);
 }
-
-/*#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <unistd.h>
-#define PORT 8080
-int main(int argc, char *argv[])
-{
-    (void)argc;
-    (void)argv;
-    int server_fd, new_socket, valread;
-    struct sockaddr_in address;
-    int opt = 1;
-    int addrlen = sizeof(address);
-    char buffer[1024] = { 0 };
-    char hello[] = "Hello from server";
- 
-    // Creating socket file descriptor
-    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        perror("socket failed");
-        exit(EXIT_FAILURE);
-    }
- 
-    // Forcefully attaching socket to the port 8080
-    if (setsockopt(server_fd, SOL_SOCKET,
-                   SO_REUSEADDR | SO_REUSEPORT, &opt,
-                   sizeof(opt))) {
-        perror("setsockopt");
-        exit(EXIT_FAILURE);
-    }
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
- 
-    // Forcefully attaching socket to the port 8080
-    if (bind(server_fd, (struct sockaddr*)&address,
-             sizeof(address))
-        < 0) {
-        perror("bind failed");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(server_fd, 3) < 0) {
-        perror("listen");
-        exit(EXIT_FAILURE);
-    }
-	if (fcntl(server_fd, F_SETFL, O_NONBLOCK) < 0)
-	{
-        perror("fcntl");
-        exit(EXIT_FAILURE);
-    }
-    if ((new_socket
-         = accept(server_fd, (struct sockaddr*)&address,
-                  (socklen_t*)&addrlen))
-        < 0) {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-	else 
-		std::cout << GREEN << "Accept success !" << NORMAL << std::endl;
-    valread = read(new_socket, buffer, 1024);
-    printf("%s\n", buffer);
-    send(new_socket, hello, strlen(hello), 0);
-    printf("Hello message sent\n");
- 
-    // closing the connected socket
-    close(new_socket);
-    // closing the listening socket
-    shutdown(server_fd, SHUT_RDWR);
-    (void)valread;
-    return 0;
-}
-*/
