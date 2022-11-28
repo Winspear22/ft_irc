@@ -35,65 +35,6 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 	return (SUCCESS);
 }
 
-
-/*static void	set_pollfd(Server *serv, std::vector<struct pollfd> &fds)
-{
-    std::map<sockfd, Client*>::const_iterator it
-	fds.clear();
-
-	if (serv == NULL)
-		return ;
-    it = serv->getUsers().begin();
-	fds.push_back(pollfd());
-	fds.back().fd = serv->getListener();
-	fds.back().events = POLLIN;
-	fds.back().revents = 0;
-
-	while (it != serv->getUsers().end())
-	{
-		fds.push_back(pollfd());
-		fds.back().fd = it->first;
-		fds.back().events = POLLIN;
-		fds.back().revents = 0;
-		if (it->second->getLastcom() >= serv->getConfig()->getPing())
-			it->second->send_to("PING " + it->second->getNickname());
-        ++it;
-	}
-}
-
-void	server_loop(Server *serv)
-{
-	std::vector<struct pollfd> fds;
-
-	while (serv != NULL && server_running)
-	{
-		set_pollfd(serv, fds);
-
-		poll(fds.data(), fds.size(), serv->getConfig()->getTimeout());
-		for (size_t n = 0; n < fds.size(); n++)
-		{
-			if (fds[n].revents != 0)
-			{
-				if (fds[n].revents & POLLIN)
-				{
-					if (n == 0)		// The listening socket is at index 0.
-						serv_accept(serv, fds);
-					else if (n != 0)
-						serv_receive(fds[n].fd, serv);
-				}
-				if (fds[n].revents & POLLHUP || fds[n].revents & POLLERR || fds[n].revents & POLLNVAL)
-				{	
-					std::cout << "Invalid event on socket #" << fds[n].fd << "." << std::endl;
-					serv->getUser(fds[n].fd)->disconnect();
-				}
-			}
-		}
-		rm_deco_users(serv);
-		rm_empty_chans(serv);
-	}
-}
-*/
-
 int main(int argc, char **argv)
 {
     if (argc != 3)
@@ -111,8 +52,7 @@ int main(int argc, char **argv)
 		return (FAILURE);
     while (ServerStatus != SERVER_OFF)
     {
-		Irc_Serveur.AcceptClientsConnections();
-	//	Irc_Serveur.RecvAndSend();
+		Irc_Serveur.SelectClients();
     }
     return (EXIT_SUCCESS);
 }

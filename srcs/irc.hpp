@@ -34,7 +34,9 @@
 
 /*map*/
 # include <map>
-//# include "MyServer.hpp"
+
+# include "MyServer.hpp"
+# include "Clients.hpp"
 /*===============================================================================================================*/
 /*                                                DEFINES                                                        */
 /*===============================================================================================================*/
@@ -59,6 +61,7 @@
 # define ERROR_RECV 8
 # define ERROR_SEND 9
 # define ERROR_SELECT 10
+# define ERROR_NEW 11
 # define TIMEOUT 0
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
@@ -80,7 +83,8 @@
 /*===============================================================================================================*/
 
 /*                                              errors_handler.cpp                                                */
-int errors_handlers_msg( int error_code );
-void loop_errors_handlers_msg( int error_code );
+int     errors_handlers_msg( int error_code );
+void    loop_errors_handlers_msg( int error_code );
+//void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> _clients_list );
 
 #endif

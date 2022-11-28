@@ -23,6 +23,19 @@ MyServer::MyServer( const MyServer & copy )
 MyServer::~MyServer( void )
 {
 	std::cout << RED << "MyServer Destructor called." << NORMAL << std::endl;
+	std::map<Clients*, int>::const_iterator it;
+	
+	it = this->_clients_list.begin();
+	
+	std::cout << RED << "Error." << WHITE << " New(); " << RED << "had an error and returned -1. No new Client was created." << NORMAL << std::endl;
+	while (it != this->_clients_list.end())
+	{
+		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
+		delete it->first;
+		it++;
+	}
+	this->_clients_list.clear();
+	std::cout << RED << "All Clients were freed. No Leaks." << NORMAL << std::endl;
 	return ;
 }
 
@@ -92,7 +105,7 @@ int			MyServer::SetSocketOptions( void )
 int			MyServer::BindSocketFd( void )
 {
 	int ret;
-
+	this->_new_fd_nb = 0;
 	this->_sockadress.sin_port = htons(this->_port);
 	this->_sockadress.sin_family = AF_INET; 
 	this->_sockadress.sin_addr.s_addr = INADDR_ANY;
@@ -131,114 +144,69 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 	return (SUCCESS);
 }
 
-void			MyServer::set_pollfd( std::vector<struct pollfd> &fds )
+int			MyServer::SelectClients( void )
 {
-	fds.clear();
-	fds.push_back(pollfd());
-	fds.back().fd = this->_socketfd;
-	fds.back().events = POLLIN;
-	fds.back().revents = 0;
-}
+	fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
+	fd_set	readfds; // mes sets de fds pouvant lire
+	//fd_set	writefds; // mes sets de fds pouvant ecrire
+	int		maximum_fds; // mon nombre max de fds peut etre remplace par FD_ISSET
+	int		ret_select; //return de select pour les erreurs
+	int		fds_list; // sert a loop pour trouver lequel des fds a des donnees pour moi
+//	int		new_client_fd; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
 
-void	MyServer::serv_accept(std::vector<pollfd> &fds)
-{
-	int				new_client_fd;
-	struct sockaddr	cs;
-	socklen_t		cs_len = sizeof(cs);
-	new_client_fd = accept(this->_socketfd, &cs, &cs_len);
-	if (new_client_fd == -1)
-		return ;
-	Clients *new_client = new Clients(new_client_fd, *reinterpret_cast<struct sockaddr_in*>(&cs), "MyServerName");
-	this->_clients_list.insert(std::make_pair(new_client, new_client_fd));
-/*	if (serv->getUsers().size() > serv->getConfig()->getMaxUsers())
-	{
-		new_client->disconnect();
-		fds.push_back(pollfd());
-		fds.back().fd = new_client_fd;
-		fds.back().events = 0;
-		fds.back().revents = 0;
-		return ;
-	}*/
-
-	fds.push_back(pollfd());
-	fds.back().fd = new_client_fd;
-	fds.back().events = POLLIN;
-	fds.back().revents = POLLIN;
-
-	std::cout << "New Client on socket #" << new_client_fd << "." << std::endl;
-}
-
-
-void			MyServer::AcceptClientsConnections( void )
-{
-	std::vector<struct pollfd> fds;
-	int timeout;
-	unsigned int i;
-	int ret_poll;
-
-	/*CREER UNE FONCTION QUI INITIALISE MES FDS*/
-	timeout = (3 * 3 * 1000);
-	i = 0;
-	set_pollfd(fds);
-	ret_poll = poll(fds.data(), fds.size(), timeout);
-	if (ret_poll == TIMEOUT) // REGLER LE RETURN ;
-		return ;
-	if (ret_poll == -1) // REGLER LE RETURN ;
-		return ;
-	while (i < fds.size())
-	{
-		if (fds[i].revents == POLLIN)
-		{
-			if (i == 0)
-			{
-				std::cout << "SERVER ACCEPT" << std::endl;
-				serv_accept(fds);		
-			}
-			if (i != 0)
-					std::cout << "SERVER RECEIVE" << std::endl;
-					/*SERVER RECEIVE*/
-		}
-		if (fds[i].revents == POLLHUP || fds[i].revents == POLLERR || fds[i].revents == POLLNVAL)
-		{	
-				std::cout << "Invalid event on socket #" << fds[i].fd << "." << std::endl;
-				//serv->getUser(fds[n].fd)->disconnect();
-		}
-		i++;
-	}
-		/*RM DECO
-		RM CHANS */
-}
-
-void			MyServer::SelectClients( void )
-{
-	fd_set	fds;
-	fd_set	readfds;
-	//fd_set	writefds;
-	int		maximum_clients;
-	int		ret_select;
-
-	FD_ZERO(&fds);
-	FD_SET(this->_socketfd, &fds);
-	readfds = fds;
-	maximum_clients = this->_socketfd;
-	std::cout << PURPLE << "je suis avant le select." << std::endl;
-	ret_select = select(maximum_clients + 1, &readfds, NULL, NULL, NULL);
-	std::cout << PURPLE << "je suis apres le select." << std::endl;
+	fds_list = -1;
+	FD_ZERO(&ready_fds);
+	FD_SET(this->_socketfd, &ready_fds);
+	readfds = ready_fds; // je sais plus pk on fait ca 
+	maximum_fds = this->_socketfd;
+	ret_select = select(maximum_fds + 1, &readfds, NULL, NULL, NULL);
 	if (ret_select == ERROR_SERVER)
 		loop_errors_handlers_msg(ERROR_SELECT);
+	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
+	{
+		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
+		{
+			this->CreateClients();
+			FD_SET(this->_new_fd_nb, &ready_fds);
+			if (this->_new_fd_nb > maximum_fds)
+                     maximum_fds = this->_new_fd_nb;
+			std::cout << CYAN << "Client currently connected : " << maximum_fds - 3 << std::endl;
+
+		}
+		else
+		{
+			//this->RecvMsg( fds_list );
+		}
+	}
+	return (SUCCESS);
 }
 
-void			MyServer::RecvAndSend( void )
+
+void			MyServer::CreateClients( void )
 {
-	char buff[999999];
-	char msg_sent[42] = "\033[1;35mSalut les amis. Ca marche !\033[0m";
-	int ret_send;
-	int ret_recv;
-	/*ON NE MET PAS DE PROTECTION CAR TANT QUE RIEN N'EST SEND OU RECV, IL RENVOIT -1 EN PERMANENCE*/
-	ret_recv = recv(this->_acceptsocket, buff, strlen(buff), 0);
-	if (ret_recv == ERROR_SERVER)
-		loop_errors_handlers_msg(ERROR_RECV);
-	ret_send = send(this->_acceptsocket, msg_sent, strlen(msg_sent), 0);
-	if (ret_send == ERROR_SERVER)
-		loop_errors_handlers_msg(ERROR_SEND);
+	int				client_created_fd;
+	Clients			*client_created;
+	struct sockaddr	cs;
+	socklen_t		cs_len;
+	
+	cs_len = sizeof(cs);
+	client_created_fd = accept(this->_socketfd, &cs, &cs_len);
+	if (client_created_fd == ERROR_ACCEPT)
+	{
+		this->_new_fd_nb -= 1;
+		return (loop_errors_handlers_msg(ERROR_ACCEPT));
+	}
+	client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&cs), "MyServerName");
+	/*TESTER AVEC NULL*/
+	/*if (this->_new_fd_nb > 10)
+		return (loop_safe_exit(client_created, this->_clients_list));
+
+		//client_created = NULL;
+	if (client_created == NULL)
+		return (loop_safe_exit(client_created, this->_clients_list));
+	*/
+	this->_clients_list.insert(std::make_pair(client_created, client_created_fd));
+	this->_new_fd_nb = client_created_fd;
+	std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
+
 }

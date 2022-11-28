@@ -4,6 +4,8 @@
 # include "irc.hpp"
 # include "Clients.hpp"
 
+class Clients;
+
 class MyServer
 {
 public:
@@ -25,15 +27,12 @@ public:
 	int			BindSocketFd( void );
 	int			ListenToSockedFd( void );
 	int			SetSocketFdToNonBlocking( void );
-	
-	void		AcceptClientsConnections( void );
-	void		set_pollfd( std::vector<struct pollfd> &fds );
-	void		serv_accept(std::vector<pollfd> &fds);
 
-	
-	
-	void		SelectClients( void );
-	void		RecvAndSend( void );
+	int			SelectClients( void );
+	void		CreateClients( void );
+
+	std::map<Clients*, int> _clients_list;
+
 
 private:
     MyServer(/* ARG */);
@@ -42,10 +41,10 @@ private:
     int         	_port;
     std::string 	_password;
 	bool			_server_status;
-	int				_socketfd;
-	int				_acceptsocket;
+	int				_socketfd; // sert de socket qui va listen
 	sockaddr_in		_sockadress;
-	std::map<Clients*, int> _clients_list;
+	/*TEST*/
+	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
 };
 
 
