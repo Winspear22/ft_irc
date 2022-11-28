@@ -34,6 +34,11 @@ int errors_handlers_msg( int error_code )
 		std::cout << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The socket was not set to non-blocking status."<< NORMAL << std::endl;
 		return (FAILURE);
 	}
+	if (error_code == TIMEOUT)
+	{
+		std::cout << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 1 minute delay."<< NORMAL << std::endl;
+		return (FAILURE);
+	}
 	return (SUCCESS);
 
 }

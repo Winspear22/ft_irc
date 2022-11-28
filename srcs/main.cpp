@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 		return (FAILURE);
 	if (check_serveur_creation(Irc_Serveur) == FAILURE)
 		return (FAILURE);
+	Irc_Serveur.InitVariables();
     while (ServerStatus != SERVER_OFF)
     {
 		Irc_Serveur.SelectClients();

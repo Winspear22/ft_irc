@@ -14,6 +14,8 @@ public:
     MyServer & operator=( const MyServer & server );
     ~MyServer( void );
 
+	void		InitVariables( void );
+
     void        SetPort( char *str );
     void        SetPassword( char *str );
 	void		SetServerStatus( int ServerStatus );
@@ -45,6 +47,7 @@ private:
 	sockaddr_in		_sockadress;
 	/*TEST*/
 	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
+	int				_nb_of_clients;
 };
 
 
