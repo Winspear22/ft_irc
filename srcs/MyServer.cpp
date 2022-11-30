@@ -196,7 +196,7 @@ void			MyServer::CreateClients( void )
 	
 	sizeofsockaddr = sizeof(client_addr);
 	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
-	if (client_created_fd == ERROR_ACCEPT)
+	if (client_created_fd == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_ACCEPT));
 	else
 	{
