@@ -41,3 +41,33 @@ Clients::~Clients( void )
 	std::cout << RED << "Clients Destructor called." << NORMAL << std::endl;
 	return ;
 }
+
+int		Clients::GetClientsFd( void )
+{
+	return (this->_ClientFd);
+}
+
+std::string Clients::GetClientsUsername( void )
+{
+	return (this->_Username);
+}
+
+std::string Clients::GetClientsRealname( void )
+{
+	return (this->_Realname);
+}
+
+std::string Clients::GetClientsNickname( void )
+{
+	return (this->_Nickname);
+}
+
+std::string Clients::GetClientsMessage( void )
+{
+	return (this->_ClientMessage);
+}
+
+void		Clients::SetClientsMessage( std::string msg_recv )
+{
+	this->_ClientMessage = msg_recv;
+}

@@ -1,5 +1,5 @@
 NAME = ircserv
-SRCS = srcs/main.cpp srcs/MyServer.cpp srcs/errors_msg.cpp srcs/Clients.cpp
+SRCS = srcs/main.cpp srcs/MyServer.cpp srcs/errors_msg.cpp srcs/Clients.cpp srcs/MyMsg.cpp
 
 INCLUDE= irc.hpp
 

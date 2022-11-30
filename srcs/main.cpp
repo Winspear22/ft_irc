@@ -35,6 +35,24 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 	return (SUCCESS);
 }
 
+
+void	WelcomeOnTheServer( void )
+{
+	std::cout << "\033[2J" << std::flush;
+	std::cout << BLUE << "==============================================================================================================================" << NORMAL << std::endl;
+	std::cout << YELLOW << "| |  | |    | |                          | |                           |_   _| ___ \\/  __ \\ /  ___|                         " << NORMAL << std::endl;
+	std::cout << YELLOW << "| |  | | ___| | ___ ___  _ __ ___   ___  | |_ ___     ___  _   _ _ __    | | | |_/ /| /  \\/ \\ `--.  ___ _ ____   _____ _ __ " << NORMAL << std::endl;
+	std::cout << YELLOW << "| |/\\| |/ _ \\ |/ __/ _ \\| '_ ` _ \\ / _ \\ | __/ _ \\   / _ \\| | | | '__|   | | |    / | |      `--. \\/ _ \\ '__\\ \\ / / _ \\ '__|" << NORMAL << std::endl;
+	std::cout << YELLOW << "\\  /\\  /  __/ | (_| (_) | | | | | |  __/ | || (_) | | (_) | |_| | |     _| |_| |\\ \\ | \\__/\\ /\\__/ /  __/ |   \\ V /  __/ |   " << NORMAL << std::endl;
+	std::cout << YELLOW << " \\/  \\/ \\___|_|\\___\\___/|_| |_| |_|\\___|  \\__\\___/   \\___/ \\__,_|_|     \\___/\\_| \\_| \\____/ \\____/ \\___|_|    \\_/ \\___|_|   " << NORMAL << std::endl;
+	std::cout << BLUE << "==============================================================================================================================" << NORMAL << std::endl;
+	std::cout << WHITE << "Team :" << NORMAL << std::endl;
+	std::cout << RED << "Malbrand" << NORMAL << std::endl;
+	std::cout << BLUE << "Naben-za" << NORMAL << std::endl;
+	std::cout << YELLOW "Adaloui" << NORMAL << std::endl;
+}
+
+
 int main(int argc, char **argv)
 {
     if (argc != 3)
@@ -51,7 +69,8 @@ int main(int argc, char **argv)
 	if (check_serveur_creation(Irc_Serveur) == FAILURE)
 		return (FAILURE);
 	Irc_Serveur.InitVariables();
-    while (ServerStatus != SERVER_OFF)
+	WelcomeOnTheServer();
+	while (ServerStatus != SERVER_OFF)
     {
 		Irc_Serveur.SelectClients();
     }

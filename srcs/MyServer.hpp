@@ -3,6 +3,7 @@
 
 # include "irc.hpp"
 # include "Clients.hpp"
+# include "MyMsg.hpp"
 
 class Clients;
 
@@ -32,6 +33,10 @@ public:
 
 	int			SelectClients( void );
 	void		CreateClients( void );
+	void		RecvClientsMsg( int ClientsFd );
+
+	Clients		*GetClientsThroughName( std::string name );
+	Clients		*GetClientsThroughSocketFd( int fd );
 
 	std::map<Clients*, int> _clients_list;
 

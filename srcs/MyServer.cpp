@@ -23,11 +23,9 @@ MyServer::MyServer( const MyServer & copy )
 MyServer::~MyServer( void )
 {
 	std::cout << RED << "MyServer Destructor called." << NORMAL << std::endl;
-	std::map<Clients*, int>::const_iterator it;
+	std::map<Clients*, int>::iterator it;
 	
-	it = this->_clients_list.begin();
-	
-	std::cout << RED << "Error." << WHITE << " New(); " << RED << "had an error and returned -1. No new Client was created." << NORMAL << std::endl;
+	it = this->_clients_list.begin();	
 	while (it != this->_clients_list.end())
 	{
 		delete it->first;
@@ -150,6 +148,37 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 	return (SUCCESS);
 }
 
+
+	#include <stdio.h>
+	#include <time.h>
+
+const char *dot_str[] = {".", ".", ".", "\b\b\b   \b\b\b"};
+#define countof(x) (sizeof(x)/sizeof((x)[0]))
+
+static int next_state = 0;
+void update_progress(void) {
+    fputs(dot_str[next_state], stdout);
+    next_state = (next_state + 1) % countof(dot_str);
+    fflush(stdout);
+}
+
+static time_t last_time = 0;
+void update_progress_if_time(void) {
+    time_t now = time(NULL);
+    if(now > last_time) {
+        update_progress();
+        last_time = now;
+    }
+}
+
+void start_progress(const char *loading) {
+    fputs(loading, stdout);
+    next_state = 0;
+    last_time = 0;
+    fflush(stdout);
+}
+
+
 int			MyServer::SelectClients( void )
 {
 	fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
@@ -157,19 +186,22 @@ int			MyServer::SelectClients( void )
 	int		maximum_fds; // mon nombre max de fds peut etre remplace par FD_ISSET
 	int		ret_select; //return de select pour les erreurs
 	int		fds_list; // sert a loop pour trouver lequel des fds a des donnees pour moi
+	struct timeval		timeout;
 
+	timeout.tv_sec = 120;
 	fds_list = -1;
 	FD_ZERO(&ready_fds);
 	FD_SET(this->_socketfd, &ready_fds);
 	readfds = ready_fds; // je sais plus pk on fait ca 
 	maximum_fds = this->_socketfd;
-	ret_select = select(maximum_fds + 1, &readfds, NULL, NULL, NULL);
+	ret_select = select(maximum_fds + 1, &readfds, NULL, NULL, &timeout);
 	if (ret_select == ERROR_SERVER)
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		errors_handlers_msg(TIMEOUT);
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
+		update_progress_if_time();
 		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
 		{
 			this->CreateClients();
@@ -179,9 +211,7 @@ int			MyServer::SelectClients( void )
 			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 		}
 		else
-		{
-			std::cout << "SALUT" << std::endl;//this->RecvMsg( fds_list );
-		}
+			RecvClientsMsg(this->_new_fd_nb);
 	}
 	return (SUCCESS);
 }
@@ -200,11 +230,88 @@ void			MyServer::CreateClients( void )
 		return (loop_errors_handlers_msg(ERROR_ACCEPT));
 	else
 	{
-		
 		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
 		this->_clients_list.insert(std::make_pair(client_created, client_created_fd));
 		this->_new_fd_nb = client_created_fd;
 		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
 		this->_nb_of_clients++;
 	}
+}
+
+
+
+std::vector<std::string> split(char *str, const char *delim)
+{
+	std::vector<std::string> vector;
+
+	if (str == NULL)
+		return vector;
+
+	char 	*ptr = strtok(str, delim);
+
+	while (ptr)
+	{
+		vector.push_back(std::string(ptr));
+		ptr = strtok(NULL, delim);
+	}
+	return vector;
+}
+
+
+
+void		MyServer::RecvClientsMsg( int ClientsFd )
+{
+	
+	char		recv_buffer[999999 + 1];
+	char		*msg_buffer;
+	int			ret_rcv;
+	std::vector<std::string>	splitted_msg;
+	std::vector<std::string>::iterator it;
+
+	memset(recv_buffer, 0, 999999 + 1);
+	ret_rcv = recv(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
+	if (ret_rcv == ERROR_SERVER)
+		return (loop_errors_handlers_msg(ERROR_RECV));
+	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
+
+	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
+	splitted_msg = split(msg_buffer, "\r\n");
+	it = splitted_msg.begin();
+	while (it != splitted_msg.end())
+	{
+		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
+		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() << std::endl;
+		//std::cout << "Message from client #" << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() << " (" << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << ") << [" << *it << "]" << std::endl;
+		//send(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
+		it++;
+	}
+	free(msg_buffer);
+}
+
+Clients		*MyServer::GetClientsThroughName( std::string NickName )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_clients_list.begin();
+	while (it != this->_clients_list.end())
+	{
+		if (it->first->GetClientsNickname() == NickName)
+			return (it->first);
+		it++;
+	}
+	return (NULL);
+}
+
+Clients		*MyServer::GetClientsThroughSocketFd( int fd )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_clients_list.begin();
+	while (it != this->_clients_list.end())
+	{
+		if (it->second == fd)
+			return (it->first);
+		it++;
+	}
+	return (NULL);
 }

@@ -2,6 +2,8 @@
 # define CLIENTS_HPP
 
 # include "irc.hpp"
+class MyMsg;
+
 class Clients
 {
 public:
@@ -10,15 +12,26 @@ public:
 	Clients & operator=( const Clients & client );
 	~Clients( void );
 
-	int		GetClientFd( void );
+	int			GetClientsFd( void );
+	std::string	GetClientsUsername( void );
+	std::string	GetClientsRealname( void );
+	std::string	GetClientsNickname( void );
 
-	void	SetClientFd( int ClientFd );
-
+	std::string GetClientsMessage( void );
+	void		SetClientsMessage( std::string msg_recv );
 private:
     Clients(/* ARG*/);
 	int 		_ClientFd;
 	sockaddr_in _New_Address;
 	std::string _ServerName;
+
+	/*Clients Identity*/
+	std::string	_Username;
+	std::string _Realname;
+	std::string	_Nickname;
+
+	/*Clients Message*/
+	std::string	_ClientMessage;
 
 };
 # endif
