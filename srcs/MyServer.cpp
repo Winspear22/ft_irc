@@ -188,6 +188,7 @@ int			MyServer::SelectClients( void )
 	int		fds_list; // sert a loop pour trouver lequel des fds a des donnees pour moi
 	struct timeval		timeout;
 
+	memset(&timeout, 0, sizeof(struct timeval));
 	timeout.tv_sec = 120;
 	fds_list = -1;
 	FD_ZERO(&ready_fds);
