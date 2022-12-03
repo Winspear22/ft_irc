@@ -148,37 +148,6 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 	return (SUCCESS);
 }
 
-
-	#include <stdio.h>
-	#include <time.h>
-
-const char *dot_str[] = {".", ".", ".", "\b\b\b   \b\b\b"};
-#define countof(x) (sizeof(x)/sizeof((x)[0]))
-
-static int next_state = 0;
-void update_progress(void) {
-    fputs(dot_str[next_state], stdout);
-    next_state = (next_state + 1) % countof(dot_str);
-    fflush(stdout);
-}
-
-static time_t last_time = 0;
-void update_progress_if_time(void) {
-    time_t now = time(NULL);
-    if(now > last_time) {
-        update_progress();
-        last_time = now;
-    }
-}
-
-void start_progress(const char *loading) {
-    fputs(loading, stdout);
-    next_state = 0;
-    last_time = 0;
-    fflush(stdout);
-}
-
-
 int			MyServer::SelectClients( void )
 {
 	fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
@@ -202,7 +171,6 @@ int			MyServer::SelectClients( void )
 		errors_handlers_msg(TIMEOUT);
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		update_progress_if_time();
 		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
 		{
 			this->CreateClients();
@@ -241,24 +209,22 @@ void			MyServer::CreateClients( void )
 
 
 
-std::vector<std::string> split(char *str, const char *delim)
+std::vector<std::string> SplitByEndline(char *str, char *delim)
 {
-	std::vector<std::string> vector;
+	char 	*tmp;
+	std::vector<std::string> splitted_str;
 
 	if (str == NULL)
-		return vector;
+		return (splitted_str);
 
-	char 	*ptr = strtok(str, delim);
-
-	while (ptr)
+	tmp = strtok(str, delim);
+	while (tmp)
 	{
-		vector.push_back(std::string(ptr));
-		ptr = strtok(NULL, delim);
+		splitted_str.push_back(std::string(tmp));
+		tmp = strtok(NULL, delim);
 	}
-	return vector;
+	return (splitted_str);
 }
-
-
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
@@ -276,13 +242,12 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
 
 	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
-	splitted_msg = split(msg_buffer, "\r\n");
+	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
 	while (it != splitted_msg.end())
 	{
 		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() << std::endl;
-		//std::cout << "Message from client #" << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() << " (" << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << ") << [" << *it << "]" << std::endl;
 		//send(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
 		it++;
 	}
