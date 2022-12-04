@@ -50,6 +50,7 @@ private:
 	bool			_server_status;
 	int				_socketfd; // sert de socket qui va listen
 	sockaddr_in		_sockadress;
+	bool			_right_password_used;
 	/*TEST*/
 	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
 	int				_nb_of_clients;

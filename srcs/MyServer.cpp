@@ -84,6 +84,7 @@ void		MyServer::InitVariables( void )
 {
 	this->_new_fd_nb = 0;
 	this->_nb_of_clients = 0;
+	this->_right_password_used = FAILURE;
 }
 
 
@@ -207,8 +208,6 @@ void			MyServer::CreateClients( void )
 	}
 }
 
-
-
 std::vector<std::string> SplitByEndline(char *str, const char *delim)
 {
 	char 	*tmp;
@@ -229,11 +228,11 @@ std::vector<std::string> SplitByEndline(char *str, const char *delim)
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
 	
-	char		recv_buffer[999999 + 1];
-	char		*msg_buffer;
-	int			ret_rcv;
-	std::vector<std::string>	splitted_msg;
-	std::vector<std::string>::iterator it;
+	char								recv_buffer[999999 + 1];
+	char								*msg_buffer;
+	int									ret_rcv;
+	std::vector<std::string>			splitted_msg;
+	std::vector<std::string>::iterator 	it;
 
 	memset(recv_buffer, 0, 999999 + 1);
 	ret_rcv = recv(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
