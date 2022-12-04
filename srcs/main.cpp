@@ -17,6 +17,8 @@ int		check_serveur_args(MyServer & Irc_Serveur)
 		return (errors_handlers_msg(ERROR_WRONG_PORT));
 	else if (Irc_Serveur.GetPort() > 65535)
 		return (errors_handlers_msg(ERROR_WRONG_PORT));
+	else if (Irc_Serveur.GetPort() != 6667)
+		return (errors_handlers_msg(ERROR_NOT_PORT_6667));
 	return (SUCCESS);
 }
 

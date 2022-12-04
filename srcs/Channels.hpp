@@ -11,7 +11,7 @@ public:
 	Channels & operator=( const Channels & popo );
 	~Channels( void );
 private:
-    Channels(/*ARG*/);
+    //Channels(/*ARG*/);
 };
 
 #endif

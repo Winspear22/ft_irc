@@ -6,7 +6,13 @@ int errors_handlers_msg( int error_code )
 {
     if (error_code == ERROR_WRONG_PORT)
     {
-		std::cerr << RED << "Error. Wrong port used. Try a port between " << WHITE << "1024 " << RED << "and " << WHITE << "65535." << NORMAL << std::endl;
+		std::cerr << RED << "Error. Wrong port used. You cannot use a port under " << WHITE << "1024 " << RED << "and above " << WHITE << "65535" << RED \
+		<< ". Moreover, the only authorized port for this server is " << WHITE << "6667" << RED << "." << std::endl;
+		return (FAILURE);
+	}
+	if (error_code == ERROR_NOT_PORT_6667)
+    {
+		std::cerr << RED << "Error. Wrong port used. You must use the port " << WHITE << "6667" << RED << "." << NORMAL << std::endl;
 		return (FAILURE);
 	}
 	if (error_code == ERROR_SOCKET_CREATION)
@@ -34,11 +40,6 @@ int errors_handlers_msg( int error_code )
 		std::cerr << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The socket was not set to non-blocking status."<< NORMAL << std::endl;
 		return (FAILURE);
 	}
-	if (error_code == TIMEOUT)
-	{
-		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 1 minute delay."<< NORMAL << std::endl;
-		return (FAILURE);
-	}
 	return (SUCCESS);
 
 }
@@ -48,7 +49,8 @@ IL FAUR AVOIR DES FONCTIONS VOID POUR PAS AVOIR DE RETURN FAILURE QUI VONT NOUS
 SORTIR DE LA BOUCLE*/
 void loop_errors_handlers_msg( int error_code )
 {
-	if (error_code == ERROR_ACCEPT)
+	(void)error_code;
+	/*if (error_code == ERROR_ACCEPT)
 		std::cerr << RED << "Error." << WHITE << " Accept(); " << RED << "had an error and returned -1. No connection was accepted." << NORMAL << std::endl;
 	if (error_code == ERROR_NEW)
 		std::cerr << RED << "Error." << WHITE << " New(); " << RED << "had an error and returned -1. No new Client was created." << NORMAL << std::endl;
@@ -58,7 +60,9 @@ void loop_errors_handlers_msg( int error_code )
 		std::cerr << RED << "Error." << WHITE << " Send(); " << RED << "had an error and returned -1. Nothing was sent." << NORMAL << std::endl;
 	if (error_code == ERROR_SELECT)
 		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "had an error and returned -1. No client was selected." << NORMAL << std::endl;
-	
+	*/
+	if (error_code == TIMEOUT)
+		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
 }
 
 /*void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> _clients_list )

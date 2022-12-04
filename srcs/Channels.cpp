@@ -6,13 +6,6 @@ Channels::Channels( void )
 	return ;
 }
 
-
-Channels::Channels( void )
-{
-	std::cout << GREEN << "Channels Constructor called." << NORMAL << std::endl;
-	return ;
-}
-
 Channels::Channels( const Channels & copy )
 {
 	std::cout << "\033[0;33mChannels Copy Constructor called." << NORMAL << std::endl;

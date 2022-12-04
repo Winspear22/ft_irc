@@ -168,7 +168,7 @@ int			MyServer::SelectClients( void )
 	if (ret_select == ERROR_SERVER)
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
-		errors_handlers_msg(TIMEOUT);
+		loop_errors_handlers_msg(TIMEOUT);
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
 		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
@@ -209,7 +209,7 @@ void			MyServer::CreateClients( void )
 
 
 
-std::vector<std::string> SplitByEndline(char *str, char *delim)
+std::vector<std::string> SplitByEndline(char *str, const char *delim)
 {
 	char 	*tmp;
 	std::vector<std::string> splitted_str;
