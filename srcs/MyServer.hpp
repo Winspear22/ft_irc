@@ -38,6 +38,8 @@ public:
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
+	std::vector<std::string> GetCmdList( void );
+
 	std::map<Clients*, int> _clients_list;
 
 
@@ -54,6 +56,9 @@ private:
 	/*TEST*/
 	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
 	int				_nb_of_clients;
+	/*pour avoir la liste des commandes complete*/
+	std::vector<std::string> _cmd_list;
+	std::vector<std::string>::iterator _it;
 };
 
 

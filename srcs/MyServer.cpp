@@ -10,6 +10,17 @@ MyServer::MyServer( void )
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
+	int i;
+	std::string cmd_list_string[78] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
+	"LUSERS", "MODE", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
+	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
+	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
+	"USERIP", "USERS", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS" };
+
+	i = -1;
+	while (++i < 78)
+		this->_cmd_list.push_back(cmd_list_string[i]);
 	return ;
 }
 
@@ -215,7 +226,6 @@ std::vector<std::string> SplitByEndline(char *str, const char *delim)
 
 	if (str == NULL)
 		return (splitted_str);
-
 	tmp = strtok(str, delim);
 	while (tmp)
 	{
@@ -228,14 +238,19 @@ std::vector<std::string> SplitByEndline(char *str, const char *delim)
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
 	
-	char								recv_buffer[999999 + 1];
+	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
 	char								*msg_buffer;
 	int									ret_rcv;
 	std::vector<std::string>			splitted_msg;
 	std::vector<std::string>::iterator 	it;
+	
+	std::vector<std::string>			tab_parse;
+	std::vector<std::string>::iterator 	str;
+	char								*tmp;
 
-	memset(recv_buffer, 0, 999999 + 1);
-	ret_rcv = recv(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
+
+	memset(recv_buffer, 0, 512 + 1);
+	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
@@ -246,7 +261,37 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	while (it != splitted_msg.end())
 	{
 		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() << std::endl;
+		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
+		/*PARSING DU MESSAGE*/
+		tmp = strdup(it->c_str());
+		tab_parse = SplitByEndline(tmp, " ");
+		free(tmp);
+		str = tab_parse.begin();
+		/*PENSER AU CAS DES EMPTY MESSAGES QUI DOIVENT ETRE IGNORES --> 2.3.1*/
+		/*TRIE DES PREFIX QUI COMENCENT TPUJOURS PAR ':'*/
+		if (str->at(0) == ':')
+		{
+			new_msg.SetPrefix(*str);
+			std::cout << GREEN << "Coucou" << NORMAL << std::endl;
+			str++;
+		}
+		/*TRIE DES COMMANDES ISSUES DE LA LISTE*/
+		if (new_msg.CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+		{
+			std::cout << RED "JE SUIS LA" << NORMAL << std::endl;
+			new_msg.SetCmd(*str);
+			std::cout << new_msg.GetCmd() << std::endl;
+			str++;
+		}
+		else
+		{
+			std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
+		//	break ;
+		}
+		/*TRIE DES PARAMS*/
+		if (str != tab_parse.end())
+			new_msg.SetParams(*str);
+		std::cout << PURPLE << "The prefix is = " << WHITE << new_msg.GetPrefix() << PURPLE << " the cmd is = " << WHITE << new_msg.GetCmd() << PURPLE << "the params are = " << WHITE << new_msg.GetParams() << NORMAL << std::endl;
 		//send(ClientsFd, recv_buffer, 999999, MSG_DONTWAIT);
 		it++;
 	}
@@ -279,4 +324,9 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 		it++;
 	}
 	return (NULL);
+}
+
+std::vector<std::string> MyServer::GetCmdList( void )
+{
+	return (this->_cmd_list);
 }
