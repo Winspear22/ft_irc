@@ -293,8 +293,10 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		if (it->at(0) == 'N' && it->at(1) == 'I' && it->at(2) == 'C' && it->at(3) == 'K')
 			new_msg.NickCmd();
 		if (it->at(0) == 'U' && it->at(1) == 'S' && it->at(2) == 'E' && it->at(3) == 'R')
+		{
 			new_msg.UserCmd();
-		new_msg.ValidateClientsConnections();
+			new_msg.ValidateClientsConnections();
+		}
 		it++;
 	}
 	free(msg_buffer);
