@@ -203,21 +203,16 @@ int		MyMsg::ValidateClientsConnections( void )
 	std::string RPL_YOURHOST;
 	std::string RPL_CREATED;
 	std::string RPL_MYINFO;
-	std::string endline;
-	//time_t timer;
-
-	endline = "\r\n";
-	RPL_WELCOME = "001";
-	RPL_WELCOME += " " + this->_SentFrom->GetClientsNickname() + " \033[1;33mWelcome to the Internet Relay Network \033[1;37m" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname();
+	time_t 		tmp;
+	
+	tmp = time(NULL);
+	RPL_WELCOME = "001 " + this->_SentFrom->GetClientsNickname() + " \033[1;33mWelcome to the Internet Relay Network \033[1;37m" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname();
+	RPL_YOURHOST = "002 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m Your host is \033[1;31m" + "MyServerName" + "\033[1;33m, running version \033[1;31m" + "0.2";
+	RPL_CREATED = "003 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m This server was created \033[1;37m" + std::string(ctime(&tmp)); //"dimanche 21 mai (UTC+0200) at 2017, 09:08:01";
+	RPL_MYINFO = "004 " + this->_SentFrom->GetClientsNickname() + " " + "MyServerName" + " " + "0.2AAAAAAAAAAAAAAAAAAAAA";
 	SendMsgBackToClients(*this, RPL_WELCOME);
-	RPL_YOURHOST = "002";
-	RPL_YOURHOST += " " + this->_SentFrom->GetClientsNickname() + "\033[1;33m Your host is \033[1;31m" + "MyServerName" + "\033[1;33m, running version \033[1;31m" + "0.2";
 	SendMsgBackToClients(*this, RPL_YOURHOST);
-	RPL_CREATED = "003";
-	RPL_CREATED += " " + this->_SentFrom->GetClientsNickname() + "\033[1;33m This server was created \033[1;37m" + "dimanche 21 mai (UTC+0200) at 2017, 09:08:01";
 	SendMsgBackToClients(*this, RPL_CREATED);
-	RPL_MYINFO = "004";
-	RPL_MYINFO += " " + this->_SentFrom->GetClientsNickname() + " " + "MyServerName" + " " + "0.2AAAAAAAAAAAAAAAAAAAAA";
 	SendMsgBackToClients(*this, RPL_MYINFO);
 	SendMsgBackToClients(*this, "\r\n");
 	this->_SentFrom->SetClientsConnectionPermission(YES);
