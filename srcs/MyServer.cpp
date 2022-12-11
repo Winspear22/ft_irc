@@ -247,6 +247,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	
 	std::vector<std::string>			tab_parse;
 	std::vector<std::string>::iterator 	str;
+	std::string 						cmd;
 	char								*tmp;
 
 
@@ -275,8 +276,8 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		}
 		if (new_msg.CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
 		{
+			cmd = *str;
 			new_msg.SetCmd(*str);
-			std::cout << new_msg.GetCmd() << std::endl;
 			str++;
 		}
 		else
@@ -286,11 +287,11 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			new_msg.SetParams(*str);
 			str++;
 		}
-		if (it->at(0) == 'P' && it->at(1) == 'A' && it->at(2) == 'S' && it->at(3) == 'S')
+		if (cmd == "PASS")
 			new_msg.PassCmd();
-		if (it->at(0) == 'N' && it->at(1) == 'I' && it->at(2) == 'C' && it->at(3) == 'K')
+		if (cmd == "NICK")
 			new_msg.NickCmd();
-		if (it->at(0) == 'U' && it->at(1) == 'S' && it->at(2) == 'E' && it->at(3) == 'R')
+		if (cmd == "USER")
 		{
 			new_msg.UserCmd();
 			new_msg.ValidateClientsConnections();

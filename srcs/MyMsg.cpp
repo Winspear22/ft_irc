@@ -143,14 +143,11 @@ int		MyMsg::PassCmd( void )
 }
 
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
-
 int	MyMsg::NickCmd( void )
 {
 	std::string msg;
 
 	this->_SentFrom->SetClientsNickname(this->_Params.front());
-	//std::cout << RED << "PARAMS = " << this->_Params << NORMAL << std::endl;
-
 	if (this->_Params.size() >= 1)
 	{
 		msg = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
@@ -191,11 +188,7 @@ int	MyMsg::UserCmd( void )
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
-/*	std::cout << RED << "Usernane = " << WHITE << this->_SentFrom->GetClientsUsername() << NORMAL << std::endl;
-	std::cout << RED << "Hostname = " << WHITE << this->_SentFrom->GetClientsHostname() << NORMAL << std::endl;
-	std::cout << RED << "Realname = " << WHITE << this->_SentFrom->GetClientsRealname() << NORMAL << std::endl;
-	std::cout << RED << "Nickname = " << WHITE << this->_SentFrom->GetClientsNickname() << NORMAL << std::endl;
-*/	return (SUCCESS);
+	return (SUCCESS);
 }
 
 int		MyMsg::ValidateClientsConnections( void )
