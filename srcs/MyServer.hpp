@@ -6,6 +6,7 @@
 # include "MyMsg.hpp"
 
 class Clients;
+class MyMsg;
 
 class MyServer
 {
@@ -34,6 +35,11 @@ public:
 	int			SelectClients( void );
 	void		CreateClients( void );
 	void		RecvClientsMsg( int ClientsFd );
+	int			ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
+	int			ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
+	int			ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
+	int			ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
+
 
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
@@ -61,5 +67,6 @@ private:
 	std::vector<std::string>::iterator _it;
 };
 
-
+void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
+/*En dehors du scope de la classe car je l'utilise dans une autre classe et dans laquelle il n'y a pas l'instance IRC_Server*/
 # endif

@@ -12,6 +12,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_ClientFd = ClientFd;
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
+	this->_HasTheClientsBeenAccepted = NO;
 	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
@@ -52,14 +53,40 @@ std::string Clients::GetClientsUsername( void )
 	return (this->_Username);
 }
 
+void		Clients::SetClientsUsername( std::string username )
+{
+	this->_Username = username;
+}
+
+std::string	Clients::GetClientsHostname( void )
+{
+	return (this->_Hostname);
+}
+
+void		Clients::SetClientsHostname( std::string hostname )
+{
+	this->_Hostname = hostname;
+}
+
 std::string Clients::GetClientsRealname( void )
 {
 	return (this->_Realname);
 }
 
+void		Clients::SetClientsRealname( std::string Realname )
+{
+	this->_Realname = Realname;
+}
+
+
 std::string Clients::GetClientsNickname( void )
 {
 	return (this->_Nickname);
+}
+
+void		Clients::SetClientsNickname( std::string Nickname )
+{
+	this->_Nickname = Nickname;
 }
 
 std::string Clients::GetClientsMessage( void )
@@ -70,4 +97,14 @@ std::string Clients::GetClientsMessage( void )
 void		Clients::SetClientsMessage( std::string msg_recv )
 {
 	this->_ClientMessage = msg_recv;
+}
+
+int			Clients::GetClientsConnectionPermission( void )
+{
+	return (this->_HasTheClientsBeenAccepted);
+}
+
+void		Clients::SetClientsConnectionPermission( int PermissionStatus )
+{
+	this->_HasTheClientsBeenAccepted = PermissionStatus;
 }

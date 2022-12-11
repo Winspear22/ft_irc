@@ -50,6 +50,8 @@
 # define SUCCESS 0
 # define EXIT_SUCCESS 0
 # define EXIT_FAILIURE -1
+# define NO 1
+# define YES 0
 
 /*                                             ERRORS CODES                                                      */
 
@@ -67,6 +69,7 @@
 # define ERROR_SELECT 10
 # define ERROR_NEW 11
 # define TIMEOUT 0
+
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
 # define SERVER_OFF 1
