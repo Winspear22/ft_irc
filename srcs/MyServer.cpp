@@ -271,12 +271,10 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		if (str->at(0) == ':')
 		{
 			new_msg.SetPrefix(*str);
-			std::cout << GREEN << "Coucou" << NORMAL << std::endl;
 			str++;
 		}
 		if (new_msg.CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
 		{
-			std::cout << RED "JE SUIS LA" << NORMAL << std::endl;
 			new_msg.SetCmd(*str);
 			std::cout << new_msg.GetCmd() << std::endl;
 			str++;
@@ -301,8 +299,6 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	}
 	free(msg_buffer);
 }
-
-
 
 int		MyServer::ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg, std::vector<std::string> msg_split_by_space )
 {

@@ -38,6 +38,9 @@
 /*list*/
 # include <list>
 
+/*time ctime*/
+#include <ctime>
+
 # include "MyServer.hpp"
 # include "Clients.hpp"
 /*===============================================================================================================*/

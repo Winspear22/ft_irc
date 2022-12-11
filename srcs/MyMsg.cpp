@@ -120,14 +120,24 @@ int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
 int		MyMsg::PassCmd( void )
 {
-	std::string str;
-	//std::cout << RED << "PARAMS = " << this->_Params << NORMAL << std::endl;
-	
-	if (this->_Params.size() >= 1)
+	std::string msg;
+	if (this->_Params.size() < 1)
 	{
-		str = "\033[1;31mERR_NEEDMOREPARAMS \033[1;37mPASS :Not enough parameters\n\033[0m";
-		//send(this->_SentFrom->GetClientsFd(), str.c_str(), strlen(str.c_str()), MSG_DONTWAIT);
-		SendMsgBackToClients(*this, str);
+		msg = "\033[1;31mERR_NEEDMOREPARAMS \033[1;37mPASS :Not enough parameters\n\033[0m";
+		SendMsgBackToClients(*this, msg);
+	}
+	if (this->_Params.front() != "111")
+	{
+		msg = "\033[1;31mERR_PASSWDMISMATCH \033[1;37mPASS :Password incorrect\n\033[0m";
+		SendMsgBackToClients(*this, msg);
+	}	
+	if (this->_Params.size() == 1)
+	{
+		if (this->_SentFrom->GetClientsConnectionPermission() == YES)
+		{
+			msg = "\033[1;31mERR_ALREADYREGISTERED \033[1;37mPASS :You may not reregister\n\033[0m";
+			SendMsgBackToClients(*this, msg);
+		}
 	}
 	return (SUCCESS);
 }
@@ -136,15 +146,15 @@ int		MyMsg::PassCmd( void )
 
 int	MyMsg::NickCmd( void )
 {
-	std::string str;
+	std::string msg;
 
 	this->_SentFrom->SetClientsNickname(this->_Params.front());
 	//std::cout << RED << "PARAMS = " << this->_Params << NORMAL << std::endl;
 
 	if (this->_Params.size() >= 1)
 	{
-		str = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
-		SendMsgBackToClients(*this, str);
+		msg = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
+		SendMsgBackToClients(*this, msg);
 	}
 	return (SUCCESS);
 }
@@ -160,15 +170,8 @@ int	MyMsg::UserCmd( void )
 	std::string hostname;
 	std::string realname;
 	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator test;
 
 	it = this->_Params.begin();
-	test = this->_Params.begin();
-	while (test != this->_Params.end())
-	{
-		std::cout << CYAN << "test == " << WHITE << *test << NORMAL << std::endl;
-		test++;
-	}
 	username = *it;
 	this->_SentFrom->SetClientsUsername(username);
 	it++;
@@ -188,14 +191,12 @@ int	MyMsg::UserCmd( void )
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
-	std::cout << RED << "Usernane = " << WHITE << this->_SentFrom->GetClientsUsername() << NORMAL << std::endl;
+/*	std::cout << RED << "Usernane = " << WHITE << this->_SentFrom->GetClientsUsername() << NORMAL << std::endl;
 	std::cout << RED << "Hostname = " << WHITE << this->_SentFrom->GetClientsHostname() << NORMAL << std::endl;
 	std::cout << RED << "Realname = " << WHITE << this->_SentFrom->GetClientsRealname() << NORMAL << std::endl;
 	std::cout << RED << "Nickname = " << WHITE << this->_SentFrom->GetClientsNickname() << NORMAL << std::endl;
-	return (SUCCESS);
+*/	return (SUCCESS);
 }
-
-#include <ctime>
 
 int		MyMsg::ValidateClientsConnections( void )
 {
