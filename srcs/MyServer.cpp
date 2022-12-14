@@ -6,7 +6,6 @@ MyServer::MyServer( void )
 	return ;
 }
 
-
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
@@ -99,7 +98,6 @@ void		MyServer::InitVariables( void )
 	this->_right_password_used = FAILURE;
 }
 
-
 int			MyServer::CreateSocketFd( void )
 {
 	this->_socketfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -118,7 +116,6 @@ int			MyServer::SetSocketOptions( void )
 		return (ERROR_SOCKET_OPTIONS);
 	return (SUCCESS);
 }
-
 
 int			MyServer::BindSocketFd( void )
 {
@@ -182,22 +179,17 @@ int			MyServer::SelectClients( void )
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
+	this->CreateClients();
+	FD_SET(this->_new_fd_nb, &ready_fds);
+	if (this->_new_fd_nb > maximum_fds)
+        maximum_fds = this->_new_fd_nb;
+	std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
-		{
-			this->CreateClients();
-			FD_SET(this->_new_fd_nb, &ready_fds);
-			if (this->_new_fd_nb > maximum_fds)
-                     maximum_fds = this->_new_fd_nb;
-			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
-		}
-		else
-			RecvClientsMsg(this->_new_fd_nb);
+		RecvClientsMsg(this->_new_fd_nb);
 	}
 	return (SUCCESS);
 }
-
 
 void			MyServer::CreateClients( void )
 {
@@ -205,7 +197,7 @@ void			MyServer::CreateClients( void )
 	Clients			*client_created;
 	struct sockaddr	client_addr;
 	socklen_t		sizeofsockaddr;
-	
+
 	sizeofsockaddr = sizeof(client_addr);
 	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
 	if (client_created_fd == ERROR_SERVER)
@@ -238,33 +230,30 @@ std::vector<std::string> SplitByEndline(char *str, const char *delim)
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
-	
 	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
 	char								*msg_buffer;
 	int									ret_rcv;
 	std::vector<std::string>			splitted_msg;
 	std::vector<std::string>::iterator 	it;
-	
+
 	std::vector<std::string>			tab_parse;
 	std::vector<std::string>::iterator 	str;
 	std::string 						cmd;
 	char								*tmp;
-
 
 	memset(recv_buffer, 0, 512 + 1);
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
-
 	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
 	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
 	while (it != splitted_msg.end())
 	{
 		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
-		/*PARSING DU MESSAGE*/
+		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
+		/* PARSING DU MESSAGE */
 		tmp = strdup(it->c_str());
 		tab_parse = SplitByEndline(tmp, " ");
 		free(tmp);
@@ -315,7 +304,6 @@ int		MyServer::ParsingOfClientsCmds( std::vector<std::string>::iterator msg_spli
 	return (SUCCESS);
 }
 
-
 int		MyServer::ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg )
 {
 	if (msg_split_by_space_it->at(0) == ':')
@@ -349,7 +337,6 @@ int		MyServer::ParsingOfParams( std::vector<std::string>::iterator msg_split_by_
 	(void)msg_split_by_space;
 	return (SUCCESS);
 }
-
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 {

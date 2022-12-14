@@ -40,7 +40,6 @@ public:
 	int			ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
 	int			ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
 
-
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
