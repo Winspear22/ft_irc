@@ -250,19 +250,23 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	std::string 						cmd;
 	char								*tmp;
 
-
 	memset(recv_buffer, 0, 512 + 1);
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
-
 	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
 	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
+
+
+	std::vector<std::string>::iterator popo;
+
 	while (it != splitted_msg.end())
 	{
-		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
+		MyMsg *new_msg;
+		
+		new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 		/*PARSING DU MESSAGE*/
 		tmp = strdup(it->c_str());
@@ -271,83 +275,74 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		str = tab_parse.begin();
 		if (str->at(0) == ':')
 		{
-			new_msg.SetPrefix(*str);
+			//new_msg->SetPrefix(*str);
+			new_msg->Prefix = *str;
 			str++;
 		}
-		if (new_msg.CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+		if (new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
 		{
 			cmd = *str;
-			new_msg.SetCmd(*str);
+			new_msg->Command = *str;
+			//new_msg->SetCmd(*str);
 			str++;
+			new_msg->SetCmdExistence(CMD_EXISTS);
 		}
 		else
+		{
 			std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
+			new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
+		}
 		while (str != tab_parse.end())
 		{
-			new_msg.SetParams(*str);
+			//new_msg->SetParams(*str);
+			new_msg->Params.push_back(*str);
 			str++;
 		}
-		if (cmd == "PASS")
-			new_msg.PassCmd();
-		if (cmd == "NICK")
-			new_msg.NickCmd();
-		if (cmd == "USER")
+		popo = new_msg->Params.begin();
+		while (popo != new_msg->Params.end())
 		{
-			new_msg.UserCmd();
-			new_msg.ValidateClientsConnections();
+			std::cout << GREEN << "popo = "<< *popo << NORMAL << std::endl;
+			popo++;
 		}
+		if (new_msg->GetCmdExistence() == CMD_EXISTS)
+		{
+			this->_it_cmd = this->_cmd_list.begin();
+			while (this->_it_cmd != this->_cmd_list.end())
+			{
+				if (*this->_it_cmd == cmd)
+					this->ExecuteCommand(*this->_it_cmd, new_msg);
+				this->_it_cmd++;
+			}
+		}
+		delete new_msg;
 		it++;
+
 	}
 	free(msg_buffer);
 }
 
-int		MyServer::ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg, std::vector<std::string> msg_split_by_space )
+void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg )
 {
-	if (this->ParsingOfPrefix( msg_split_by_space_it, msg ) == FAILURE)
-		return (FAILURE);
-	if (this->ParsingOfCmd( msg_split_by_space_it, msg ) == FAILURE)
-		return (FAILURE);
-	if (this->ParsingOfParams( msg_split_by_space_it, msg, msg_split_by_space ) == FAILURE)
-		return (FAILURE);
-	(void)msg_split_by_space_it;
+	std::vector<std::string>::iterator popo;
+	popo = msg->Params.begin();
+	while (popo != msg->Params.end())
+	{
+		std::cout << YELLOW << "popo = "<< *popo << NORMAL << std::endl;
+		popo++;
+	}
+	if (cmd == "PASS")
+		msg->PassCmd();
+	else if (cmd == "NICK")
+		msg->NickCmd();
+	else if (cmd == "USER")
+		msg->UserCmd();
+	else if (cmd == "MODE")
+		msg->ModeCmd();
+	else if (cmd == "PING")
+		msg->PingCmd();
+	(void)cmd;
 	(void)msg;
-	(void)msg_split_by_space;
-	return (SUCCESS);
-}
 
-
-int		MyServer::ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg )
-{
-	if (msg_split_by_space_it->at(0) == ':')
-	{
-		msg.SetPrefix(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	return (SUCCESS);
-}
-
-int		MyServer::ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg )
-{
-	if (msg.CheckFormatCmd(*msg_split_by_space_it, this->_cmd_list) == SUCCESS)
-	{
-		msg.SetCmd(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	return (SUCCESS);
-}
-
-int		MyServer::ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg, std::vector<std::string> msg_split_by_space )
-{
-	while (msg_split_by_space_it != msg_split_by_space.end())
-	{
-		std::cout << BLUE << "msg_split == " << *msg_split_by_space_it << NORMAL << std::endl;
-		msg.SetParams(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	(void)msg_split_by_space_it;
-	(void)msg;
-	(void)msg_split_by_space;
-	return (SUCCESS);
 }
 
 

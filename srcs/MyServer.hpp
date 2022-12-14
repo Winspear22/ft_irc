@@ -35,11 +35,7 @@ public:
 	int			SelectClients( void );
 	void		CreateClients( void );
 	void		RecvClientsMsg( int ClientsFd );
-	int			ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
-	int			ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
-	int			ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
-	int			ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
-
+	void		ExecuteCommand( std::string cmd, MyMsg *msg );
 
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
@@ -64,7 +60,7 @@ private:
 	int				_nb_of_clients;
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
-	std::vector<std::string>::iterator _it;
+	std::vector<std::string>::iterator _it_cmd;
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );

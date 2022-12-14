@@ -85,6 +85,16 @@ void MyMsg::SetCmd( std::string Cmd )
 	this->_Command = toupper_striing( Cmd );
 }
 
+int	MyMsg::GetCmdExistence( void )
+{
+	return (this->_DoesCmdExist);
+}
+
+void	MyMsg::SetCmdExistence( int CmdStatus )
+{
+	this->_DoesCmdExist = CmdStatus;
+}
+
 void MyMsg::SetParams( std::string Params )
 {
 	this->_Params.push_back(Params);
@@ -92,18 +102,6 @@ void MyMsg::SetParams( std::string Params )
 
 int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list )
 {
-	/*int i;
-
-	i = 0;
-	if (cmd.size() != 3)
-		return (FAILURE);
-	if (!isalpha(cmd[0]))
-		return (FAILURE);
-	while (cmd[++i])
-	{
-		if (!isdigit(cmd[i]))
-			return (FAILURE);
-	}*/
 	std::vector<std::string>::iterator it;
 	
 	it = cmd_list.begin();
@@ -113,25 +111,32 @@ int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list 
 			return (SUCCESS);
 		it++;
 	}
-	
-	return (FAILURE);
+	return (SUCCESS);
 }
 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
 int		MyMsg::PassCmd( void )
 {
 	std::string msg;
-	if (this->_Params.size() < 1)
+	std::vector<std::string>::iterator popo;
+	popo = this->Params.begin();
+	while (popo != this->Params.end())
+	{
+		std::cout << CYAN << "popo = "<< *popo << NORMAL << std::endl;
+		popo++;
+	}
+	popo = this->Params.begin();
+	if (popo->size() < 1)
 	{
 		msg = "\033[1;31mERR_NEEDMOREPARAMS \033[1;37mPASS :Not enough parameters\n\033[0m";
 		SendMsgBackToClients(*this, msg);
 	}
-	if (this->_Params.front() != "111")
+	else if (*popo != "111")
 	{
 		msg = "\033[1;31mERR_PASSWDMISMATCH \033[1;37mPASS :Password incorrect\n\033[0m";
 		SendMsgBackToClients(*this, msg);
 	}	
-	if (this->_Params.size() == 1)
+	else if (popo->size() >= 1)
 	{
 		if (this->_SentFrom->GetClientsConnectionPermission() == YES)
 		{
@@ -146,11 +151,12 @@ int		MyMsg::PassCmd( void )
 int	MyMsg::NickCmd( void )
 {
 	std::string msg;
-
-	this->_SentFrom->SetClientsNickname(this->_Params.front());
+	std::vector<std::string>::iterator popo;
+	popo = this->Params.begin();
 	if (this->_Params.size() >= 1)
 	{
 		msg = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
+		this->_SentFrom->SetClientsNickname(*popo);
 		SendMsgBackToClients(*this, msg);
 	}
 	return (SUCCESS);
@@ -168,6 +174,15 @@ int	MyMsg::UserCmd( void )
 	std::string realname;
 	std::vector<std::string>::iterator it;
 
+	it = this->_Params.begin();
+	//std::cout << CYAN << *it << NORMAL << std::endl;
+	std::cout << PURPLE << "lolo" << NORMAL << std::endl;
+	while (it != this->_Params.end())
+	{
+		std::cout << CYAN << *it << std::endl;
+		std::cout << PURPLE << "lolo" << NORMAL << std::endl;
+		it++;
+	}
 	it = this->_Params.begin();
 	username = *it;
 	this->_SentFrom->SetClientsUsername(username);
@@ -188,6 +203,24 @@ int	MyMsg::UserCmd( void )
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
+	return (SUCCESS);
+}
+
+int			MyMsg::ModeCmd( void )
+{
+	std::string msg_sent;
+
+	msg_sent = "MODE";
+	SendMsgBackToClients(*this, msg_sent);
+	return (SUCCESS);
+}
+
+int			MyMsg::PingCmd( void )
+{
+	std::string msg_sent;
+
+	msg_sent = "PONG";
+	SendMsgBackToClients(*this, msg_sent);
 	return (SUCCESS);
 }
 

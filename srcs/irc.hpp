@@ -72,6 +72,8 @@
 # define ERROR_SELECT 10
 # define ERROR_NEW 11
 # define TIMEOUT 0
+# define CMD_EXISTS 0
+# define CMD_DOESNT_EXIST 1
 
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
