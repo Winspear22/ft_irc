@@ -1,6 +1,7 @@
 # include "MyMsg.hpp"
 # include <sys/socket.h>
 # include <sys/types.h>
+# include "num_replies.cpp"
 
 MyMsg::MyMsg( void )
 {
@@ -144,15 +145,10 @@ int		MyMsg::PassCmd( void )
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
 int	MyMsg::NickCmd( void )
 {
-	std::string msg;
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
 	if (this->Params.size() >= 1)
-	{
-		msg = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
 		this->_SentFrom->SetClientsNickname(*it);
-		SendMsgBackToClients(*this, msg);
-	}
 	return (SUCCESS);
 }
 
@@ -188,7 +184,6 @@ int	MyMsg::UserCmd( void )
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
-	this->ValidateClientsConnections();
 	return (SUCCESS);
 }
 
@@ -212,22 +207,17 @@ int			MyMsg::PingCmd( void )
 
 int		MyMsg::ValidateClientsConnections( void )
 {
-	std::string RPL_WELCOME;
-	std::string RPL_YOURHOST;
-	std::string RPL_CREATED;
-	std::string RPL_MYINFO;
-	time_t 		tmp;
-	
-	tmp = time(NULL);
-	RPL_WELCOME = "001 " + this->_SentFrom->GetClientsNickname() + " \033[1;33mWelcome to the Internet Relay Network \033[1;37m" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname();
-	RPL_YOURHOST = "002 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m Your host is \033[1;31m" + "MyServerName" + "\033[1;33m, running version \033[1;31m" + "0.2";
-	RPL_CREATED = "003 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m This server was created \033[1;37m" + std::string(ctime(&tmp));
-	RPL_MYINFO = "004 " + this->_SentFrom->GetClientsNickname() + " " + "MyServerName" + " " + "0.2";
-	SendMsgBackToClients(*this, RPL_WELCOME);
-	SendMsgBackToClients(*this, RPL_YOURHOST);
-	SendMsgBackToClients(*this, RPL_CREATED);
-	SendMsgBackToClients(*this, RPL_MYINFO);
+	std::string intro_new_nick;
+
+
+	SendMsgBackToClients(*this, ::RPL_WELCOME(*this));
+	SendMsgBackToClients(*this, ::RPL_YOURHOST(*this));
+	SendMsgBackToClients(*this, ::RPL_CREATED(*this));
+	SendMsgBackToClients(*this, ::RPL_MYINFO(*this));
 	SendMsgBackToClients(*this, "\r\n");
 	this->_SentFrom->SetClientsConnectionPermission(YES);
+
+	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
+	SendMsgBackToClients(*this, intro_new_nick);
 	return (SUCCESS);
 }

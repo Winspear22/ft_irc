@@ -182,18 +182,14 @@ int			MyServer::SelectClients( void )
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
+	this->CreateClients();
+	FD_SET(this->_new_fd_nb, &ready_fds);
+	if (this->_new_fd_nb > maximum_fds)
+        maximum_fds = this->_new_fd_nb;
+	std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
-		{
-			this->CreateClients();
-			FD_SET(this->_new_fd_nb, &ready_fds);
-			if (this->_new_fd_nb > maximum_fds)
-                     maximum_fds = this->_new_fd_nb;
-			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
-		}
-		else
-			RecvClientsMsg(this->_new_fd_nb);
+		RecvClientsMsg(this->_new_fd_nb);
 	}
 	return (SUCCESS);
 }
@@ -313,7 +309,10 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg )
 	else if (cmd == "NICK")
 		msg->NickCmd();
 	else if (cmd == "USER")
+	{
 		msg->UserCmd();
+		msg->ValidateClientsConnections();
+	}
 	else if (cmd == "MODE")
 		msg->ModeCmd();
 	else if (cmd == "PING")
