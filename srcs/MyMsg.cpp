@@ -66,7 +66,7 @@ Clients	*MyMsg::GetClients( void )
 
 void MyMsg::SetPrefix( std::string Prefix)
 {
-	this->_Prefix = Prefix;
+	this->Prefix = Prefix;
 }
 
 std::string toupper_striing( std::string cmd )
@@ -82,7 +82,7 @@ std::string toupper_striing( std::string cmd )
 
 void MyMsg::SetCmd( std::string Cmd )
 {
-	this->_Command = toupper_striing( Cmd );
+	this->Command = toupper_striing( Cmd );
 }
 
 int	MyMsg::GetCmdExistence( void )
@@ -97,7 +97,7 @@ void	MyMsg::SetCmdExistence( int CmdStatus )
 
 void MyMsg::SetParams( std::string Params )
 {
-	this->_Params.push_back(Params);
+	this->Params.push_back(Params);
 }
 
 int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list )
@@ -118,25 +118,19 @@ int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list 
 int		MyMsg::PassCmd( void )
 {
 	std::string msg;
-	std::vector<std::string>::iterator popo;
-	popo = this->Params.begin();
-	while (popo != this->Params.end())
-	{
-		std::cout << CYAN << "popo = "<< *popo << NORMAL << std::endl;
-		popo++;
-	}
-	popo = this->Params.begin();
-	if (popo->size() < 1)
+	std::vector<std::string>::iterator it;
+	it = this->Params.begin();
+	if (it->size() < 1)
 	{
 		msg = "\033[1;31mERR_NEEDMOREPARAMS \033[1;37mPASS :Not enough parameters\n\033[0m";
 		SendMsgBackToClients(*this, msg);
 	}
-	else if (*popo != "111")
+	else if (*it != "111")
 	{
 		msg = "\033[1;31mERR_PASSWDMISMATCH \033[1;37mPASS :Password incorrect\n\033[0m";
 		SendMsgBackToClients(*this, msg);
 	}	
-	else if (popo->size() >= 1)
+	else if (it->size() >= 1)
 	{
 		if (this->_SentFrom->GetClientsConnectionPermission() == YES)
 		{
@@ -151,12 +145,12 @@ int		MyMsg::PassCmd( void )
 int	MyMsg::NickCmd( void )
 {
 	std::string msg;
-	std::vector<std::string>::iterator popo;
-	popo = this->Params.begin();
-	if (this->_Params.size() >= 1)
+	std::vector<std::string>::iterator it;
+	it = this->Params.begin();
+	if (this->Params.size() >= 1)
 	{
 		msg = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
-		this->_SentFrom->SetClientsNickname(*popo);
+		this->_SentFrom->SetClientsNickname(*it);
 		SendMsgBackToClients(*this, msg);
 	}
 	return (SUCCESS);
@@ -174,16 +168,7 @@ int	MyMsg::UserCmd( void )
 	std::string realname;
 	std::vector<std::string>::iterator it;
 
-	it = this->_Params.begin();
-	//std::cout << CYAN << *it << NORMAL << std::endl;
-	std::cout << PURPLE << "lolo" << NORMAL << std::endl;
-	while (it != this->_Params.end())
-	{
-		std::cout << CYAN << *it << std::endl;
-		std::cout << PURPLE << "lolo" << NORMAL << std::endl;
-		it++;
-	}
-	it = this->_Params.begin();
+	it = this->Params.begin();
 	username = *it;
 	this->_SentFrom->SetClientsUsername(username);
 	it++;
@@ -194,15 +179,16 @@ int	MyMsg::UserCmd( void )
 	it++;
 	realname = *it;
 	it++;
-	if (it != this->_Params.end())
+	if (it != this->Params.end())
 	{
-		while (it != this->_Params.end())
+		while (it != this->Params.end())
 		{
 			realname += " " + *it;
 			it++;
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
+	this->ValidateClientsConnections();
 	return (SUCCESS);
 }
 
@@ -235,8 +221,8 @@ int		MyMsg::ValidateClientsConnections( void )
 	tmp = time(NULL);
 	RPL_WELCOME = "001 " + this->_SentFrom->GetClientsNickname() + " \033[1;33mWelcome to the Internet Relay Network \033[1;37m" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname();
 	RPL_YOURHOST = "002 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m Your host is \033[1;31m" + "MyServerName" + "\033[1;33m, running version \033[1;31m" + "0.2";
-	RPL_CREATED = "003 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m This server was created \033[1;37m" + std::string(ctime(&tmp)); //"dimanche 21 mai (UTC+0200) at 2017, 09:08:01";
-	RPL_MYINFO = "004 " + this->_SentFrom->GetClientsNickname() + " " + "MyServerName" + " " + "0.2AAAAAAAAAAAAAAAAAAAAA";
+	RPL_CREATED = "003 " + this->_SentFrom->GetClientsNickname() + "\033[1;33m This server was created \033[1;37m" + std::string(ctime(&tmp));
+	RPL_MYINFO = "004 " + this->_SentFrom->GetClientsNickname() + " " + "MyServerName" + " " + "0.2";
 	SendMsgBackToClients(*this, RPL_WELCOME);
 	SendMsgBackToClients(*this, RPL_YOURHOST);
 	SendMsgBackToClients(*this, RPL_CREATED);

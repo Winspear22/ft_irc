@@ -198,7 +198,6 @@ int			MyServer::SelectClients( void )
 	return (SUCCESS);
 }
 
-
 void			MyServer::CreateClients( void )
 {
 	int				client_created_fd;
@@ -259,14 +258,9 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
 
-
-	std::vector<std::string>::iterator popo;
-
 	while (it != splitted_msg.end())
-	{
-		MyMsg *new_msg;
-		
-		new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
+	{		
+		this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 		/*PARSING DU MESSAGE*/
 		tmp = strdup(it->c_str());
@@ -275,61 +269,45 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		str = tab_parse.begin();
 		if (str->at(0) == ':')
 		{
-			//new_msg->SetPrefix(*str);
-			new_msg->Prefix = *str;
+			this->new_msg->SetPrefix(*str);
+			//this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
 			str++;
 		}
-		if (new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+		if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
 		{
-			cmd = *str;
-			new_msg->Command = *str;
-			//new_msg->SetCmd(*str);
+			this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
 			str++;
-			new_msg->SetCmdExistence(CMD_EXISTS);
+			this->new_msg->SetCmdExistence(CMD_EXISTS);
 		}
 		else
 		{
 			std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
-			new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
+			this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
 		}
 		while (str != tab_parse.end())
 		{
-			//new_msg->SetParams(*str);
-			new_msg->Params.push_back(*str);
+			this->new_msg->SetParams(*str);
+			//this->new_msg->Params.push_back(*str);
 			str++;
 		}
-		popo = new_msg->Params.begin();
-		while (popo != new_msg->Params.end())
-		{
-			std::cout << GREEN << "popo = "<< *popo << NORMAL << std::endl;
-			popo++;
-		}
-		if (new_msg->GetCmdExistence() == CMD_EXISTS)
+		if (this->new_msg->GetCmdExistence() == CMD_EXISTS)
 		{
 			this->_it_cmd = this->_cmd_list.begin();
 			while (this->_it_cmd != this->_cmd_list.end())
 			{
-				if (*this->_it_cmd == cmd)
-					this->ExecuteCommand(*this->_it_cmd, new_msg);
+				if (*this->_it_cmd == this->new_msg->Command)
+					this->ExecuteCommand(*this->_it_cmd, this->new_msg);
 				this->_it_cmd++;
 			}
 		}
-		delete new_msg;
+		delete this->new_msg;
 		it++;
-
 	}
 	free(msg_buffer);
 }
 
 void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg )
 {
-	std::vector<std::string>::iterator popo;
-	popo = msg->Params.begin();
-	while (popo != msg->Params.end())
-	{
-		std::cout << YELLOW << "popo = "<< *popo << NORMAL << std::endl;
-		popo++;
-	}
 	if (cmd == "PASS")
 		msg->PassCmd();
 	else if (cmd == "NICK")
@@ -340,9 +318,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg )
 		msg->ModeCmd();
 	else if (cmd == "PING")
 		msg->PingCmd();
-	(void)cmd;
-	(void)msg;
-
+	else if (cmd == "POPO")
+		std::cout << RED << "Mauvaise cmd" <<  NORMAL << std::endl;
 }
 
 
