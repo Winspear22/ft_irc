@@ -92,6 +92,11 @@ std::string     MyServer::GetPassword( void )
     return (this->_password);
 }
 
+int				MyServer::GetSocketFd( void )
+{
+	return (this->_socketfd);
+}
+
 void		MyServer::InitVariables( void )
 {
 	this->_new_fd_nb = 0;
@@ -149,12 +154,10 @@ int			MyServer::ListenToSockedFd( void )
 	return (SUCCESS);
 }
 
-int			MyServer::SetSocketFdToNonBlocking( void )
+int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 {
 	int ret;
-	/*COMPRENDRE LE FLAG F_SETFL*/
-	/*Si on retire cette partie, la connexion devient bloquante*/
-	ret = fcntl(this->_socketfd, F_SETFL, O_NONBLOCK);
+	ret = fcntl(SocketFd, F_SETFL, O_NONBLOCK);
 	if (ret == ERROR_SERVER)
 		return (ERROR_NONBLOCKING);
 	std::cout << GREEN << "fcntl(); works !" << std::endl;
@@ -163,7 +166,7 @@ int			MyServer::SetSocketFdToNonBlocking( void )
 
 int			MyServer::SelectClients( void )
 {
-	fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
+fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
 	fd_set	readfds; // mes sets de fds pouvant lire
 	int		maximum_fds; // mon nombre max de fds peut etre remplace par FD_ISSET
 	int		ret_select; //return de select pour les erreurs
@@ -182,14 +185,20 @@ int			MyServer::SelectClients( void )
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
-	this->CreateClients();
-	FD_SET(this->_new_fd_nb, &ready_fds);
-	if (this->_new_fd_nb > maximum_fds)
-        maximum_fds = this->_new_fd_nb;
-	std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		RecvClientsMsg(this->_new_fd_nb);
+		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
+		{
+			this->CreateClients();
+
+			FD_SET(this->_new_fd_nb, &ready_fds);
+			if (this->_new_fd_nb > maximum_fds)
+                     maximum_fds = this->_new_fd_nb;
+			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
+		}
+		else
+			RecvClientsMsg(this->_new_fd_nb);
+
 	}
 	return (SUCCESS);
 }
@@ -200,9 +209,13 @@ void			MyServer::CreateClients( void )
 	Clients			*client_created;
 	struct sockaddr	client_addr;
 	socklen_t		sizeofsockaddr;
+	int				ret_fcntl;
 	
 	sizeofsockaddr = sizeof(client_addr);
 	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
+	ret_fcntl = SetSocketFdToNonBlocking(client_created_fd);
+	if (ret_fcntl == ERROR_SERVER)
+		return (loop_errors_handlers_msg(ERROR_NONBLOCKING));
 	if (client_created_fd == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_ACCEPT));
 	else
@@ -233,7 +246,6 @@ std::vector<std::string> SplitByEndline(char *str, const char *delim)
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
-	
 	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
 	char								*msg_buffer;
 	int									ret_rcv;
@@ -253,20 +265,18 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
 	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
-
 	while (it != splitted_msg.end())
 	{		
 		this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
-		/*PARSING DU MESSAGE*/
 		tmp = strdup(it->c_str());
 		tab_parse = SplitByEndline(tmp, " ");
 		free(tmp);
 		str = tab_parse.begin();
 		if (str->at(0) == ':')
 		{
-			this->new_msg->SetPrefix(*str);
-			//this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
+			//this->new_msg->SetPrefix(*str);
+			this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
 			str++;
 		}
 		if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
@@ -292,7 +302,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			while (this->_it_cmd != this->_cmd_list.end())
 			{
 				if (*this->_it_cmd == this->new_msg->Command)
-					this->ExecuteCommand(*this->_it_cmd, this->new_msg);
+					this->CheckClientsAuthentification(*this->_it_cmd, this->new_msg);
 				this->_it_cmd++;
 			}
 		}
@@ -302,33 +312,41 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	free(msg_buffer);
 }
 
-void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg )
+void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
+{
+	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
+		this->ExecuteCommand(cmd, msg);
+}
+
+void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 {
 	if (cmd == "PASS")
-		msg->PassCmd();
+		msg->PassCmd(this);
 	else if (cmd == "NICK")
-		msg->NickCmd();
+		msg->NickCmd(this);
 	else if (cmd == "USER")
 	{
-		msg->UserCmd();
+		msg->UserCmd(this);
 		msg->ValidateClientsConnections();
 	}
 	else if (cmd == "MODE")
-		msg->ModeCmd();
+		msg->ModeCmd(this);
 	else if (cmd == "PING")
-		msg->PingCmd();
-	else if (cmd == "POPO")
-		std::cout << RED << "Mauvaise cmd" <<  NORMAL << std::endl;
+		msg->PingCmd(this);
+	else if (cmd == "QUIT")
+		msg->QuitCmd(this);
 }
-
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 {
 	int ret_send;
 
-	ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
-	if (ret_send == ERROR_SERVER)
-		return (loop_errors_handlers_msg(ERROR_SEND));
+	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
+	{
+		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
+		if (ret_send == ERROR_SERVER)
+			return (loop_errors_handlers_msg(ERROR_SEND));
+	}
 }
 
 Clients		*MyServer::GetClientsThroughName( std::string NickName )
@@ -362,4 +380,19 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 std::vector<std::string> MyServer::GetCmdList( void )
 {
 	return (this->_cmd_list);
+}
+
+int		MyServer::DeleteDisconnectedClients( int ClientFd )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_clients_list.find(GetClientsThroughSocketFd(ClientFd));
+	std::cout << RED << "QUIT USED" << NORMAL << std::endl;
+	if (it != this->_clients_list.end())
+	{
+		this->_clients_list.erase(it);
+		delete GetClientsThroughSocketFd(ClientFd);
+	}
+	//if (this->_clients_list.find())
+	return (SUCCESS);
 }

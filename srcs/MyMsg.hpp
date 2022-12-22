@@ -27,11 +27,12 @@ public:
 	void		SetCmdExistence( int CmdExistenceStatus );
 	int			CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list );
 
-	int			PassCmd( void );
-	int			NickCmd( void );
-	int			UserCmd( void );
-	int			ModeCmd( void );
-	int			PingCmd( void );
+	int			PassCmd( MyServer *IRC_Server );
+	int			NickCmd( MyServer *IRC_Server );
+	int			UserCmd( MyServer *IRC_Server );
+	int			ModeCmd( MyServer *IRC_Server );
+	int			PingCmd( MyServer *IRC_Server );
+	int			QuitCmd( MyServer *IRC_Server );
 	int			ValidateClientsConnections( void );
 	std::string					Prefix;
 	std::string					Command;

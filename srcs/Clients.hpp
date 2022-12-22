@@ -23,6 +23,8 @@ public:
 	void		SetClientsNickname( std::string nickname );
 	int			GetClientsConnectionPermission( void );
 	void		SetClientsConnectionPermission( int PermissionStatus );
+	int			GetClientsConnectionAuthorisation( void );
+	void		SetClientsConnectionAuthorisation( int PermissionStatus );
 
 
 	std::string GetClientsMessage( void );
@@ -39,6 +41,7 @@ private:
 	std::string _Realname;
 	std::string	_Nickname;
 	bool		_HasTheClientsBeenAccepted;
+	bool		_HasTheClientsBeenAuthorized;
 
 	/*Clients Message*/
 	std::string	_ClientMessage;

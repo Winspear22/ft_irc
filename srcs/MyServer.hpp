@@ -25,27 +25,29 @@ public:
     int         GetPort( void );
 	int			GetServerStatus( void );
     std::string GetPassword( void );
+	int			GetSocketFd( void );
 
 	int			CreateSocketFd( void );
 	int			SetSocketOptions( void );
 	int			BindSocketFd( void );
 	int			ListenToSockedFd( void );
-	int			SetSocketFdToNonBlocking( void );
+	int			SetSocketFdToNonBlocking( int SocketFd );
 
 	int			SelectClients( void );
 	void		CreateClients( void );
 	void		RecvClientsMsg( int ClientsFd );
-	void		ExecuteCommand( std::string cmd, MyMsg *msg );
+	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
+	void		ExecuteCommand(std::string cmd, MyMsg *msg);
 
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
-	void		DeleteDisconnectedClients( void );
+	int			DeleteDisconnectedClients( int ClientFd );
+
 	
 	std::vector<std::string> GetCmdList( void );
 	std::map<Clients*, int> _clients_list;
 	MyMsg					*new_msg;
-
 
 private:
     MyServer(/* ARG */);
@@ -63,8 +65,10 @@ private:
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
+
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
+
 /*En dehors du scope de la classe car je l'utilise dans une autre classe et dans laquelle il n'y a pas l'instance IRC_Server*/
 # endif

@@ -42,7 +42,7 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
 
-    reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ": Not enough parameters\n";
+    reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters\n";
 
     return (reply);
 }
@@ -51,7 +51,7 @@ std::string ERR_ALREADYREGISTRED(MyMsg msg)
 {
     std::string reply;
 
-    reply = "462 " + msg.GetClients()->GetClientsNickname() + ": Unauthorized command (already registered)\n";
+    reply = "462 " + msg.GetClients()->GetClientsNickname() + ":Unauthorized command (already registered)\n";
 
     return (reply);
 }

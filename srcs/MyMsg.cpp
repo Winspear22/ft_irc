@@ -116,39 +116,49 @@ int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list 
 }
 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
-int		MyMsg::PassCmd( void )
+int		MyMsg::PassCmd( MyServer *IRC_Server )
 {
 	std::string msg;
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
-	if (it->size() < 1)
+	if (this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == NO)
 	{
-		msg = "\033[1;31mERR_NEEDMOREPARAMS \033[1;37mPASS :Not enough parameters\n\033[0m";
+		msg = ERR_NEEDMOREPARAMS(*this);
+		std::cout << RED << msg << NORMAL << std::endl;
+		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
+		SendMsgBackToClients(*this, msg);
+		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+	}
+	else if (*it != IRC_Server->GetPassword())
+	{
+		msg = ERR_PASSWDMISMATCH();
+		std::cout << RED << msg << NORMAL << std::endl;
+		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
+		SendMsgBackToClients(*this, msg);
+		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+	}	
+	else if (!this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
+	{
+		msg = ERR_ALREADYREGISTRED(*this);
+		std::cout << RED << msg << NORMAL << std::endl;
 		SendMsgBackToClients(*this, msg);
 	}
-	else if (*it != "111")
+	else if (*it == IRC_Server->GetPassword())
 	{
-		msg = "\033[1;31mERR_PASSWDMISMATCH \033[1;37mPASS :Password incorrect\n\033[0m";
-		SendMsgBackToClients(*this, msg);
-	}	
-	else if (it->size() >= 1)
-	{
-		if (this->_SentFrom->GetClientsConnectionPermission() == YES)
-		{
-			msg = "\033[1;31mERR_ALREADYREGISTERED \033[1;37mPASS :You may not reregister\n\033[0m";
-			SendMsgBackToClients(*this, msg);
-		}
+		std::cout << "Pass validé" << std::endl;
+		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
 	}
 	return (SUCCESS);
 }
 
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
-int	MyMsg::NickCmd( void )
+int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
 	if (this->Params.size() >= 1)
 		this->_SentFrom->SetClientsNickname(*it);
+	(void)IRC_Server;
 	return (SUCCESS);
 }
 
@@ -156,7 +166,7 @@ int	MyMsg::NickCmd( void )
 ELLE EST FAIE A LA ZOB MAIS ELLE MARCHE, C'EST L'IMPORTANT */
 /*TROUVER COMMENT CHANGER LE USERNAME, HOSTNAME ET REALNAME DANS LES 
 OPTIONS POUR FAIRE UN VRAI ALGORITHME*/
-int	MyMsg::UserCmd( void )
+int	MyMsg::UserCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 	std::string username;
@@ -184,26 +194,52 @@ int	MyMsg::UserCmd( void )
 		}
 	}
 	this->_SentFrom->SetClientsRealname(realname);
+	this->_SentFrom->SetClientsConnectionPermission(YES);
+	(void)IRC_Server;
 	return (SUCCESS);
 }
 
-int			MyMsg::ModeCmd( void )
+int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 
-	msg_sent = "MODE";
+	msg_sent = "\033[1;35mMODE\033[0m";
 	SendMsgBackToClients(*this, msg_sent);
+	(void)IRC_Server;
 	return (SUCCESS);
 }
 
-int			MyMsg::PingCmd( void )
+int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 
-	msg_sent = "PONG";
+	msg_sent = "\033[1;35mPONG\033[0m";
 	SendMsgBackToClients(*this, msg_sent);
+	(void)IRC_Server;
 	return (SUCCESS);
 }
+
+
+int			MyMsg::QuitCmd( MyServer *IRC_Server )
+{
+	unsigned int			i;
+	std::string msg_sent;
+
+	msg_sent = "Quit: "; //message renvoyé selon le RFC modern.ircdocs.horse
+	i = -1;
+	if (this->Params.size() == 0)
+		msg_sent = "Quit: ";  //message renvoyé selon si le Client n'a pas spécifié de raison
+	if (this->Params.size() >= 1)
+	{
+		while (++i < this->Params.size())
+			msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
+	}
+	//SendMsgBackToClients(*this, msg_sent);
+	//IRC_Server->DeleteDisconnectedClients(this->_SentFrom->GetClientsFd());
+	(void)IRC_Server;
+	return (SUCCESS);
+}
+
 
 int		MyMsg::ValidateClientsConnections( void )
 {
@@ -218,6 +254,7 @@ int		MyMsg::ValidateClientsConnections( void )
 	this->_SentFrom->SetClientsConnectionPermission(YES);
 
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
+	this->GetClients()->SetClientsConnectionPermission(YES);
 	SendMsgBackToClients(*this, intro_new_nick);
 	return (SUCCESS);
 }

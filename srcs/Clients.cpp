@@ -13,6 +13,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
 	this->_HasTheClientsBeenAccepted = NO;
+	this->_HasTheClientsBeenAuthorized = NO;
 	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
@@ -108,3 +109,14 @@ void		Clients::SetClientsConnectionPermission( int PermissionStatus )
 {
 	this->_HasTheClientsBeenAccepted = PermissionStatus;
 }
+
+int			Clients::GetClientsConnectionAuthorisation( void )
+{
+	return (this->_HasTheClientsBeenAuthorized);
+}
+
+void		Clients::SetClientsConnectionAuthorisation( int PermissionStatus )
+{
+	this->_HasTheClientsBeenAuthorized = PermissionStatus;
+}
+

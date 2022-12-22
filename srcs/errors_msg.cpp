@@ -49,47 +49,14 @@ IL FAUR AVOIR DES FONCTIONS VOID POUR PAS AVOIR DE RETURN FAILURE QUI VONT NOUS
 SORTIR DE LA BOUCLE*/
 void loop_errors_handlers_msg( int error_code )
 {
-	(void)error_code;
-	/*if (error_code == ERROR_ACCEPT)
+	if (error_code == ERROR_ACCEPT)
 		std::cerr << RED << "Error." << WHITE << " Accept(); " << RED << "had an error and returned -1. No connection was accepted." << NORMAL << std::endl;
-	if (error_code == ERROR_NEW)
-		std::cerr << RED << "Error." << WHITE << " New(); " << RED << "had an error and returned -1. No new Client was created." << NORMAL << std::endl;
-	if (error_code == ERROR_RECV)
-		std::cerr << RED << "Error." << WHITE << " Recv(); " << RED << "had an error and returned -1. Nothing was received." << NORMAL << std::endl;
 	if (error_code == ERROR_SEND)
 		std::cerr << RED << "Error." << WHITE << " Send(); " << RED << "had an error and returned -1. Nothing was sent." << NORMAL << std::endl;
 	if (error_code == ERROR_SELECT)
 		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "had an error and returned -1. No client was selected." << NORMAL << std::endl;
-	*/
+	if (error_code == ERROR_NONBLOCKING)
+		std::cerr << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The client created fd is not set to non-blocking option." << NORMAL << std::endl;
 	if (error_code == TIMEOUT)
 		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
 }
-
-/*void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> _clients_list )
-{
-	std::cout << YELLOW << _clients_list.size() << NORMAL << std::endl;
-	if (_clients_list.size() > 0)
-	{
-
-		std::map<Clients*, int>::const_iterator it;
-	
-		it = _clients_list.begin();
-	
-		std::cout << RED << "Error." << WHITE << " New(); " << RED << "had an error and returned -1. No new Client was created." << NORMAL << std::endl;
-		while (it != _clients_list.end())
-		{
-			std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
-			delete it->first;
-			it++;
-		}
-		_clients_list.clear();
-		std::cout << RED << "All Clients were freed. No Leaks" << NORMAL << std::endl;
-		exit(127);
-	}
-	else
-	{
-		std::cout << RED << "ICI" << NORMAL << std::endl;
-		delete sole_client;
-		exit(127);
-	}
-}*/

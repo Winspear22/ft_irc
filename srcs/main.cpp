@@ -28,12 +28,14 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 		return (errors_handlers_msg(ERROR_SOCKET_CREATION));
 	if (Irc_Serveur.SetSocketOptions() == ERROR_SOCKET_OPTIONS)
 		return (errors_handlers_msg(ERROR_SOCKET_OPTIONS));
+	if (Irc_Serveur.SetSocketFdToNonBlocking(Irc_Serveur.GetSocketFd()) == ERROR_NONBLOCKING)
+		return (errors_handlers_msg(ERROR_NONBLOCKING));
 	if (Irc_Serveur.BindSocketFd() == ERROR_SOCKET_BINDING)
 		return (errors_handlers_msg(ERROR_SOCKET_BINDING));
 	if (Irc_Serveur.ListenToSockedFd() == ERROR_LISTENING)
 		return (errors_handlers_msg(ERROR_LISTENING));
-	if (Irc_Serveur.SetSocketFdToNonBlocking() == ERROR_NONBLOCKING)
-		return (errors_handlers_msg(ERROR_NONBLOCKING));
+//	if (Irc_Serveur.SetSocketFdToNonBlocking(Irc_Serveur.GetSocketFd()) == ERROR_NONBLOCKING)
+//		return (errors_handlers_msg(ERROR_NONBLOCKING));
 	return (SUCCESS);
 }
 
