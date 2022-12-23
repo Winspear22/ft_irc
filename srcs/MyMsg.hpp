@@ -29,6 +29,7 @@ public:
 
 	int			PassCmd( MyServer *IRC_Server );
 	int			NickCmd( MyServer *IRC_Server );
+	int			NickFormatCheck( std::vector<std::string>::iterator nickcheck );
 	int			UserCmd( MyServer *IRC_Server );
 	int			ModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );

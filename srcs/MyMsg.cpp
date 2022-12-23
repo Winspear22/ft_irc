@@ -155,12 +155,42 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
+{
+	unsigned int i;
+	int j;
+	char special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '\'', '|'};
+	
+	i = 1;
+	j = -1;
+	while (special_characters[++j]) // Je check si le premier est un character spé
+	{
+		if (nickcheck->at(0) != special_characters[j] && !isalpha(nickcheck->at(0)))
+			return (FAILURE);
+	}
+	while (i < nickcheck->size()) // je check si les 8 autres caractères sont autre choses qu'un alphanum + spé
+	{
+		j = -1;
+		while (special_characters[++j])
+		{
+			if (nickcheck->at(i) != special_characters[j] && !isalnum(nickcheck->at(i)))
+				return (FAILURE);
+		}
+		i++;
+	}
+	std::cout << GREEN << "NickFormatCheck SUCCESS !!" << NORMAL << std::endl;
+	return (SUCCESS);
+}
+
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
 int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 	std::vector<std::string>::iterator it;
+	std::vector<std::string>::iterator nick_format_check;
 	it = this->Params.begin();
+	nick_format_check = this->Params.begin();
+	
 
 	if (this->Params.empty())
 	{
@@ -172,7 +202,12 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_NONICKNAMEGIVEN();
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	else if (it->size() > 9)
+	else if (it->size() > 9 || it->size() == 0)
+	{
+		msg_sent = ERR_ERRONEUSNICKNAME(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else if (this->NickFormatCheck(nick_format_check) == FAILURE)
 	{
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackToClients(*this, msg_sent);
