@@ -178,11 +178,12 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 		}
 		i++;
 	}
-	std::cout << GREEN << "NickFormatCheck SUCCESS !!" << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
+/*PAS ENCORE TERMINE IL RESTE A DETERMINE LA DERNIERE ETAPE CELLE AVEC 
+UN CHANNEL*/
 int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -192,30 +193,41 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	nick_format_check = this->Params.begin();
 	
 
-	if (this->Params.empty())
+	if (this->Params.empty()) // Est-ce que rien n'a été mis --> NICK ""
 	{
 		msg_sent = ERR_NONICKNAMEGIVEN();
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	else if (this->Params.size() > 1)
+	else if (this->Params.size() > 1) // Est-ce que plrs params ont été mis --> NICK popo lolo
 	{
 		msg_sent = ERR_NONICKNAMEGIVEN();
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	else if (it->size() > 9 || it->size() == 0)
+	else if (it->size() > 9 || it->size() == 0) // La taille du NICK est plus grand que 9 ou vide --> NICK lolololololo OU NICK ""
 	{
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	else if (this->NickFormatCheck(nick_format_check) == FAILURE)
+	else if (this->NickFormatCheck(nick_format_check) == FAILURE) // Format illégal du NICK --> NICK 1popo 
 	{
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	if (this->Params.size() >= 1)
+	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
+	{
+		msg_sent = ERR_NICKNAMEINUSE(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else if (IRC_Server->GetClientsThroughName(*it) == NULL) // Tout va bien, alors je peux remplir le Nickname
+	{
 		this->_SentFrom->SetClientsNickname(*it);
-	(void)IRC_Server;
-	return (SUCCESS);
+		msg_sent = "NICK ";
+		msg_sent = msg_sent + *it;
+		SendMsgBackToClients(*this, msg_sent);
+		return (SUCCESS);
+	}
+	/*IL RESTE UN CAS DE FIGURE, CELUI DES CHANNELS, MAIS AUCUNE IDEE DE QUOI FAIRE*/
+	return (FAILURE);
 }
 
 /*LA COMMANDE NICK QUI SET LE USERNAME, LE HOSTNAME ET LE REALNAME 
@@ -231,6 +243,11 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	std::vector<std::string>::iterator it;
 
 	it = this->Params.begin();
+	if (this->Params.size() < 4)
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
 	username = *it;
 	this->_SentFrom->SetClientsUsername(username);
 	it++;

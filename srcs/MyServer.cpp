@@ -376,23 +376,3 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 	}
 	return (NULL);
 }
-
-std::vector<std::string> MyServer::GetCmdList( void )
-{
-	return (this->_cmd_list);
-}
-
-int		MyServer::DeleteDisconnectedClients( int ClientFd )
-{
-	std::map<Clients*, int>::iterator it;
-
-	it = this->_clients_list.find(GetClientsThroughSocketFd(ClientFd));
-	std::cout << RED << "QUIT USED" << NORMAL << std::endl;
-	if (it != this->_clients_list.end())
-	{
-		this->_clients_list.erase(it);
-		delete GetClientsThroughSocketFd(ClientFd);
-	}
-	//if (this->_clients_list.find())
-	return (SUCCESS);
-}

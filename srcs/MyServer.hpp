@@ -42,10 +42,8 @@ public:
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
-	int			DeleteDisconnectedClients( int ClientFd );
 
 	
-	std::vector<std::string> GetCmdList( void );
 	std::map<Clients*, int> _clients_list;
 	MyMsg					*new_msg;
 

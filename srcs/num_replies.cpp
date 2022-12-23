@@ -42,8 +42,10 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
 
-    reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters\n";
-
+    if (msg.GetClients()->GetClientsNickname().size() == 0)
+        reply = "461 *" + msg.GetCmd() + ":Not enough parameters\n";
+    else
+        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters\n";
     return (reply);
 }
 
