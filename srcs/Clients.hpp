@@ -25,6 +25,12 @@ public:
 	void		SetClientsConnectionPermission( int PermissionStatus );
 	int			GetClientsConnectionAuthorisation( void );
 	void		SetClientsConnectionAuthorisation( int PermissionStatus );
+	int			GetClientsConnectionNickCmd( void );
+	void		SetClientsConnectionNickCmd( int PermissionStatus );
+	int			GetClientsConnectionUserCmd( void );
+	void		SetClientsConnectionUserCmd( int PermissionStatus );
+
+
 
 
 	std::string GetClientsMessage( void );
@@ -40,8 +46,13 @@ private:
 	std::string _Hostname;
 	std::string _Realname;
 	std::string	_Nickname;
-	bool		_HasTheClientsBeenAccepted;
-	bool		_HasTheClientsBeenAuthorized;
+
+	/*On utilise les deux derniers booléens car Nick et User peuvent être faits dans des ordres différents*/
+	/*Autrement : Authorisation + NICK + USER = Permission */
+	bool		_HasTheClientsBeenAccepted; // Authorisation pour le PWD
+	bool		_HasTheClientsBeenAuthorized; // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
+	bool		_HasTheClientsNickBeenChosen; // Authorisation pour le Nick - NICK a bien fonctionné
+	bool		_HasTheClientsUserBeenChosen; // Authorisation pour le User - USER a bien fonctionné
 
 	/*Clients Message*/
 	std::string	_ClientMessage;

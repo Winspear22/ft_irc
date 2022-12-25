@@ -53,8 +53,10 @@ std::string ERR_ALREADYREGISTRED(MyMsg msg)
 {
     std::string reply;
 
-    reply = "462 " + msg.GetClients()->GetClientsNickname() + ":Unauthorized command (already registered)\n";
-
+    if (msg.GetClients()->GetClientsNickname().size() == 0)
+        reply = "462 *" + msg.GetCmd() + ":Unauthorized command (already registered)\n";
+    else
+        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Unauthorized command (already registered)\n";
     return (reply);
 }
 

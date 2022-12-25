@@ -215,6 +215,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
 	{
+		std::cout << "ICI" << std::endl;
 		msg_sent = ERR_NICKNAMEINUSE(*this);
 		SendMsgBackToClients(*this, msg_sent);
 	}
@@ -224,6 +225,10 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = "NICK ";
 		msg_sent = msg_sent + *it;
 		SendMsgBackToClients(*this, msg_sent);
+		/*Si le NICK et le USER sont OK, alors tout est OK*/
+		this->_SentFrom->SetClientsConnectionNickCmd(YES);
+		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
+			ValidateClientsConnections();
 		return (SUCCESS);
 	}
 	/*IL RESTE UN CAS DE FIGURE, CELUI DES CHANNELS, MAIS AUCUNE IDEE DE QUOI FAIRE*/
@@ -236,9 +241,8 @@ ELLE EST FAIE A LA ZOB MAIS ELLE MARCHE, C'EST L'IMPORTANT */
 OPTIONS POUR FAIRE UN VRAI ALGORITHME*/
 int	MyMsg::UserCmd( MyServer *IRC_Server )
 {
+	(void)IRC_Server;
 	std::string msg_sent;
-	std::string username;
-	std::string hostname;
 	std::string realname;
 	std::vector<std::string>::iterator it;
 
@@ -248,27 +252,40 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	username = *it;
-	this->_SentFrom->SetClientsUsername(username);
-	it++;
-	hostname = *it;
-	it++;
-	hostname += " " + *it;
-	this->_SentFrom->SetClientsHostname(hostname);
-	it++;
-	realname = *it;
-	it++;
-	if (it != this->Params.end())
+	else if (this->_SentFrom->GetClientsUsername().empty() == false)
+	{
+		msg_sent = ERR_ALREADYREGISTRED(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else if (this->Params.size() >= 4) // > 4 car le realname peut contenir des  espaces
 	{
 		while (it != this->Params.end())
 		{
-			realname += " " + *it;
+			if (it->empty() == true)
+			{
+				msg_sent = ERR_NEEDMOREPARAMS(*this);
+				SendMsgBackToClients(*this, msg_sent);
+			}
 			it++;
 		}
+		it = this->Params.begin();
+		this->_SentFrom->SetClientsUsername(*it);
+		if (it->at(0) == ':')
+			realname = it->substr(1);
+		else
+			realname = *it;
+		while (it != this->Params.end())
+		{
+			realname = realname + " " + *it;
+			std::cout << "realname == " << realname << std::endl;
+			it++;
+		}
+		this->_SentFrom->SetClientsRealname(realname);
+		this->_SentFrom->SetClientsConnectionUserCmd(YES);
+	/*Si le NICK et le USER sont OK, alors tout est OK*/
+		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
+			ValidateClientsConnections();
 	}
-	this->_SentFrom->SetClientsRealname(realname);
-	this->_SentFrom->SetClientsConnectionPermission(YES);
-	(void)IRC_Server;
 	return (SUCCESS);
 }
 
@@ -318,16 +335,15 @@ int		MyMsg::ValidateClientsConnections( void )
 {
 	std::string intro_new_nick;
 
-
+	this->_SentFrom->SetClientsConnectionPermission(YES);
+	std::cout << GREEN << "Client validé" << NORMAL << std::endl;
 	SendMsgBackToClients(*this, ::RPL_WELCOME(*this));
 	SendMsgBackToClients(*this, ::RPL_YOURHOST(*this));
 	SendMsgBackToClients(*this, ::RPL_CREATED(*this));
 	SendMsgBackToClients(*this, ::RPL_MYINFO(*this));
 	SendMsgBackToClients(*this, "\r\n");
-	this->_SentFrom->SetClientsConnectionPermission(YES);
 
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
-	this->GetClients()->SetClientsConnectionPermission(YES);
 	SendMsgBackToClients(*this, intro_new_nick);
 	return (SUCCESS);
 }

@@ -325,10 +325,7 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 	else if (cmd == "NICK")
 		msg->NickCmd(this);
 	else if (cmd == "USER")
-	{
 		msg->UserCmd(this);
-		msg->ValidateClientsConnections();
-	}
 	else if (cmd == "MODE")
 		msg->ModeCmd(this);
 	else if (cmd == "PING")
