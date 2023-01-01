@@ -175,7 +175,6 @@ int			MyServer::SelectClients( void )
 
 
 	memset(&timeout, 0, sizeof(struct timeval));
-//	timeout.tv_sec = 1;
 	timeout.tv_usec = 200000;
 	fds_list = -1;
 	FD_ZERO(&ready_fds);
@@ -261,57 +260,63 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
-	else if (ret_rcv == ERROR_USER_DISCONNECTED) // Cas où le client se deconnecte normalement
-		std::cout << "recv == 0 - user safely disconnected" << std::endl; // gérer ce cas de figure
-	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
-	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
-	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
-	it = splitted_msg.begin();
-	while (it != splitted_msg.end())
-	{	
-		this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
-		tmp = strdup(it->c_str());
-		tab_parse = SplitByEndline(tmp, " ");
-		free(tmp);
-		str = tab_parse.begin();
-		if (str->at(0) == ':')
-		{
-			//this->new_msg->SetPrefix(*str);
-			this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
-			str++;
-		}
-		if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
-		{
-			this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
-			str++;
-			this->new_msg->SetCmdExistence(CMD_EXISTS);
-		}
-		else
-		{
-			std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
-			this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
-		}
-		while (str != tab_parse.end())
-		{
-			this->new_msg->SetParams(*str);
-			//this->new_msg->Params.push_back(*str);
-			str++;
-		}
-		if (this->new_msg->GetCmdExistence() == CMD_EXISTS)
-		{
-			this->_it_cmd = this->_cmd_list.begin();
-			while (this->_it_cmd != this->_cmd_list.end())
-			{
-				if (*this->_it_cmd == this->new_msg->Command)
-					this->CheckClientsAuthentification(*this->_it_cmd, this->new_msg);
-				this->_it_cmd++;
-			}
-		}
-		delete this->new_msg;
-		it++;
+	if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL)
+	{ // Cas où le client se deconnecte normalement
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);
+		return ;
 	}
-	free(msg_buffer);
+	else if (ret_rcv != ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL)
+	{
+		GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
+		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
+		splitted_msg = SplitByEndline(msg_buffer, "\r\n");
+		it = splitted_msg.begin();
+		while (it != splitted_msg.end())
+		{	
+			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
+			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
+			tmp = strdup(it->c_str());
+			tab_parse = SplitByEndline(tmp, " ");
+			free(tmp);
+			str = tab_parse.begin();
+			if (str->at(0) == ':')
+			{
+				//this->new_msg->SetPrefix(*str);
+				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
+				str++;
+			}
+			if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+			{
+				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
+				str++;
+				this->new_msg->SetCmdExistence(CMD_EXISTS);
+			}
+			else
+			{
+				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
+				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
+			}
+			while (str != tab_parse.end())
+			{
+				this->new_msg->SetParams(*str);
+				//this->new_msg->Params.push_back(*str);
+				str++;
+			}
+			if (this->new_msg->GetCmdExistence() == CMD_EXISTS)
+			{
+				this->_it_cmd = this->_cmd_list.begin();
+				while (this->_it_cmd != this->_cmd_list.end())
+				{
+					if (*this->_it_cmd == this->new_msg->Command)
+						this->CheckClientsAuthentification(*this->_it_cmd, this->new_msg);
+					this->_it_cmd++;
+				}
+			}
+			delete this->new_msg;
+			it++;
+		}
+		free(msg_buffer);
+	}
 }
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
@@ -375,4 +380,15 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 		it++;
 	}
 	return (NULL);
+}
+
+int	 MyServer::DeleteDisconnectedClients(Clients* client)
+{
+	if (client != NULL && this->GetClientsThroughSocketFd(client->GetClientsFd()))
+	{
+		this->_clients_list.erase(this->GetClientsThroughSocketFd(client->GetClientsFd()));
+	//	this->_c
+		delete this->GetClientsThroughSocketFd(client->GetClientsFd());
+	}
+	return (SUCCESS);
 }

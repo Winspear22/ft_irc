@@ -222,7 +222,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	{
 		this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
-		msg_sent = msg_sent + *it + "\n"; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
+		msg_sent = msg_sent + *it + "\r\n"; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
 		SendMsgBackToClients(*this, msg_sent);
 		/*Si le NICK et le USER sont OK, alors tout est OK*/
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
@@ -308,10 +308,10 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 /*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
-	std::string msg_sent;
+	//std::string msg_sent;
 
-	msg_sent = "\033[1;35mMODE\033[0m";
-	SendMsgBackToClients(*this, msg_sent);
+/*	msg_sent = "\033[1;35mMODE\033[0m";
+	SendMsgBackToClients(*this, msg_sent);*/
 	(void)IRC_Server;
 	return (SUCCESS);
 }
@@ -321,8 +321,16 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 
-	msg_sent = "\033[1;35mPONG\033[0m";
-	SendMsgBackToClients(*this, msg_sent);
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NOORIGIN(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else
+	{
+		msg_sent = "PONG " + this->_SentFrom->GetClientsNickname() + " :" + this->Params.at(0);
+		SendMsgBackToClients(*this, msg_sent);
+	}
 	(void)IRC_Server;
 	return (SUCCESS);
 }
@@ -331,19 +339,19 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 int			MyMsg::QuitCmd( MyServer *IRC_Server )
 {
 	unsigned int			i;
-	std::string msg_sent;
+	std::string				 msg_sent;
 
 	msg_sent = "Quit: "; //message renvoyé selon le RFC modern.ircdocs.horse
 	i = -1;
-	if (this->Params.size() == 0)
-		msg_sent = "Quit: ";  //message renvoyé selon si le Client n'a pas spécifié de raison
+	if (this->Params.empty())
+		msg_sent += this->_SentFrom->GetClientsNickname();  //message renvoyé selon si le Client n'a pas spécifié de raison
 	if (this->Params.size() >= 1)
 	{
 		while (++i < this->Params.size())
 			msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
 	}
-	//SendMsgBackToClients(*this, msg_sent);
-	//IRC_Server->DeleteDisconnectedClients(this->_SentFrom->GetClientsFd());
+	SendMsgBackToClients(*this, msg_sent);
+	IRC_Server->DeleteDisconnectedClients(this->_SentFrom);
 	(void)IRC_Server;
 	return (SUCCESS);
 }

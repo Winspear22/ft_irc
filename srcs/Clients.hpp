@@ -33,6 +33,8 @@ public:
 	void		SetClientsConnectionUserCmd( int PermissionStatus );
 	std::string	GetClientsBuffer( void );
 	void		SetClientsBuffer( std::string );
+	int			GetClientsConnectionStatus( void );
+	void		SetClientsConnectionStatus( int status );
 
 
 
@@ -58,7 +60,7 @@ private:
 	bool		_HasTheClientsBeenAuthorized; // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
 	bool		_HasTheClientsNickBeenChosen; // Authorisation pour le Nick - NICK a bien fonctionné
 	bool		_HasTheClientsUserBeenChosen; // Authorisation pour le User - USER a bien fonctionné
-
+	int			_ConnectionStatus;
 	/*Clients Message*/
 	std::string	_ClientMessage;
 

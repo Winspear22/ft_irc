@@ -159,3 +159,11 @@ std::string ERR_NOSUCHSERVER(MyMsg msg)
 
     return (reply);
 }
+
+std::string ERR_NOORIGIN(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "409 " + msg.GetClients()->GetClientsNickname() + " :No origin specified";
+    return (reply);
+}

@@ -43,7 +43,7 @@ public:
 	Clients		*GetClientsThroughSocketFd( int fd );
 
 
-	
+	int			DeleteDisconnectedClients(Clients *client);
 	std::map<Clients*, int> _clients_list;
 	MyMsg					*new_msg;
 

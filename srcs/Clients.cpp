@@ -16,6 +16,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_HasTheClientsBeenAuthorized = NO;
 	this->_HasTheClientsUserBeenChosen = NO;
 	this->_HasTheClientsNickBeenChosen = NO;
+	this->_ConnectionStatus = YES;
 	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
@@ -151,7 +152,7 @@ void		Clients::SetClientsConnectionUserCmd( int PermissionStatus )
 {
 	this->_HasTheClientsUserBeenChosen = PermissionStatus;
 }
-
+/*Ces deux fonctions servent au cas où le messge reçu serait incomplet avec recv*/
 std::string	Clients::GetClientsBuffer( void )
 {
 	return (this->_Buffer);
@@ -159,4 +160,13 @@ std::string	Clients::GetClientsBuffer( void )
 void		Clients::SetClientsBuffer( std::string msg )
 {
 	this->_Buffer = msg;
+}
+
+int			Clients::GetClientsConnectionStatus( void )
+{
+	return (this->_ConnectionStatus);
+}
+void		Clients::SetClientsConnectionStatus( int status )
+{
+	this->_ConnectionStatus = status;
 }
