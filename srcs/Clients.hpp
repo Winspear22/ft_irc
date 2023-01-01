@@ -31,7 +31,8 @@ public:
 	void		SetClientsConnectionNickCmd( int PermissionStatus );
 	int			GetClientsConnectionUserCmd( void );
 	void		SetClientsConnectionUserCmd( int PermissionStatus );
-
+	std::string	GetClientsBuffer( void );
+	void		SetClientsBuffer( std::string );
 
 
 
@@ -42,6 +43,7 @@ private:
 	int 		_ClientFd;
 	sockaddr_in _New_Address;
 	std::string _ServerName;
+	std::string _Buffer;
 
 	/*Clients Identity*/
 	std::string	_Username;

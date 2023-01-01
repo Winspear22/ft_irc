@@ -57,6 +57,6 @@ void loop_errors_handlers_msg( int error_code )
 		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "had an error and returned -1. No client was selected." << NORMAL << std::endl;
 	if (error_code == ERROR_NONBLOCKING)
 		std::cerr << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The client created fd is not set to non-blocking option." << NORMAL << std::endl;
-	if (error_code == TIMEOUT)
-		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
+//	if (error_code == TIMEOUT)
+//		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
 }

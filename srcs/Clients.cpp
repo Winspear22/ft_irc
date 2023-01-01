@@ -151,3 +151,12 @@ void		Clients::SetClientsConnectionUserCmd( int PermissionStatus )
 {
 	this->_HasTheClientsUserBeenChosen = PermissionStatus;
 }
+
+std::string	Clients::GetClientsBuffer( void )
+{
+	return (this->_Buffer);
+}
+void		Clients::SetClientsBuffer( std::string msg )
+{
+	this->_Buffer = msg;
+}

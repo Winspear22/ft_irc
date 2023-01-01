@@ -215,7 +215,6 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
 	{
-		std::cout << "ICI" << std::endl;
 		msg_sent = ERR_NICKNAMEINUSE(*this);
 		SendMsgBackToClients(*this, msg_sent);
 	}
@@ -235,10 +234,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	return (FAILURE);
 }
 
-/*LA COMMANDE NICK QUI SET LE USERNAME, LE HOSTNAME ET LE REALNAME 
-ELLE EST FAIE A LA ZOB MAIS ELLE MARCHE, C'EST L'IMPORTANT */
-/*TROUVER COMMENT CHANGER LE USERNAME, HOSTNAME ET REALNAME DANS LES 
-OPTIONS POUR FAIRE UN VRAI ALGORITHME*/
+/*LA COMMANDE USER QUI SET LE USERNAME, LE mode ET LE REALNAME */
 int	MyMsg::UserCmd( MyServer *IRC_Server )
 {
 	(void)IRC_Server;
@@ -308,6 +304,8 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+
+/*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -318,6 +316,7 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+/*PING NON FONCTIONNEL ENCORE*/
 int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -328,7 +327,7 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
+/*QUIT NON FONCTIONNEL ENCORE*/
 int			MyMsg::QuitCmd( MyServer *IRC_Server )
 {
 	unsigned int			i;

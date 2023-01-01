@@ -78,6 +78,7 @@
 # define TIMEOUT 0
 # define CMD_EXISTS 0
 # define CMD_DOESNT_EXIST 1
+# define ERROR_USER_DISCONNECTED 0
 
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0

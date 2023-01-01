@@ -166,15 +166,17 @@ int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 
 int			MyServer::SelectClients( void )
 {
-fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
+	fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
 	fd_set	readfds; // mes sets de fds pouvant lire
 	int		maximum_fds; // mon nombre max de fds peut etre remplace par FD_ISSET
 	int		ret_select; //return de select pour les erreurs
 	int		fds_list; // sert a loop pour trouver lequel des fds a des donnees pour moi
 	struct timeval		timeout;
 
+
 	memset(&timeout, 0, sizeof(struct timeval));
-	timeout.tv_sec = 120;
+//	timeout.tv_sec = 1;
+	timeout.tv_usec = 200000;
 	fds_list = -1;
 	FD_ZERO(&ready_fds);
 	FD_SET(this->_socketfd, &ready_fds);
@@ -187,18 +189,16 @@ fd_set	ready_fds; //mes fds etant prets a transmettre des donnes
 		loop_errors_handlers_msg(TIMEOUT);
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		if (fds_list == this->_socketfd) // C'est un client qui a ete trouve
+		if (FD_ISSET(fds_list, &readfds))//(fds_list == this->_socketfd) // C'est un client qui a ete trouve
 		{
 			this->CreateClients();
-
 			FD_SET(this->_new_fd_nb, &ready_fds);
 			if (this->_new_fd_nb > maximum_fds)
-                     maximum_fds = this->_new_fd_nb;
+         	      maximum_fds = this->_new_fd_nb;
 			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 		}
 		else
 			RecvClientsMsg(this->_new_fd_nb);
-
 	}
 	return (SUCCESS);
 }
@@ -261,12 +261,14 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
+	else if (ret_rcv == ERROR_USER_DISCONNECTED) // Cas où le client se deconnecte normalement
+		std::cout << "recv == 0 - user safely disconnected" << std::endl; // gérer ce cas de figure
 	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
 	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
 	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
 	it = splitted_msg.begin();
 	while (it != splitted_msg.end())
-	{		
+	{	
 		this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 		tmp = strdup(it->c_str());
@@ -314,6 +316,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
+
 	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
 		this->ExecuteCommand(cmd, msg);
 }
