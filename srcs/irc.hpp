@@ -39,7 +39,10 @@
 # include <list>
 
 /*time ctime*/
-#include <ctime>
+# include <ctime>
+
+/*find*/
+# include <algorithm>
 
 # include "MyServer.hpp"
 # include "Clients.hpp"

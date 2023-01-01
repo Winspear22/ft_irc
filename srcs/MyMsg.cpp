@@ -223,7 +223,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	{
 		this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
-		msg_sent = msg_sent + *it;
+		msg_sent = msg_sent + *it + "\n"; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
 		SendMsgBackToClients(*this, msg_sent);
 		/*Si le NICK et le USER sont OK, alors tout est OK*/
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
@@ -270,17 +270,36 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		}
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
-		if (it->at(0) == ':')
-			realname = it->substr(1);
-		else
-			realname = *it;
+		it++;
+		this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
+		it++;
+		this->_SentFrom->SetClientsUnused(*it);
+		it++;
 		while (it != this->Params.end())
 		{
-			realname = realname + " " + *it;
-			std::cout << "realname == " << realname << std::endl;
+			if (it->empty()) // Si aucun realname n'est renseigné, il doit etre remplacé par le NICK
+				realname = this->_SentFrom->GetClientsNickname();
+			else // Sinon, tout ce qui suit après le 3e arguments = realname
+			{	
+				if (it->at(0) == ':') // S'il y'a plusieurs ':' les uns à la suite des autres, seul le premier ':' doit être évité
+				{
+					realname = it->substr(1);
+					it++;
+					while (it != this->Params.end())
+					{
+						realname += " " + *it;
+						it++;
+					}						
+					break ;
+				}
+				else
+					realname += " " + *it;
+			}
 			it++;
 		}
 		this->_SentFrom->SetClientsRealname(realname);
+	//	std::cout << "realname == " << this->_SentFrom->GetClientsRealname() << std::endl;
+
 		this->_SentFrom->SetClientsConnectionUserCmd(YES);
 	/*Si le NICK et le USER sont OK, alors tout est OK*/
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
@@ -337,6 +356,7 @@ int		MyMsg::ValidateClientsConnections( void )
 
 	this->_SentFrom->SetClientsConnectionPermission(YES);
 	std::cout << GREEN << "Client validé" << NORMAL << std::endl;
+
 	SendMsgBackToClients(*this, ::RPL_WELCOME(*this));
 	SendMsgBackToClients(*this, ::RPL_YOURHOST(*this));
 	SendMsgBackToClients(*this, ::RPL_CREATED(*this));

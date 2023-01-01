@@ -15,8 +15,10 @@ public:
 	int			GetClientsFd( void );
 	std::string	GetClientsUsername( void );
 	void		SetClientsUsername( std::string username );
-	std::string	GetClientsHostname( void );
-	void		SetClientsHostname( std::string hostname );
+	std::string	GetClientsMode( void );
+	void		SetClientsMode( std::string Mode );
+	std::string	GetClientsUnused( void );
+	void		SetClientsUnused( std::string Unused );
 	std::string	GetClientsRealname( void );
 	void		SetClientsRealname( std::string realname );
 	std::string	GetClientsNickname( void );
@@ -43,7 +45,8 @@ private:
 
 	/*Clients Identity*/
 	std::string	_Username;
-	std::string _Hostname;
+	std::string _Mode; // Sert à la commande MODE, il y'a 2 modes --> à voir plus tard lors de la prgmtion de MODE
+	std::string	_Unused; // ce paramètre n'est pas utilisé par les clients selon RFC
 	std::string _Realname;
 	std::string	_Nickname;
 

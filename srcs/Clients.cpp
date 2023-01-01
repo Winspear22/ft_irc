@@ -61,14 +61,24 @@ void		Clients::SetClientsUsername( std::string username )
 	this->_Username = username;
 }
 
-std::string	Clients::GetClientsHostname( void )
+std::string	Clients::GetClientsMode( void )
 {
-	return (this->_Hostname);
+	return (this->_Mode);
 }
 
-void		Clients::SetClientsHostname( std::string hostname )
+void		Clients::SetClientsMode( std::string mode )
 {
-	this->_Hostname = hostname;
+	this->_Mode = mode;
+}
+
+std::string	Clients::GetClientsUnused( void )
+{
+	return (this->_Unused);
+}
+
+void		Clients::SetClientsUnused( std::string Unused )
+{
+	this->_Unused = Unused;
 }
 
 std::string Clients::GetClientsRealname( void )
