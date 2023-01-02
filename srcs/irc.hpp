@@ -29,7 +29,24 @@
 /*strlen*/
 # include <string.h>
 
-//# include "MyServer.hpp"
+/*vector*/
+# include <vector>
+
+/*map*/
+# include <map>
+
+/*list*/
+# include <list>
+
+/*time ctime*/
+# include <ctime>
+
+/*find*/
+# include <algorithm>
+
+# include "MyServer.hpp"
+# include "Clients.hpp"
+
 /*===============================================================================================================*/
 /*                                                DEFINES                                                        */
 /*===============================================================================================================*/
@@ -40,11 +57,14 @@
 # define SUCCESS 0
 # define EXIT_SUCCESS 0
 # define EXIT_FAILIURE -1
+# define NO 1
+# define YES 0
 
 /*                                             ERRORS CODES                                                      */
 
 # define ERROR_SERVER -1
 # define ERROR_WRONG_PORT 1
+# define ERROR_NOT_PORT_6667 12
 # define ERROR_SOCKET_CREATION 2
 # define ERROR_SOCKET_OPTIONS 3
 # define ERROR_SOCKET_BINDING 4
@@ -54,6 +74,12 @@
 # define ERROR_RECV 8
 # define ERROR_SEND 9
 # define ERROR_SELECT 10
+# define ERROR_NEW 11
+# define TIMEOUT 0
+# define CMD_EXISTS 0
+# define CMD_DOESNT_EXIST 1
+# define ERROR_USER_DISCONNECTED 0
+
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0
 # define SERVER_OFF 1
@@ -74,7 +100,8 @@
 /*===============================================================================================================*/
 
 /*                                              errors_handler.cpp                                                */
-int errors_handlers_msg( int error_code );
-void loop_errors_handlers_msg( int error_code );
+int     errors_handlers_msg( int error_code );
+void    loop_errors_handlers_msg( int error_code );
+//void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> _clients_list );
 
 #endif
