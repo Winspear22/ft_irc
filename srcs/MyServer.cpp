@@ -273,7 +273,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		while (it != splitted_msg.end())
 		{	
 			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
+			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 			tmp = strdup(it->c_str());
 			tab_parse = SplitByEndline(tmp, " ");
 			free(tmp);
@@ -284,7 +284,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
 				str++;
 			}
-			if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+			if (this->new_msg->CheckFormatCmd(str, this->_cmd_list) == SUCCESS)
 			{
 				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
 				str++;
@@ -326,14 +326,13 @@ void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 
 void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 {
-	std::cout << WHITE << "cmd == " << cmd << NORMAL << std::endl;
 	if (cmd == "PASS")
 		msg->PassCmd(this);
 	else if (cmd == "NICK")
 		msg->NickCmd(this);
 	else if (cmd == "USER")
 		msg->UserCmd(this);
-	else if (cmd == "MOTD")
+	else if (cmd == "motd")
 		msg->MotdCmd();
 	else if (cmd == "MODE")
 		msg->ModeCmd(this);

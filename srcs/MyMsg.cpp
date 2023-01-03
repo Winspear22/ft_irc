@@ -101,16 +101,14 @@ void MyMsg::SetParams( std::string Params )
 	this->Params.push_back(Params);
 }
 
-int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list )
+int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
 	std::vector<std::string>::iterator it;
 	
 	it = cmd_list.begin();
-	cmd = toupper_striing(cmd);
-	std::cout << GREEN << "cmd === " << RED << cmd << NORMAL << std::endl; 
 	while (it != cmd_list.end())
 	{
-		if (*it == cmd)
+		if (*it == *cmd)
 			return (SUCCESS);
 		it++;
 	}
