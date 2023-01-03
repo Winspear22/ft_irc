@@ -13,6 +13,8 @@ public:
 	~Clients( void );
 
 	int			GetClientsFd( void );
+	std::string	GetServerName( void );
+	void		SetServerName( std::string ServerName);
 	std::string	GetClientsUsername( void );
 	void		SetClientsUsername( std::string username );
 	std::string	GetClientsMode( void );

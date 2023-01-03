@@ -106,13 +106,15 @@ int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list 
 	std::vector<std::string>::iterator it;
 	
 	it = cmd_list.begin();
+	cmd = toupper_striing(cmd);
+	std::cout << GREEN << "cmd === " << RED << cmd << NORMAL << std::endl; 
 	while (it != cmd_list.end())
 	{
 		if (*it == cmd)
 			return (SUCCESS);
 		it++;
 	}
-	return (SUCCESS);
+	return (FAILURE);
 }
 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
@@ -382,6 +384,48 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 }
 
 
+int			MyMsg::MotdCmd( void )
+{
+	std::string msg_sent;
+	std::string file_tmp;
+	std::vector<std::string> file_content;
+	std::vector<std::string>::iterator it;
+
+	if (this->Params.size() > 4) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
+	{
+		msg_sent = ERR_NOMOTD(*this, 1);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else
+	{
+		std::ifstream motd_file("./srcs/motd.txt");
+		if (!motd_file.good()) // Si le fichier n'existe pas
+		{
+			msg_sent = ERR_NOMOTD(*this, 2);
+			SendMsgBackToClients(*this, msg_sent);
+		}
+		else // Si le fichier existe
+		{
+			msg_sent = RPL_MOTDSTART(*this); // Code pour commencer le msg
+			SendMsgBackToClients(*this, msg_sent);
+			while (getline(motd_file, file_tmp)) // j'écris dans la variable le contenu de motd.txt
+				file_content.push_back(file_tmp);
+			it = file_content.begin();
+			while (it != file_content.end())
+			{
+				msg_sent = RPL_MOTD(*this, it);
+				SendMsgBackToClients(*this, msg_sent); //je le renvoi ligne par ligne au client
+				it++;
+			}
+		}
+		motd_file.close();
+		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	return (SUCCESS);
+}
+
+
 int		MyMsg::ValidateClientsConnections( void )
 {
 	std::string intro_new_nick;
@@ -397,5 +441,6 @@ int		MyMsg::ValidateClientsConnections( void )
 
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
 	SendMsgBackToClients(*this, intro_new_nick);
+	this->MotdCmd();
 	return (SUCCESS);
 }
