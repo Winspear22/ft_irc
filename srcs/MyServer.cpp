@@ -16,7 +16,7 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
-	"USERIP", "USERS", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP" };
+	"USERIP", "USERS", "version", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP" };
 
 	i = -1;
 	while (++i < 80)
@@ -334,6 +334,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->UserCmd(this);
 	else if (cmd == "motd")
 		msg->MotdCmd();
+	else if (cmd == "version")
+		msg->VersionCmd();
 	else if (cmd == "MODE")
 		msg->ModeCmd(this);
 	else if (cmd == "PING")

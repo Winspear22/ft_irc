@@ -202,3 +202,11 @@ std::string RPL_ENDOFMOTD(MyMsg msg)
 	reply = "376 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of MOTD command\033[0m" + "\r\n";;
 	return (reply);
 }
+
+std::string RPL_VERSION(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m" + "\r\n";;
+	return (reply);
+}

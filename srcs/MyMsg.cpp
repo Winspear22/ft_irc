@@ -423,6 +423,11 @@ int			MyMsg::MotdCmd( void )
 	return (SUCCESS);
 }
 
+int		MyMsg::VersionCmd(void)
+{
+	SendMsgBackToClients(*this, RPL_VERSION(*this));
+	return (SUCCESS);
+}
 
 int		MyMsg::ValidateClientsConnections( void )
 {
