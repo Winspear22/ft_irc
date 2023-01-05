@@ -151,11 +151,12 @@ std::string ERR_NOPRIVILEGES(MyMsg msg)
     return (reply);
 }
 
-std::string ERR_NOSUCHSERVER(MyMsg msg)
+std::string ERR_NOSUCHSERVER(MyMsg msg, std::vector<std::string>::iterator it)
 {
     std::string reply;
+    std::string iterator_content = *it;
 
-    reply = "402 " + msg.GetClients()->GetClientsNickname() + " servername : No such channel" + "\r\n";;
+    reply = "402 " + msg.GetClients()->GetClientsNickname() + ": " + iterator_content + ": No such server" + "\r\n";;
 
     return (reply);
 }

@@ -33,7 +33,7 @@ public:
 	int			UserCmd( MyServer *IRC_Server );
 	int			MotdCmd();
 	int			ModeCmd( MyServer *IRC_Server );
-	int			VersionCmd(void);
+	int			VersionCmd( void );
 	int			PingCmd( MyServer *IRC_Server );
 	int			QuitCmd( MyServer *IRC_Server );
 	int			ValidateClientsConnections( void );

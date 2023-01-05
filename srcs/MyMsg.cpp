@@ -215,7 +215,6 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	it = this->Params.begin();
 	nick_format_check = this->Params.begin();
 	
-
 	if (this->Params.empty()) // Est-ce que rien n'a été mis --> NICK ""
 	{
 		msg_sent = ERR_NONICKNAMEGIVEN();
@@ -425,7 +424,15 @@ int			MyMsg::MotdCmd( void )
 
 int		MyMsg::VersionCmd(void)
 {
-	SendMsgBackToClients(*this, RPL_VERSION(*this));
+	std::vector<std::string>::iterator it;
+	it = this->Params.begin();
+
+	if (this->Params.empty())
+		SendMsgBackToClients(*this, RPL_VERSION(*this));
+	else if (this->Params.size() == 1)
+		SendMsgBackToClients(*this, ERR_NOSUCHSERVER(*this, it));
+	// else
+	// 	SendMsgBackToClients(*this, "Wrong params");
 	return (SUCCESS);
 }
 
