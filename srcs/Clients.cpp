@@ -13,6 +13,10 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
 	this->_HasTheClientsBeenAccepted = NO;
+	this->_HasTheClientsBeenAuthorized = NO;
+	this->_HasTheClientsUserBeenChosen = NO;
+	this->_HasTheClientsNickBeenChosen = NO;
+	this->_ConnectionStatus = YES;
 	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
@@ -58,14 +62,24 @@ void		Clients::SetClientsUsername( std::string username )
 	this->_Username = username;
 }
 
-std::string	Clients::GetClientsHostname( void )
+std::string	Clients::GetClientsMode( void )
 {
-	return (this->_Hostname);
+	return (this->_Mode);
 }
 
-void		Clients::SetClientsHostname( std::string hostname )
+void		Clients::SetClientsMode( std::string mode )
 {
-	this->_Hostname = hostname;
+	this->_Mode = mode;
+}
+
+std::string	Clients::GetClientsUnused( void )
+{
+	return (this->_Unused);
+}
+
+void		Clients::SetClientsUnused( std::string Unused )
+{
+	this->_Unused = Unused;
 }
 
 std::string Clients::GetClientsRealname( void )
@@ -107,4 +121,52 @@ int			Clients::GetClientsConnectionPermission( void )
 void		Clients::SetClientsConnectionPermission( int PermissionStatus )
 {
 	this->_HasTheClientsBeenAccepted = PermissionStatus;
+}
+
+int			Clients::GetClientsConnectionAuthorisation( void )
+{
+	return (this->_HasTheClientsBeenAuthorized);
+}
+
+void		Clients::SetClientsConnectionAuthorisation( int PermissionStatus )
+{
+	this->_HasTheClientsBeenAuthorized = PermissionStatus;
+}
+
+int			Clients::GetClientsConnectionNickCmd( void )
+{
+	return (this->_HasTheClientsNickBeenChosen);
+}
+
+void		Clients::SetClientsConnectionNickCmd( int PermissionStatus )
+{
+	this->_HasTheClientsNickBeenChosen = PermissionStatus;
+}
+
+int			Clients::GetClientsConnectionUserCmd( void )
+{
+	return (this->_HasTheClientsUserBeenChosen);
+}
+
+void		Clients::SetClientsConnectionUserCmd( int PermissionStatus )
+{
+	this->_HasTheClientsUserBeenChosen = PermissionStatus;
+}
+/*Ces deux fonctions servent au cas où le messge reçu serait incomplet avec recv*/
+std::string	Clients::GetClientsBuffer( void )
+{
+	return (this->_Buffer);
+}
+void		Clients::SetClientsBuffer( std::string msg )
+{
+	this->_Buffer = msg;
+}
+
+int			Clients::GetClientsConnectionStatus( void )
+{
+	return (this->_ConnectionStatus);
+}
+void		Clients::SetClientsConnectionStatus( int status )
+{
+	this->_ConnectionStatus = status;
 }

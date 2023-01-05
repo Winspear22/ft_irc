@@ -25,28 +25,27 @@ public:
     int         GetPort( void );
 	int			GetServerStatus( void );
     std::string GetPassword( void );
+	int			GetSocketFd( void );
 
 	int			CreateSocketFd( void );
 	int			SetSocketOptions( void );
 	int			BindSocketFd( void );
 	int			ListenToSockedFd( void );
-	int			SetSocketFdToNonBlocking( void );
+	int			SetSocketFdToNonBlocking( int SocketFd );
 
 	int			SelectClients( void );
 	void		CreateClients( void );
 	void		RecvClientsMsg( int ClientsFd );
-	int			ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
-	int			ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
-	int			ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg );
-	int			ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space, MyMsg msg, std::vector<std::string> wholemsg );
+	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
+	void		ExecuteCommand(std::string cmd, MyMsg *msg);
 
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
-	std::vector<std::string> GetCmdList( void );
 
+	int			DeleteDisconnectedClients(Clients *client);
 	std::map<Clients*, int> _clients_list;
-
+	MyMsg					*new_msg;
 
 private:
     MyServer(/* ARG */);
@@ -63,9 +62,11 @@ private:
 	int				_nb_of_clients;
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
-	std::vector<std::string>::iterator _it;
+	std::vector<std::string>::iterator _it_cmd;
+
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
+
 /*En dehors du scope de la classe car je l'utilise dans une autre classe et dans laquelle il n'y a pas l'instance IRC_Server*/
 # endif

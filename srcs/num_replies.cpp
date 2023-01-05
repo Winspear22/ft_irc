@@ -6,7 +6,7 @@ std::string RPL_WELCOME(MyMsg msg)
 {
     std::string reply;
 
-    reply = "001 " + msg.GetClients()->GetClientsNickname() + ": Welcome to the ft_irc Network.\n";
+    reply = "001 " + msg.GetClients()->GetClientsNickname() + ": \033[1;33mWelcome to the ft_irc Network.\033[1;37m\n";
 
     return (reply);
 }
@@ -15,7 +15,7 @@ std::string RPL_YOURHOST(MyMsg msg)
 {
     std::string reply;
 
-    reply = "002 " + msg.GetClients()->GetClientsNickname() + ": Your host is localhost:6667.\n";
+    reply = "002 " + msg.GetClients()->GetClientsNickname() + ": Your host is \033[1;31m localhost:6667.\n";
 
     return (reply);
 }
@@ -23,9 +23,10 @@ std::string RPL_YOURHOST(MyMsg msg)
 std::string RPL_CREATED(MyMsg msg)
 {
     std::string reply;
-
-    reply = "003 " + msg.GetClients()->GetClientsNickname() + ": This server was created <datetime>.\n";
-
+    time_t 		tmp;
+	
+	tmp = time(NULL);
+    reply = "003 " + msg.GetClients()->GetClientsNickname() + ": This server was created \033[1;31m" + std::string(ctime(&tmp));
     return (reply);
 }
 
@@ -34,7 +35,6 @@ std::string RPL_MYINFO(MyMsg msg)
     std::string reply;
 
     reply = "004 " + msg.GetClients()->GetClientsNickname(); // SET <available umodes> <available cmodes> [<cmodes with param>]
-
     return (reply);
 }
 
@@ -42,8 +42,10 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
 
-    reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ": Not enough parameters\n";
-
+    if (msg.GetClients()->GetClientsNickname().size() == 0)
+        reply = "461 *" + msg.GetCmd() + ":Not enough parameters\n";
+    else
+        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters\n";
     return (reply);
 }
 
@@ -51,8 +53,10 @@ std::string ERR_ALREADYREGISTRED(MyMsg msg)
 {
     std::string reply;
 
-    reply = "462 " + msg.GetClients()->GetClientsNickname() + ": Unauthorized command (already registered)\n";
-
+    if (msg.GetClients()->GetClientsNickname().size() == 0)
+        reply = "462 *" + msg.GetCmd() + ":Unauthorized command (already registered)\n";
+    else
+        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Unauthorized command (already registered)\n";
     return (reply);
 }
 
@@ -153,5 +157,13 @@ std::string ERR_NOSUCHSERVER(MyMsg msg)
 
     reply = "402 " + msg.GetClients()->GetClientsNickname() + " servername : No such channel";
 
+    return (reply);
+}
+
+std::string ERR_NOORIGIN(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "409 " + msg.GetClients()->GetClientsNickname() + " :No origin specified";
     return (reply);
 }

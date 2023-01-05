@@ -6,6 +6,7 @@ MyServer::MyServer( void )
 	return ;
 }
 
+
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
@@ -91,12 +92,18 @@ std::string     MyServer::GetPassword( void )
     return (this->_password);
 }
 
+int				MyServer::GetSocketFd( void )
+{
+	return (this->_socketfd);
+}
+
 void		MyServer::InitVariables( void )
 {
 	this->_new_fd_nb = 0;
 	this->_nb_of_clients = 0;
 	this->_right_password_used = FAILURE;
 }
+
 
 int			MyServer::CreateSocketFd( void )
 {
@@ -116,6 +123,7 @@ int			MyServer::SetSocketOptions( void )
 		return (ERROR_SOCKET_OPTIONS);
 	return (SUCCESS);
 }
+
 
 int			MyServer::BindSocketFd( void )
 {
@@ -146,12 +154,10 @@ int			MyServer::ListenToSockedFd( void )
 	return (SUCCESS);
 }
 
-int			MyServer::SetSocketFdToNonBlocking( void )
+int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 {
 	int ret;
-	/*COMPRENDRE LE FLAG F_SETFL*/
-	/*Si on retire cette partie, la connexion devient bloquante*/
-	ret = fcntl(this->_socketfd, F_SETFL, O_NONBLOCK);
+	ret = fcntl(SocketFd, F_SETFL, O_NONBLOCK);
 	if (ret == ERROR_SERVER)
 		return (ERROR_NONBLOCKING);
 	std::cout << GREEN << "fcntl(); works !" << std::endl;
@@ -167,8 +173,9 @@ int			MyServer::SelectClients( void )
 	int		fds_list; // sert a loop pour trouver lequel des fds a des donnees pour moi
 	struct timeval		timeout;
 
+
 	memset(&timeout, 0, sizeof(struct timeval));
-	timeout.tv_sec = 120;
+	timeout.tv_usec = 200000;
 	fds_list = -1;
 	FD_ZERO(&ready_fds);
 	FD_SET(this->_socketfd, &ready_fds);
@@ -179,14 +186,18 @@ int			MyServer::SelectClients( void )
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
-	this->CreateClients();
-	FD_SET(this->_new_fd_nb, &ready_fds);
-	if (this->_new_fd_nb > maximum_fds)
-        maximum_fds = this->_new_fd_nb;
-	std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
 	while (++fds_list <= maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
 	{
-		RecvClientsMsg(this->_new_fd_nb);
+		if (FD_ISSET(fds_list, &readfds))//(fds_list == this->_socketfd) // C'est un client qui a ete trouve
+		{
+			this->CreateClients();
+			FD_SET(this->_new_fd_nb, &ready_fds);
+			if (this->_new_fd_nb > maximum_fds)
+         	      maximum_fds = this->_new_fd_nb;
+			std::cout << CYAN << "Client currently connected : " << this->_nb_of_clients << std::endl;
+		}
+		else
+			RecvClientsMsg(this->_new_fd_nb);
 	}
 	return (SUCCESS);
 }
@@ -197,9 +208,13 @@ void			MyServer::CreateClients( void )
 	Clients			*client_created;
 	struct sockaddr	client_addr;
 	socklen_t		sizeofsockaddr;
-
+	int				ret_fcntl;
+	
 	sizeofsockaddr = sizeof(client_addr);
 	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
+	ret_fcntl = SetSocketFdToNonBlocking(client_created_fd);
+	if (ret_fcntl == ERROR_SERVER)
+		return (loop_errors_handlers_msg(ERROR_NONBLOCKING));
 	if (client_created_fd == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_ACCEPT));
 	else
@@ -235,7 +250,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	int									ret_rcv;
 	std::vector<std::string>			splitted_msg;
 	std::vector<std::string>::iterator 	it;
-
+	
 	std::vector<std::string>			tab_parse;
 	std::vector<std::string>::iterator 	str;
 	std::string 						cmd;
@@ -245,106 +260,98 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
-	GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
-	msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
-	splitted_msg = SplitByEndline(msg_buffer, "\r\n");
-	it = splitted_msg.begin();
-	while (it != splitted_msg.end())
-	{
-		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
-		/* PARSING DU MESSAGE */
-		tmp = strdup(it->c_str());
-		tab_parse = SplitByEndline(tmp, " ");
-		free(tmp);
-		str = tab_parse.begin();
-		if (str->at(0) == ':')
-		{
-			new_msg.SetPrefix(*str);
-			str++;
-		}
-		if (new_msg.CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
-		{
-			cmd = *str;
-			new_msg.SetCmd(*str);
-			str++;
-		}
-		else
-			std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
-		while (str != tab_parse.end())
-		{
-			new_msg.SetParams(*str);
-			str++;
-		}
-		if (cmd == "PASS")
-			new_msg.PassCmd();
-		if (cmd == "NICK")
-			new_msg.NickCmd();
-		if (cmd == "USER")
-		{
-			new_msg.UserCmd();
-			new_msg.ValidateClientsConnections();
-		}
-		it++;
+	if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL)
+	{ // Cas où le client se deconnecte normalement
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);
+		return ;
 	}
-	free(msg_buffer);
+	else if (ret_rcv != ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL)
+	{
+		GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
+		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
+		splitted_msg = SplitByEndline(msg_buffer, "\r\n");
+		it = splitted_msg.begin();
+		while (it != splitted_msg.end())
+		{	
+			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
+			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from" << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
+			tmp = strdup(it->c_str());
+			tab_parse = SplitByEndline(tmp, " ");
+			free(tmp);
+			str = tab_parse.begin();
+			if (str->at(0) == ':')
+			{
+				//this->new_msg->SetPrefix(*str);
+				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
+				str++;
+			}
+			if (this->new_msg->CheckFormatCmd(*str, this->_cmd_list) == SUCCESS)
+			{
+				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
+				str++;
+				this->new_msg->SetCmdExistence(CMD_EXISTS);
+			}
+			else
+			{
+				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
+				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
+			}
+			while (str != tab_parse.end())
+			{
+				this->new_msg->SetParams(*str);
+				//this->new_msg->Params.push_back(*str);
+				str++;
+			}
+			if (this->new_msg->GetCmdExistence() == CMD_EXISTS)
+			{
+				this->_it_cmd = this->_cmd_list.begin();
+				while (this->_it_cmd != this->_cmd_list.end())
+				{
+					if (*this->_it_cmd == this->new_msg->Command)
+						this->CheckClientsAuthentification(*this->_it_cmd, this->new_msg);
+					this->_it_cmd++;
+				}
+			}
+			delete this->new_msg;
+			it++;
+		}
+		free(msg_buffer);
+	}
 }
 
-int		MyServer::ParsingOfClientsCmds( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg, std::vector<std::string> msg_split_by_space )
+void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
-	if (this->ParsingOfPrefix( msg_split_by_space_it, msg ) == FAILURE)
-		return (FAILURE);
-	if (this->ParsingOfCmd( msg_split_by_space_it, msg ) == FAILURE)
-		return (FAILURE);
-	if (this->ParsingOfParams( msg_split_by_space_it, msg, msg_split_by_space ) == FAILURE)
-		return (FAILURE);
-	(void)msg_split_by_space_it;
-	(void)msg;
-	(void)msg_split_by_space;
-	return (SUCCESS);
+
+	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
+		this->ExecuteCommand(cmd, msg);
 }
 
-int		MyServer::ParsingOfPrefix( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg )
+void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 {
-	if (msg_split_by_space_it->at(0) == ':')
-	{
-		msg.SetPrefix(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	return (SUCCESS);
-}
-
-int		MyServer::ParsingOfCmd( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg )
-{
-	if (msg.CheckFormatCmd(*msg_split_by_space_it, this->_cmd_list) == SUCCESS)
-	{
-		msg.SetCmd(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	return (SUCCESS);
-}
-
-int		MyServer::ParsingOfParams( std::vector<std::string>::iterator msg_split_by_space_it, MyMsg msg, std::vector<std::string> msg_split_by_space )
-{
-	while (msg_split_by_space_it != msg_split_by_space.end())
-	{
-		std::cout << BLUE << "msg_split == " << *msg_split_by_space_it << NORMAL << std::endl;
-		msg.SetParams(*msg_split_by_space_it);
-		msg_split_by_space_it++;
-	}
-	(void)msg_split_by_space_it;
-	(void)msg;
-	(void)msg_split_by_space;
-	return (SUCCESS);
+	if (cmd == "PASS")
+		msg->PassCmd(this);
+	else if (cmd == "NICK")
+		msg->NickCmd(this);
+	else if (cmd == "USER")
+		msg->UserCmd(this);
+	else if (cmd == "MODE")
+		msg->ModeCmd(this);
+	else if (cmd == "PING")
+		msg->PingCmd(this);
+	else if (cmd == "QUIT")
+		msg->QuitCmd(this);
 }
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 {
 	int ret_send;
 
-	ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
-	if (ret_send == ERROR_SERVER)
-		return (loop_errors_handlers_msg(ERROR_SEND));
+	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
+	{
+		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
+		if (ret_send == ERROR_SERVER)
+			return (loop_errors_handlers_msg(ERROR_SEND));
+	}
 }
 
 Clients		*MyServer::GetClientsThroughName( std::string NickName )
@@ -375,7 +382,13 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 	return (NULL);
 }
 
-std::vector<std::string> MyServer::GetCmdList( void )
+int	 MyServer::DeleteDisconnectedClients(Clients* client)
 {
-	return (this->_cmd_list);
+	if (client != NULL && this->GetClientsThroughSocketFd(client->GetClientsFd()))
+	{
+		this->_clients_list.erase(this->GetClientsThroughSocketFd(client->GetClientsFd()));
+	//	this->_c
+		delete this->GetClientsThroughSocketFd(client->GetClientsFd());
+	}
+	return (SUCCESS);
 }
