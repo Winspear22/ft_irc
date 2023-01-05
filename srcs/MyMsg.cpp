@@ -101,18 +101,18 @@ void MyMsg::SetParams( std::string Params )
 	this->Params.push_back(Params);
 }
 
-int			MyMsg::CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list )
+int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
 	std::vector<std::string>::iterator it;
 	
 	it = cmd_list.begin();
 	while (it != cmd_list.end())
 	{
-		if (*it == cmd)
+		if (*it == *cmd)
 			return (SUCCESS);
 		it++;
 	}
-	return (SUCCESS);
+	return (FAILURE);
 }
 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
@@ -157,24 +157,47 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 
 int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 {
-	unsigned int i;
-	int j;
-	char special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '\'', '|'};
+	unsigned int 	i;
+	int 			j;
+	int				not_a_special_character;
+	char 			special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '\'', '|'};
 	
 	i = 1;
 	j = -1;
+	not_a_special_character = 0;
 	while (special_characters[++j]) // Je check si le premier est un character spé
 	{
-		if (nickcheck->at(0) != special_characters[j] && !isalpha(nickcheck->at(0)))
-			return (FAILURE);
+		if (nickcheck->at(0) != special_characters[j])
+		{
+			not_a_special_character = 1;
+			break ;
+		}
+		else
+			not_a_special_character = 0;
 	}
+	if (not_a_special_character == 1 && !isalpha(nickcheck->at(0)))
+		return (FAILURE);
+	if (not_a_special_character == 0 && j == 8 && !isalpha(nickcheck->at(0)))
+		return (FAILURE);
+	
+	not_a_special_character = 0;
 	while (i < nickcheck->size()) // je check si les 8 autres caractères sont autre choses qu'un alphanum + spé
 	{
 		j = -1;
 		while (special_characters[++j])
 		{
-			if (nickcheck->at(i) != special_characters[j] && !isalnum(nickcheck->at(i)))
-				return (FAILURE);
+			if (nickcheck->at(i) != special_characters[j])
+			{
+				not_a_special_character = 1;
+				break ;
+			}
+			else
+				not_a_special_character = 0;
+		}
+		if (not_a_special_character == 1 && j == 8 && !isalnum(nickcheck->at(i)))
+		{	
+			std::cout << RED << special_characters[j] << " = " << j << YELLOW << " = " << nickcheck->at(i) << NORMAL << std::endl;
+			return (FAILURE);
 		}
 		i++;
 	}
@@ -294,8 +317,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 			it++;
 		}
 		this->_SentFrom->SetClientsRealname(realname);
-	//	std::cout << "realname == " << this->_SentFrom->GetClientsRealname() << std::endl;
-
 		this->_SentFrom->SetClientsConnectionUserCmd(YES);
 	/*Si le NICK et le USER sont OK, alors tout est OK*/
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
@@ -308,10 +329,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 /*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
-	//std::string msg_sent;
-
-/*	msg_sent = "\033[1;35mMODE\033[0m";
-	SendMsgBackToClients(*this, msg_sent);*/
 	(void)IRC_Server;
 	return (SUCCESS);
 }
@@ -335,6 +352,7 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+# include <unistd.h>
 /*QUIT NON FONCTIONNEL ENCORE*/
 int			MyMsg::QuitCmd( MyServer *IRC_Server )
 {
@@ -351,8 +369,57 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 			msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
 	}
 	SendMsgBackToClients(*this, msg_sent);
-	IRC_Server->DeleteDisconnectedClients(this->_SentFrom);
-	(void)IRC_Server;
+//	close(this->_SentFrom->GetClientsFd());
+//	this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+	//this->_SentFrom->SetClientsConnectionNickCmd(NO);
+	//this->_SentFrom->SetClientsConnectionUserCmd(NO);
+//	this->_SentFrom->SetClientsConnectionStatus(NO);
+//	this->_SentFrom->SetClientsConnectionPermission(NO);
+
+
+(void)IRC_Server;
+	return (SUCCESS);
+}
+
+
+int			MyMsg::MotdCmd( void )
+{
+	std::string msg_sent;
+	std::string file_tmp;
+	std::vector<std::string> file_content;
+	std::vector<std::string>::iterator it;
+
+	if (this->Params.size() > 4) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
+	{
+		msg_sent = ERR_NOMOTD(*this, 1);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else
+	{
+		std::ifstream motd_file("./srcs/motd.txt");
+		if (!motd_file.good()) // Si le fichier n'existe pas
+		{
+			msg_sent = ERR_NOMOTD(*this, 2);
+			SendMsgBackToClients(*this, msg_sent);
+		}
+		else // Si le fichier existe
+		{
+			msg_sent = RPL_MOTDSTART(*this); // Code pour commencer le msg
+			SendMsgBackToClients(*this, msg_sent);
+			while (getline(motd_file, file_tmp)) // j'écris dans la variable le contenu de motd.txt
+				file_content.push_back(file_tmp);
+			it = file_content.begin();
+			while (it != file_content.end())
+			{
+				msg_sent = RPL_MOTD(*this, it);
+				SendMsgBackToClients(*this, msg_sent); //je le renvoi ligne par ligne au client
+				it++;
+			}
+		}
+		motd_file.close();
+		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
+		SendMsgBackToClients(*this, msg_sent);
+	}
 	return (SUCCESS);
 }
 
@@ -372,5 +439,6 @@ int		MyMsg::ValidateClientsConnections( void )
 
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
 	SendMsgBackToClients(*this, intro_new_nick);
+	this->MotdCmd();
 	return (SUCCESS);
 }

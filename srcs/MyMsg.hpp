@@ -25,12 +25,13 @@ public:
 	void 		SetCmd( std::string );
 	void 		SetParams( std::string );
 	void		SetCmdExistence( int CmdExistenceStatus );
-	int			CheckFormatCmd( std::string cmd, std::vector<std::string> cmd_list );
+	int			CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list );
 
 	int			PassCmd( MyServer *IRC_Server );
 	int			NickCmd( MyServer *IRC_Server );
 	int			NickFormatCheck( std::vector<std::string>::iterator nickcheck );
 	int			UserCmd( MyServer *IRC_Server );
+	int			MotdCmd();
 	int			ModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );
 	int			QuitCmd( MyServer *IRC_Server );

@@ -44,6 +44,9 @@
 /*find*/
 # include <algorithm>
 
+/*ifstream*/
+# include <fstream>
+
 # include "MyServer.hpp"
 # include "Clients.hpp"
 

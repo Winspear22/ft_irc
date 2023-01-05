@@ -170,3 +170,13 @@ void		Clients::SetClientsConnectionStatus( int status )
 {
 	this->_ConnectionStatus = status;
 }
+
+std::string	Clients::GetServerName( void )
+{
+	return (this->_ServerName);
+}
+
+void		Clients::SetServerName( std::string ServerName )
+{
+	this->_ServerName = ServerName;
+}

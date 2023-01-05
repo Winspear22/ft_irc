@@ -43,7 +43,7 @@ public:
 	Clients		*GetClientsThroughSocketFd( int fd );
 
 
-	int			DeleteDisconnectedClients(Clients *client);
+	int			DeleteDisconnectedClients( void );
 	std::map<Clients*, int> _clients_list;
 	MyMsg					*new_msg;
 
@@ -60,6 +60,9 @@ private:
 	/*TEST*/
 	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
 	int				_nb_of_clients;
+
+	int				_fds_list;
+	int				_maximum_fds;
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
