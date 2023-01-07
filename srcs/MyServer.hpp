@@ -70,6 +70,7 @@ private:
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
+void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg );
 
 /*En dehors du scope de la classe car je l'utilise dans une autre classe et dans laquelle il n'y a pas l'instance IRC_Server*/
 # endif

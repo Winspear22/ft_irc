@@ -31,10 +31,13 @@ public:
 	int			NickCmd( MyServer *IRC_Server );
 	int			NickFormatCheck( std::vector<std::string>::iterator nickcheck );
 	int			UserCmd( MyServer *IRC_Server );
-	int			MotdCmd();
+	int			MotdCmd( void );
 	int			ModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );
 	int			QuitCmd( MyServer *IRC_Server );
+	int			PrivMsgCmd( MyServer *Irc_Server );
+	int			NoticeCmd( MyServer *Irc_Server );
+
 	int			ValidateClientsConnections( void );
 	std::string					Prefix;
 	std::string					Command;
@@ -46,7 +49,7 @@ private:
 	std::string 				_Message;
 	std::string					_Prefix;
 	std::string					_Command;
-	std::vector<std::string>	_Params;
+//	std::vector<std::string>	_Params;
 	/*pour savoir de qui vient le message grace au socketfd*/
 	Clients						*_SentFrom;
 	int							_DoesCmdExist;

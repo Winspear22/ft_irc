@@ -47,6 +47,21 @@ std::string MyMsg::GetMsg( void )
 
 std::string MyMsg::GetPrefix( void )
 {
+	std::string tmp;
+
+	if (!this->_SentFrom->GetClientsNickname().empty())
+	{
+		tmp = ":" + this->_SentFrom->GetClientsNickname();
+		if (!this->_SentFrom->GetClientsUsername().empty())
+			tmp = tmp + "!" + this->_SentFrom->GetClientsUsername();
+		if (!this->_SentFrom->GetClientsUsername().empty())
+			tmp = tmp + "@" + this->_SentFrom->GetClientsHostname();
+		else
+			tmp = tmp + "@" + this->_SentFrom->GetClientsHostAdress();
+	}
+	else
+		tmp = ":" + this->_SentFrom->GetServerName();
+	this->_Prefix = tmp;
 	return (this->_Prefix);
 }
 
@@ -101,6 +116,8 @@ void MyMsg::SetParams( std::string Params )
 	this->Params.push_back(Params);
 }
 
+
+/*verifier la pertinence de cette fct par rapport au RFC car il y'a un bail avec la grammaire des commandes : 1 chifres et 3 lettres*/
 int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
 	std::vector<std::string>::iterator it;
@@ -329,6 +346,7 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 /*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
+
 	(void)IRC_Server;
 	return (SUCCESS);
 }
@@ -337,7 +355,6 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
-
 	if (this->Params.empty())
 	{
 		msg_sent = ERR_NOORIGIN(*this);
@@ -345,7 +362,8 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 	}
 	else
 	{
-		msg_sent = "PONG " + this->_SentFrom->GetClientsNickname() + " :" + this->Params.at(0);
+		msg_sent = "PONG " + this->_SentFrom->GetClientsNickname() + " :" + this->Params.at(0) + " \r\n";
+		this->_SentFrom->SetClientsLastPing(std::time(0));
 		SendMsgBackToClients(*this, msg_sent);
 	}
 	(void)IRC_Server;
@@ -381,7 +399,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
+/*RENVOIT LE MESSAGE OF THE DAY -- VERIFIER LE > 4 DANS LE PREMIER IF*/
 int			MyMsg::MotdCmd( void )
 {
 	std::string msg_sent;
@@ -423,6 +441,83 @@ int			MyMsg::MotdCmd( void )
 	return (SUCCESS);
 }
 
+int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
+{
+	std::string msg_sent;
+	std::string	tmp;
+	int			ret_find_first_of;
+	size_t		ping_pos;
+
+	ret_find_first_of = this->Params.at(0).find_first_of("!#+&");
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NORECIPENT(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (this->Params.size() == 1)
+	{
+		msg_sent = ERR_NOTEXTTOSEND(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (ret_find_first_of != 0 && Irc_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
+	{
+		std::cout << RED << "Error, no pseudo" << NORMAL << std::endl;
+		msg_sent = ERR_NOSUCHNICK(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else
+	{
+		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
+		tmp = "";
+		std::cout << GREEN << this->_Message << std::endl;
+		std::cout << "start === " << ping_pos << std::endl;
+		if (ping_pos != std::string::npos)
+		{
+			std::cout << PURPLE << "Je suis ici" << NORMAL << std::endl;
+			tmp = this->_Message.substr(ping_pos);
+		}
+		/*Ne pas oublier le cas avec les channels*/
+		//else
+		//{
+			std::cout << PURPLE << "tmp == " << WHITE << tmp << NORMAL << std::endl;
+			std::cout << PURPLE << "Je suis là" << NORMAL << std::endl;
+			RPL_PRIVMSG(this, tmp, 0); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+		//}	
+	}
+	(void)Irc_Server;
+	return (SUCCESS);
+}
+
+int	MyMsg::NoticeCmd( MyServer *Irc_Server )
+{
+	std::string msg_sent;
+	int			ret_find_first_of;
+	std::string	tmp;
+	size_t		ping_pos;
+
+
+	ret_find_first_of = this->Params.at(0).find_first_of("!#+&");
+	if (this->Params.size() < 2)
+		return (FAILURE);
+	else if (ret_find_first_of != 0 && Irc_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
+		return (FAILURE);
+	/*Ne pas oublier le if de la channels*/
+	else
+	{
+		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
+		tmp = "";
+		if (ping_pos != std::string::npos)
+		{
+			std::cout << PURPLE << "Je suis ici" << NORMAL << std::endl;
+			tmp = this->_Message.substr(ping_pos);
+			RPL_PRIVMSG(this, tmp, 1); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+		}
+	}
+	//msg_sent = "NOTICE CMD EXECUTED";
+	//SendMsgBackToClients(*this, msg_sent);
+	(void)Irc_Server;
+	return (SUCCESS);
+}
 
 int		MyMsg::ValidateClientsConnections( void )
 {

@@ -340,6 +340,19 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->PingCmd(this);
 	else if (cmd == "QUIT")
 		msg->QuitCmd(this);
+	else if (cmd == "PRIVMSG")
+		msg->PrivMsgCmd(this);
+	else if (cmd == "NOTICE")
+		msg->NoticeCmd(this);
+}
+
+void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
+{
+	std::cout << RED << "MSG === " << WHITE << Msg << std::endl;
+	Msg = ClientMsg.GetPrefix() + Msg;
+	std::cout << BLUE << "MSG with prfix === " << PURPLE << Msg << std::endl;
+
+	SendMsgBackToClients(ClientMsg, Msg);
 }
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
