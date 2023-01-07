@@ -266,7 +266,8 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		SendMsgBackToClients(*this, msg_sent);
 		/*Si le NICK et le USER sont OK, alors tout est OK*/
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
-		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
+		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
+		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
 			ValidateClientsConnections();
 		return (SUCCESS);
 	}
@@ -336,7 +337,8 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		this->_SentFrom->SetClientsRealname(realname);
 		this->_SentFrom->SetClientsConnectionUserCmd(YES);
 	/*Si le NICK et le USER sont OK, alors tout est OK*/
-		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
+		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
+		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
 			ValidateClientsConnections();
 	}
 	return (SUCCESS);
@@ -468,7 +470,7 @@ int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 	else
 	{
 		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
-		tmp = "";
+		//tmp = "";
 		std::cout << GREEN << this->_Message << std::endl;
 		std::cout << "start === " << ping_pos << std::endl;
 		if (ping_pos != std::string::npos)
@@ -505,7 +507,7 @@ int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 	else
 	{
 		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
-		tmp = "";
+		//tmp = "";
 		if (ping_pos != std::string::npos)
 		{
 			std::cout << PURPLE << "Je suis ici" << NORMAL << std::endl;
@@ -513,8 +515,6 @@ int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 			RPL_PRIVMSG(this, tmp, 1); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
 		}
 	}
-	//msg_sent = "NOTICE CMD EXECUTED";
-	//SendMsgBackToClients(*this, msg_sent);
 	(void)Irc_Server;
 	return (SUCCESS);
 }

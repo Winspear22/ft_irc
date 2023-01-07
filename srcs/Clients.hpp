@@ -67,8 +67,8 @@ private:
 
 	/*On utilise les deux derniers booléens car Nick et User peuvent être faits dans des ordres différents*/
 	/*Autrement : Authorisation + NICK + USER = Permission */
-	bool		_HasTheClientsBeenAccepted; // Authorisation pour le PWD
-	bool		_HasTheClientsBeenAuthorized; // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
+	bool		_HasTheClientsBeenAccepted;   // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
+	bool		_HasTheClientsBeenAuthorized; // Authorisation pour le PWD
 	bool		_HasTheClientsNickBeenChosen; // Authorisation pour le Nick - NICK a bien fonctionné
 	bool		_HasTheClientsUserBeenChosen; // Authorisation pour le User - USER a bien fonctionné
 	int			_ConnectionStatus;
