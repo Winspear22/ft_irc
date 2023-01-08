@@ -151,11 +151,12 @@ std::string ERR_NOPRIVILEGES(MyMsg msg)
     return (reply);
 }
 
-std::string ERR_NOSUCHSERVER(MyMsg msg)
+std::string ERR_NOSUCHSERVER(MyMsg msg, std::vector<std::string>::iterator it)
 {
     std::string reply;
+    std::string iterator_content = *it;
 
-    reply = "402 " + msg.GetClients()->GetClientsNickname() + " servername : No such channel" + "\r\n";;
+    reply = "402 " + msg.GetClients()->GetClientsNickname() + ": " + iterator_content + ": No such server" + "\r\n";;
 
     return (reply);
 }
@@ -252,4 +253,12 @@ void	 RPL_PRIVMSG(MyMsg *msg, std::string tmp, int version)
         i = i + ret_send;
     }
     return ;
+}
+
+std::string RPL_VERSION(MyMsg msg)
+{
+	std::string reply;
+	/*S'assurer de la bonne version dans le RPL*/
+	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m" + "\r\n";;
+	return (reply);
 }

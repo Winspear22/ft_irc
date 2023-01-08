@@ -3,9 +3,11 @@
 
 # include "Clients.hpp"
 # include "MyServer.hpp"
+# include "Channels.hpp"
 
 class Clients;
 class MyServer;
+class Channels;
 
 class MyMsg
 {
@@ -34,9 +36,11 @@ public:
 	int			MotdCmd( void );
 	int			ModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );
+	int			VersionCmd( void );
 	int			QuitCmd( MyServer *IRC_Server );
 	int			PrivMsgCmd( MyServer *Irc_Server );
 	int			NoticeCmd( MyServer *Irc_Server );
+	int			JoinCmd( MyServer *IRC_Server );
 
 	int			ValidateClientsConnections( void );
 	std::string					Prefix;

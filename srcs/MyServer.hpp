@@ -4,6 +4,7 @@
 # include "irc.hpp"
 # include "Clients.hpp"
 # include "MyMsg.hpp"
+# include "Channels.hpp"
 
 class Clients;
 class MyMsg;
@@ -42,10 +43,19 @@ public:
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 
+	std::vector<std::string> SplitByEndline(char *str, const char *delim);
 
-	int			DeleteDisconnectedClients( void );
-	std::map<Clients*, int> _clients_list;
-	MyMsg					*new_msg;
+	Channels	*GetChannelsByName( std::string ChannelName );
+	void		CreateChannels( Channels *ChannelCreated );
+	void		SendMsgToAllInChannels( std::string msg_sent );
+
+
+
+
+
+	std::map<Clients*, int> 			_clients_list;
+	std::map<Channels*, std::string>	channels_list;
+	MyMsg								*new_msg;
 
 private:
     MyServer(/* ARG */);
