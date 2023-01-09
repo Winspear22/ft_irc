@@ -9,6 +9,9 @@ Clients::Clients( void )
 
 Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string ServerName )
 {
+	char hostname[NI_MAXHOST];
+	int ret;
+
 	this->_ClientFd = ClientFd;
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
@@ -17,6 +20,12 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_HasTheClientsUserBeenChosen = NO;
 	this->_HasTheClientsNickBeenChosen = NO;
 	this->_ConnectionStatus = YES;
+	this->_HostAdress = inet_ntoa(New_Address.sin_addr);
+	ret = getnameinfo(((struct sockaddr *)&New_Address), sizeof(New_Address), hostname, NI_MAXHOST, NULL, 0, 0);
+	if (ret == SUCCESS)
+		this->_Hostname = hostname;
+	else
+		loop_errors_handlers_msg(ERROR_USER_DISCONNECTED);
 	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
@@ -103,6 +112,26 @@ void		Clients::SetClientsNickname( std::string Nickname )
 	this->_Nickname = Nickname;
 }
 
+std::string Clients::GetClientsHostname( void )
+{
+	return (this->_Hostname);
+}
+
+void		Clients::SetClientsHostname( std::string Hostname )
+{
+	this->_Hostname = Hostname;
+}
+
+std::string Clients::GetClientsHostAdress( void )
+{
+	return (this->_HostAdress);
+}
+
+void		Clients::SetClientsHostAdress( std::string hostAdress )
+{
+	this->_HostAdress = hostAdress;
+}
+
 std::string Clients::GetClientsMessage( void )
 {
 	return (this->_ClientMessage);
@@ -179,4 +208,13 @@ std::string	Clients::GetServerName( void )
 void		Clients::SetServerName( std::string ServerName )
 {
 	this->_ServerName = ServerName;
+}
+
+time_t		Clients::GetClientsLastPing( void )
+{
+	return (this->_LastPing);
+}
+void		Clients::SetClientsLastPing( time_t ping )
+{
+	this->_LastPing = ping;
 }

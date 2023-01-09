@@ -11,15 +11,15 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
-	std::string cmd_list_string[80] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
-	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
+	std::string cmd_list_string[81] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	"ERROR", "HELP", "info", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
 	"USERIP", "USERS", "version", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP" };
 
 	i = -1;
-	while (++i < 80)
+	while (++i < 81)
 		this->_cmd_list.push_back(cmd_list_string[i]);
 	this->_fds_list = 0;
 	return ;
@@ -36,16 +36,27 @@ MyServer::~MyServer( void )
 {
 	std::cout << RED << "MyServer Destructor called." << NORMAL << std::endl;
 	std::map<Clients*, int>::iterator it;
+	std::map<Channels*, std::string>::iterator itt;
 	
 	it = this->_clients_list.begin();	
 	while (it != this->_clients_list.end())
 	{
-		delete it->first;
 		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
+		delete it->first;
 		it++;
 	}
 	this->_clients_list.clear();
 	std::cout << CYAN << "All Clients were freed. No Leaks. :)" << NORMAL << std::endl;
+	itt = this->channels_list.begin();
+	while (itt != this->channels_list.end())
+	{
+		std::cout << YELLOW << "Deleting Channel named : " << WHITE << itt->second << NORMAL << std::endl;
+		delete itt->first;
+		itt++;
+	}
+	this->channels_list.clear();
+	std::cout << CYAN << "All Channels were freed. No Leaks. :)" << NORMAL << std::endl;
+
 	return ;
 }
 
@@ -229,7 +240,7 @@ void			MyServer::CreateClients( void )
 	}
 }
 
-std::vector<std::string> SplitByEndline(char *str, const char *delim)
+std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 {
 	char 	*tmp;
 	std::vector<std::string> splitted_str;
@@ -268,14 +279,14 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	{
 		GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
 		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
-		splitted_msg = SplitByEndline(msg_buffer, "\r\n");
+		splitted_msg = this->SplitByEndline(msg_buffer, "\r\n");
 		it = splitted_msg.begin();
 		while (it != splitted_msg.end())
 		{	
 			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
 			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 			tmp = strdup(it->c_str());
-			tab_parse = SplitByEndline(tmp, " ");
+			tab_parse = this->SplitByEndline(tmp, " ");
 			free(tmp);
 			str = tab_parse.begin();
 			if (str->at(0) == ':')
@@ -334,14 +345,31 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->UserCmd(this);
 	else if (cmd == "motd")
 		msg->MotdCmd();
-	else if (cmd == "version")
-		msg->VersionCmd();
 	else if (cmd == "MODE")
 		msg->ModeCmd(this);
 	else if (cmd == "PING")
 		msg->PingCmd(this);
 	else if (cmd == "QUIT")
 		msg->QuitCmd(this);
+	else if (cmd == "version")
+		msg->VersionCmd();
+	else if (cmd == "info")
+		msg->InfoCmd();
+	else if (cmd == "PRIVMSG")
+		msg->PrivMsgCmd(this);
+	else if (cmd == "NOTICE")
+		msg->NoticeCmd(this);
+	else if (cmd == "JOIN")
+		msg->JoinCmd(this);
+}
+
+void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
+{
+	std::cout << RED << "MSG === " << WHITE << Msg << std::endl;
+	Msg = ClientMsg.GetPrefix() + Msg;
+	std::cout << BLUE << "MSG with prfix === " << PURPLE << Msg << std::endl;
+
+	SendMsgBackToClients(ClientMsg, Msg);
 }
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
@@ -384,15 +412,47 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 	return (NULL);
 }
 
-/*int	 MyServer::DeleteDisconnectedClients( void )
+Channels	*MyServer::GetChannelsByName( std::string ChannelName )
 {
-	std::map<Clients *, int>::iterator it;
+	std::map<Channels*, std::string>::iterator it;
+
+	it = this->channels_list.begin();
+	while (it != this->channels_list.end())
+	{
+		if (it->first->GetChannelName() == ChannelName && it->second == ChannelName)
+			return (it->first);
+		it++;
+	}
+	return (NULL);
+}
+
+void		MyServer::CreateChannels( Channels *ChannelCreated )
+{
+	std::map<Channels*, std::string>::iterator it;
+
+	it = this->channels_list.begin();
+	if (ChannelCreated == NULL)
+		return ;
+	while (it != this->channels_list.end())
+	{
+		if (ChannelCreated->GetChannelName() == it->first->GetChannelName())
+		{//Si on rentre dans ce if, çavut dire que le channel existe déjà, il faut alors delete l'allocation de mémoire
+			delete ChannelCreated; 
+			return ;
+		}
+		it++;
+	}
+	this->channels_list.insert(std::make_pair(ChannelCreated, ChannelCreated->GetChannelName()));
+}
+
+/*void		MyServer::SendMsgToAllInChannels( std::string msg_sent )
+{
+	std::map<Clients*, int>::iterator it;
 
 	it = this->_clients_list.begin();
 	while (it != this->_clients_list.end())
 	{
-		if (it->first->GetClientsConnectionStatus() == NO || it->first->)
+		SendMsgBackWithPrefix(*this->new_msg, msg_sent);
 		it++;
 	}
-	return (SUCCESS);
 }*/
