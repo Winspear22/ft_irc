@@ -363,9 +363,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
 {
-	std::cout << RED << "MSG === " << WHITE << Msg << std::endl;
-	Msg = ClientMsg.GetPrefix() + Msg;
-	std::cout << BLUE << "MSG with prfix === " << PURPLE << Msg << std::endl;
+	Msg = ClientMsg.GetPrefix() + " " + Msg;
+	//std::cout << RED << "MSG with prfix === " << YELLOW << Msg << std::endl;
 
 	SendMsgBackToClients(ClientMsg, Msg);
 }

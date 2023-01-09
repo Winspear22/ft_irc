@@ -237,7 +237,8 @@ void	 RPL_PRIVMSG(MyMsg *msg, std::string tmp, int version)
     int         	ret_send;
 
     /*prefix + PRIVMSG + param[0] + " " + text*/
-    i = 0;
+    std::cout << RED << "JE SUIS DANS RPL_PRIVMSG" << NORMAL << std::endl;
+	i = 0;
 	if (version == 0)
 		reply = msg->GetPrefix() + " PRIVMSG " + msg->Params.at(0) + " " + tmp + "\r\n";
     else if (version == 1)

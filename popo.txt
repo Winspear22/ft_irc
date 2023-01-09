@@ -1,0 +1,339 @@
+N #lol
+msg == user42___
+FD == 9
+Send msgto all = user42_
+msg sent in broadcast == :user42___!user42@adaloui.42.fr JOIN #lol
+msg == user42___
+FD == 9
+fcntl(); works !
+A new client connected to the server. He holds the fd n° 10
+Client currently connected : 5
+You have a message : CAP LS from  socket n° 10
+You have a message : PASS 111 from  socket n° 10
+Pass validé
+You have a message : NICK user42 from  socket n° 10
+You have a message : USER user42 user42 127.0.0.1 :adaloui from  socket n° 10
+You have a message : NICK user42_ from  socket n° 10
+You have a message : NICK user42__ from  socket n° 10
+You have a message : NICK user42___ from  socket n° 10
+You have a message : NICK user42__1 from  socket n° 10
+Client validé
+You have a message : MODE user42__1: +i from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42___ socket n° 9
+You have a message : WHOIS user42 from user42__1 socket n° 10
+You have a message : JOIN #lol from user42__1 socket n° 10
+msg_sent in JOIN === JOIN #lol
+Send msgto all = user42
+msg sent in broadcast == :user42__1!user42@adaloui.42.fr JOIN #lol
+msg == user42__1
+FD == 10
+Send msgto all = user42_
+msg sent in broadcast == :user42__1!user42@adaloui.42.fr JOIN #lol
+msg == user42__1
+FD == 10
+Send msgto all = user42___
+msg sent in broadcast == :user42__1!user42@adaloui.42.fr JOIN #lol
+msg == user42__1
+FD == 10
+You have a message : PRIVMSG #lol :oui from user42_ socket n° 7
+Send msgto all = user42
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Send msgto all = user42___
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Send msgto all = user42__1
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Channel name == 0x5babc00
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PRIVMSG #lol :oui from user42_ socket n° 7
+Send msgto all = user42
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Send msgto all = user42___
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Send msgto all = user42__1
+msg sent in broadcast == :user42_!user42@adaloui.42.fr PRIVMSG #lol :oui
+
+msg == user42_
+FD == 7
+Channel name == 0x5babc00
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+You have a message : PING 127.0.0.1 from user42_ socket n° 7
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+fcntl(); works !
+A new client connected to the server. He holds the fd n° 11
+Client currently connected : 6
+You have a message : CAP LS from  socket n° 11
+You have a message : PASS 111 from  socket n° 11
+Pass validé
+You have a message : NICK user42 from  socket n° 11
+You have a message : USER user42 user42 127.0.0.1 :adaloui from  socket n° 11
+You have a message : NICK user42_ from  socket n° 11
+You have a message : NICK user42__ from  socket n° 11
+You have a message : NICK user42___ from  socket n° 11
+You have a message : NICK user42__1 from  socket n° 11
+You have a message : NICK user42__2 from  socket n° 11
+Client validé
+You have a message : MODE user42__2: +i from user42__2 socket n° 11
+You have a message : WHOIS user42 from user42__2 socket n° 11
+You have a message : JOIN #lol from user42__2 socket n° 11
+msg_sent in JOIN === JOIN #lol
+Send msgto all = user42
+msg sent in broadcast == :user42__2!user42@adaloui.42.fr JOIN #lol
+msg == user42__2
+FD == 11
+Send msgto all = user42_
+msg sent in broadcast == :user42__2!user42@adaloui.42.fr JOIN #lol
+msg == user42__2
+FD == 11
+Send msgto all = user42___
+msg sent in broadcast == :user42__2!user42@adaloui.42.fr JOIN #lol
+msg == user42__2
+FD == 11
+Send msgto all = user42__1
+msg sent in broadcast == :user42__2!user42@adaloui.42.fr JOIN #lol
+msg == user42__2
+FD == 11
+You have a message : PING 127.0.0.1 from user42__1 socket n° 10
+You have a message : PING 127.0.0.1 from user42__2 socket n° 11
+You have a message : PING 127.0.0.1 from user42__ socket n° 8
+fcntl(); works !
+A new client connected to the server. He holds the fd n° 21
+Client currently connected : 7
+You have a message : CAP LS from  socket n° 21
+You have a message : PASS 111 from  socket n° 21
+Pass validé
+You have a message : NICK user42 from  socket n° 21
+You have a message : USER user42 user42 127.0.0.1 :adaloui from  socket n° 21
+You have a message : PING 127.0.0.1 from user42 socket n° 6
+You have a message : NICK user42_ from  socket n° 21
+You have a message : NICK user42__ from  socket n° 21
+You have a message : NICK user42___ from  socket n° 21
+You have a message : NICK user42__1 from  socket n° 21
+You have a message : NICK user42__2 from  socket n° 21
+You have a message : NICK user42__3 from  socket n° 21
+Client validé
+You have a message : MODE user42__3: +i from user42__3 socket n° 21
+You have a message : WHOIS user42 from user42__3 socket n° 21
+You have a message : JOIN #lol from user42__3 socket n° 21
+msg_sent in JOIN === JOIN #lol
+Send msgto all = user42
+msg sent in broadcast == :user42__3!user42@adaloui.42.fr JOIN #lol
+msg == user42__3
+FD == 21
+Send msgto all = user42_
+msg sent in broadcast == :user42__3!user42@adaloui.42.fr JOIN #lol
+msg == user42__3
+FD == 21
+Send msgto all = user42___
+msg sent in broadcast == :user42__3!user42@adaloui.42.fr JOIN #lol
+msg == user42__3
+FD == 21
+==4507== 
+==4507== Process terminating with default action of signal 13 (SIGPIPE)
+==4507==    at 0x55019DD: send (send.c:28)
+==4507==    by 0x11D9CF: Channels::SendMsgToAllInChannels(MyMsg*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, Clients*) (Channels.cpp:117)
+==4507==    by 0x11C53F: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:584)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507==    by 0x10E51C: MyServer::CheckClientsAuthentification(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:335)
+==4507==    by 0x10E230: MyServer::RecvClientsMsg(int) (MyServer.cpp:321)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== HEAP SUMMARY:
+==4507==     in use at exit: 8,343 bytes in 38 blocks
+==4507==   total heap usage: 3,955 allocs, 3,917 frees, 680,607 bytes allocated
+==4507== 
+==4507== 12 bytes in 1 blocks are still reachable in loss record 1 of 15
+==4507==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x547C9D9: strdup (strdup.c:42)
+==4507==    by 0x10DC45: MyServer::RecvClientsMsg(int) (MyServer.cpp:281)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 32 bytes in 1 blocks are still reachable in loss record 2 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x111FEF: __gnu_cxx::new_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x111890: __gnu_cxx::__alloc_traits<std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::allocate(std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x110CA5: std::_Vector_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate(unsigned long) (stl_vector.h:172)
+==4507==    by 0x110627: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >* std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate_and_copy<__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >(unsigned long, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >) (stl_vector.h:1260)
+==4507==    by 0x10F712: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::operator=(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (vector.tcc:206)
+==4507==    by 0x10DC98: MyServer::RecvClientsMsg(int) (MyServer.cpp:282)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 32 bytes in 1 blocks are still reachable in loss record 3 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x111FEF: __gnu_cxx::new_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x111890: __gnu_cxx::__alloc_traits<std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::allocate(std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x110CA5: std::_Vector_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate(unsigned long) (stl_vector.h:172)
+==4507==    by 0x10FF59: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (vector.tcc:406)
+==4507==    by 0x10F327: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::push_back(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (stl_vector.h:948)
+==4507==    by 0x117904: MyMsg::SetParams(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (MyMsg.cpp:116)
+==4507==    by 0x10E0FD: MyServer::RecvClientsMsg(int) (MyServer.cpp:311)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 32 bytes in 1 blocks are still reachable in loss record 4 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x111FEF: __gnu_cxx::new_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x111890: __gnu_cxx::__alloc_traits<std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::allocate(std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x110CA5: std::_Vector_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate(unsigned long) (stl_vector.h:172)
+==4507==    by 0x110627: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >* std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate_and_copy<__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >(unsigned long, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >) (stl_vector.h:1260)
+==4507==    by 0x10F712: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::operator=(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (vector.tcc:206)
+==4507==    by 0x11C115: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:569)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507==    by 0x10E51C: MyServer::CheckClientsAuthentification(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:335)
+==4507==    by 0x10E230: MyServer::RecvClientsMsg(int) (MyServer.cpp:321)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 32 bytes in 1 blocks are still reachable in loss record 5 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x4F62AC6: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_assign(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x4F62E18: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x117518: MyMsg::GetPrefix[abi:cxx11]() (MyMsg.cpp:64)
+==4507==    by 0x11D70B: Channels::SendMsgToAllInChannels(MyMsg*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, Clients*) (Channels.cpp:108)
+==4507==    by 0x11C53F: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:584)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507==    by 0x10E51C: MyServer::CheckClientsAuthentification(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:335)
+==4507==    by 0x10E230: MyServer::RecvClientsMsg(int) (MyServer.cpp:321)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 42 bytes in 1 blocks are still reachable in loss record 6 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x4F62AC6: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_assign(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x4F62E18: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x11D755: Channels::SendMsgToAllInChannels(MyMsg*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, Clients*) (Channels.cpp:108)
+==4507==    by 0x11C53F: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:584)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507==    by 0x10E51C: MyServer::CheckClientsAuthentification(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:335)
+==4507==    by 0x10E230: MyServer::RecvClientsMsg(int) (MyServer.cpp:321)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 64 bytes in 1 blocks are still reachable in loss record 7 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x111FEF: __gnu_cxx::new_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x111890: __gnu_cxx::__alloc_traits<std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::allocate(std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x110CA5: std::_Vector_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate(unsigned long) (stl_vector.h:172)
+==4507==    by 0x110627: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >* std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate_and_copy<__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >(unsigned long, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, __gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >) (stl_vector.h:1260)
+==4507==    by 0x10F712: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::operator=(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > const&) (vector.tcc:206)
+==4507==    by 0x10DEEC: MyServer::RecvClientsMsg(int) (MyServer.cpp:289)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 72 bytes in 1 blocks are still reachable in loss record 8 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x112741: __gnu_cxx::new_allocator<std::_Rb_tree_node<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x112605: __gnu_cxx::__alloc_traits<std::allocator<std::_Rb_tree_node<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > > >::allocate(std::allocator<std::_Rb_tree_node<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x112472: std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_get_node() (stl_tree.h:588)
+==4507==    by 0x11227B: std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_create_node(std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&) (stl_tree.h:610)
+==4507==    by 0x111DFF: std::_Rb_tree_node<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >* std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node::operator()<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >(std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&) const (stl_tree.h:556)
+==4507==    by 0x11155E: std::_Rb_tree_iterator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_<std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&, std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_Alloc_node&) (stl_tree.h:1753)
+==4507==    by 0x1108AE: std::_Rb_tree<Channels*, std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::_Select1st<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::_M_insert_unique(std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&) (stl_tree.h:2096)
+==4507==    by 0x10FC6A: std::map<Channels*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::less<Channels*>, std::allocator<std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >::insert(std::pair<Channels* const, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > const&) (stl_map.h:796)
+==4507==    by 0x10EE8F: MyServer::CreateChannels(Channels*) (MyServer.cpp:442)
+==4507==    by 0x11C34F: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:579)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507== 
+==4507== 88 bytes in 1 blocks are still reachable in loss record 9 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x11C31E: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:579)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507==    by 0x10E51C: MyServer::CheckClientsAuthentification(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:335)
+==4507==    by 0x10E230: MyServer::RecvClientsMsg(int) (MyServer.cpp:321)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 200 bytes in 1 blocks are still reachable in loss record 10 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x10DD43: MyServer::RecvClientsMsg(int) (MyServer.cpp:286)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 288 bytes in 6 blocks are still reachable in loss record 11 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x1126F4: __gnu_cxx::new_allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x11258A: __gnu_cxx::__alloc_traits<std::allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > > >::allocate(std::allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x1123B0: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_get_node() (stl_tree.h:588)
+==4507==    by 0x112041: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_create_node(std::pair<Clients* const, int> const&) (stl_tree.h:610)
+==4507==    by 0x111A2D: std::_Rb_tree_node<std::pair<Clients* const, int> >* std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node::operator()<std::pair<Clients* const, int> >(std::pair<Clients* const, int> const&) const (stl_tree.h:556)
+==4507==    by 0x110FCE: std::_Rb_tree_iterator<std::pair<Clients* const, int> > std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_insert_<std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<Clients* const, int> const&, std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node&) (stl_tree.h:1753)
+==4507==    by 0x1103EA: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_insert_unique(std::pair<Clients* const, int> const&) (stl_tree.h:2096)
+==4507==    by 0x10F5D0: std::map<Clients*, int, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::insert(std::pair<Clients* const, int> const&) (stl_map.h:796)
+==4507==    by 0x11D5A2: Channels::AddClientsToChannelMemberList(Clients*) (Channels.cpp:81)
+==4507==    by 0x11C3B7: MyMsg::JoinCmd(MyServer*) (MyMsg.cpp:580)
+==4507==    by 0x10E761: MyServer::ExecuteCommand(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, MyMsg*) (MyServer.cpp:361)
+==4507== 
+==4507== 336 bytes in 7 blocks are still reachable in loss record 12 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x1126F4: __gnu_cxx::new_allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x11258A: __gnu_cxx::__alloc_traits<std::allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > > >::allocate(std::allocator<std::_Rb_tree_node<std::pair<Clients* const, int> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x1123B0: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_get_node() (stl_tree.h:588)
+==4507==    by 0x112041: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_create_node(std::pair<Clients* const, int> const&) (stl_tree.h:610)
+==4507==    by 0x111A2D: std::_Rb_tree_node<std::pair<Clients* const, int> >* std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node::operator()<std::pair<Clients* const, int> >(std::pair<Clients* const, int> const&) const (stl_tree.h:556)
+==4507==    by 0x110FCE: std::_Rb_tree_iterator<std::pair<Clients* const, int> > std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_insert_<std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node>(std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::pair<Clients* const, int> const&, std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_Alloc_node&) (stl_tree.h:1753)
+==4507==    by 0x1103EA: std::_Rb_tree<Clients*, std::pair<Clients* const, int>, std::_Select1st<std::pair<Clients* const, int> >, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::_M_insert_unique(std::pair<Clients* const, int> const&) (stl_tree.h:2096)
+==4507==    by 0x10F5D0: std::map<Clients*, int, std::less<Clients*>, std::allocator<std::pair<Clients* const, int> > >::insert(std::pair<Clients* const, int> const&) (stl_map.h:796)
+==4507==    by 0x10D807: MyServer::CreateClients() (MyServer.cpp:236)
+==4507==    by 0x10D555: MyServer::SelectClients() (MyServer.cpp:205)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 497 bytes in 7 blocks are still reachable in loss record 13 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x4F62AC6: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_assign(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x4F62E18: std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::operator=(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (in /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.25)
+==4507==    by 0x113A33: Clients::SetClientsMessage(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (Clients.cpp:142)
+==4507==    by 0x10DBE4: MyServer::RecvClientsMsg(int) (MyServer.cpp:280)
+==4507==    by 0x10D659: MyServer::SelectClients() (MyServer.cpp:212)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 2,520 bytes in 7 blocks are still reachable in loss record 14 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x10D77E: MyServer::CreateClients() (MyServer.cpp:235)
+==4507==    by 0x10D555: MyServer::SelectClients() (MyServer.cpp:205)
+==4507==    by 0x10B1CC: main (main.cpp:78)
+==4507== 
+==4507== 4,096 bytes in 1 blocks are still reachable in loss record 15 of 15
+==4507==    at 0x4C3217F: operator new(unsigned long) (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4507==    by 0x111FEF: __gnu_cxx::new_allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >::allocate(unsigned long, void const*) (new_allocator.h:111)
+==4507==    by 0x111890: __gnu_cxx::__alloc_traits<std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::allocate(std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >&, unsigned long) (alloc_traits.h:130)
+==4507==    by 0x110CA5: std::_Vector_base<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_allocate(unsigned long) (stl_vector.h:172)
+==4507==    by 0x10FF59: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::_M_realloc_insert(__gnu_cxx::__normal_iterator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >*, std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > > >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (vector.tcc:406)
+==4507==    by 0x10F327: std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >::push_back(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) (stl_vector.h:948)
+==4507==    by 0x10C384: MyServer::MyServer(int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >) (MyServer.cpp:23)
+==4507==    by 0x10B128: main (main.cpp:68)
+==4507== 
+==4507== LEAK SUMMARY:
+==4507==    definitely lost: 0 bytes in 0 blocks
+==4507==    indirectly lost: 0 bytes in 0 blocks
+==4507==      possibly lost: 0 bytes in 0 blocks
+==4507==    still reachable: 8,343 bytes in 38 blocks
+==4507==         suppressed: 0 bytes in 0 blocks
