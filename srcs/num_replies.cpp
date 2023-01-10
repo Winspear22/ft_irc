@@ -34,7 +34,8 @@ std::string RPL_MYINFO(MyMsg msg)
 {
     std::string reply;
 
-    reply = "004 " + msg.GetClients()->GetClientsNickname() + "\r\n";// SET <available umodes> <available cmodes> [<cmodes with param>]
+    reply = "004 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetServerName() + " 0.2" + "\r\n";// SET <available umodes> <available cmodes> [<cmodes with param>]
+
     return (reply);
 }
 
@@ -119,7 +120,7 @@ std::string RPL_UMODEIS(MyMsg msg)
 {
     std::string reply;
 
-    reply = "221 " + msg.GetClients()->GetClientsNickname() + "\r\n"; // + "<user mode string>"
+    reply = "221 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetClientsMode() + "\r\n"; // + "<user mode string>"
 
     return (reply);
 }
@@ -137,7 +138,7 @@ std::string ERR_UMODEUNKNOWNFLAG(MyMsg msg)
 {
     std::string reply;
 
-    reply = "501 " + msg.GetClients()->GetClientsNickname() + " : Unknown MODE flag\n";
+    reply = "501 " + msg.GetClients()->GetClientsNickname() + " : Unknown MODE flag\r\n";
 
     return (reply);
 }
@@ -261,5 +262,23 @@ std::string RPL_VERSION(MyMsg msg)
 	std::string reply;
 	/*S'assurer de la bonne version dans le RPL*/
 	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m" + "\r\n";;
+	return (reply);
+}
+
+
+std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
+{
+	std::string reply;
+    std::string iterator_content = *it;
+	/*S'assurer de la bonne version dans le RPL*/
+	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content + "\r\n";;
+	return (reply);
+}
+
+std::string RPL_ENDOFINFO(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m" + "\r\n";;
 	return (reply);
 }

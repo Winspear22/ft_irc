@@ -337,3 +337,130 @@ FD == 21
 ==4507==      possibly lost: 0 bytes in 0 blocks
 ==4507==    still reachable: 8,343 bytes in 38 blocks
 ==4507==         suppressed: 0 bytes in 0 blocks
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**************************************************************\
+|**************************************************************|
+\**************************************************************/
+int	MyMsg::NickCmd( MyServer *IRC_Server )
+{
+	std::string str;
+	Clients* const client = this->_SentFrom;
+
+	if (this->Params.size() > 1 || this->Params.size() == 0)
+		str = ERR_NONICKNAMEGIVEN();
+	else
+	{
+		std::string new_nick = this->Params[0];
+		if (new_nick.length() > 9 || new_nick.length() <= 0 || this->NickFormatCheck(new_nick) == FAILURE)
+			str = ERR_ERRONEUSNICKNAME(*this);
+		else if (IRC_Server->GetClientsThroughName(new_nick) != NULL)
+			str = ERR_NICKNAMEINUSE(*this);
+		else if (IRC_Server->GetClientsThroughName(new_nick) == NULL && this->NickFormatCheck(new_nick) == SUCCESS \
+		&& client->GetClientsNickname().size() == 0)
+		{
+			str = this->Prefix + " " + "NICK " + new_nick;
+			client->SetClientsNickname(new_nick);
+			send(client->GetClientsFd(), str.c_str(), strlen(str.c_str()), MSG_DONTWAIT);
+			client->SetClientsConnectionNickCmd(YES);
+			if (client->GetClientsConnectionUserCmd() == YES && client->GetClientsConnectionNickCmd() == YES && client->GetClientsConnectionAuthorisation() == YES \
+				&& client->GetClientsConnectionPermission() == NO)
+					ValidateClientsConnections();
+			return (SUCCESS);
+		}
+		else if (IRC_Server->GetClientsThroughName(new_nick) == NULL && this->NickFormatCheck(new_nick) == SUCCESS \
+		&& client->GetClientsNickname().size() != 0)
+		{
+			std::string str2;
+			str2 = this->Prefix + " " + "NICK " + new_nick;
+			str = "NICK ";
+			str += new_nick;
+			std::map<Channels*, std::string>::iterator it;
+			it = IRC_Server->channels_list.begin();
+			while (it != IRC_Server->channels_list.end())
+			{
+				if (it->first->GetClientsInChannelMemberList(client->GetClientsNickname()) != NULL)
+					it->first->SendMsgToAllInChannels(this, str, client);
+				it++;
+			}
+			send(client->GetClientsFd(), str2.c_str(), strlen(str2.c_str()), MSG_DONTWAIT);
+			client->SetClientsNickname(new_nick);
+		}
+		send(client->GetClientsFd(), str.c_str(), strlen(str.c_str()), MSG_DONTWAIT);
+
+	}
+	
+	return (SUCCESS);
+}
+
+
+
+
+-------------------------------------------------------
+int			MyMsg::UserCmd( MyServer *IRC_Server )
+{
+	std::string			str;
+	Clients* const		client = this->_SentFrom;
+
+	if (this->Params.size() < 4)
+	{
+		str = this->Prefix + " ";
+		str += ERR_NEEDMOREPARAMS(*this);
+		send(client->GetClientsFd(), str.c_str(), strlen(str.c_str()), MSG_DONTWAIT);
+	}
+	else if (client->GetClientsUsername().size())
+	{
+		str = this->Prefix + " ";
+		str += ERR_ALREADYREGISTRED(*this);
+		send(client->GetClientsFd(), str.c_str(), strlen(str.c_str()), MSG_DONTWAIT);
+	}
+	else if (this->Params.size() >= 4)
+	{
+		std::vector<std::string>::iterator it = this->Params.begin();
+		client->SetClientsUsername(*it);
+		std::string realname;
+		if ((*it)[0] == ':')
+			realname = it->substr(1);
+		else
+			realname = *it;
+		while (it != this->Params.end())
+		{
+			realname += " " + *it;
+			it++;
+		}
+		client->SetClientsRealname(realname);
+		this->_SentFrom->SetClientsConnectionUserCmd(YES);
+		if (client->GetClientsConnectionUserCmd() == YES && client->GetClientsConnectionNickCmd() == YES && client->GetClientsConnectionAuthorisation() == YES \
+			&& client->GetClientsConnectionPermission() == NO)
+				ValidateClientsConnections();
+	}
+	(void)IRC_Server;
+	return (SUCCESS);
+}

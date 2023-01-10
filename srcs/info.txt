@@ -1,0 +1,8 @@
+
+/*     Information     */
+Name : ft_irc
+Version : 1.0
+Compiled : $date
+Patchlevel : 0
+Started : 25/01/2023
+Developped by : adaloui, maeva, naben-za

@@ -41,6 +41,8 @@ public:
 	int			PrivMsgCmd( MyServer *Irc_Server );
 	int			NoticeCmd( MyServer *Irc_Server );
 	int			JoinCmd( MyServer *IRC_Server );
+	int			NamesCmd( MyServer *IRC_Server );
+	int			InfoCmd( void );
 
 	int			ValidateClientsConnections( void );
 	std::string					Prefix;

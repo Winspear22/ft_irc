@@ -218,3 +218,23 @@ void		Clients::SetClientsLastPing( time_t ping )
 {
 	this->_LastPing = ping;
 }
+
+int			Clients::DeleteClientsMode( char DeleteMode )
+{
+
+	if (this->_Mode.find(DeleteMode) == std::string::npos)
+		return (FAILURE);
+	else
+		this->_Mode.erase(this->_Mode.find(DeleteMode), 1);
+	return (SUCCESS);
+
+}
+
+int			Clients::AddClientsMode( char AddMode )
+{
+	if (this->_Mode.find(AddMode) != std::string::npos)
+		return (FAILURE);
+	else
+		this->_Mode = this->_Mode + AddMode;
+	return (SUCCESS);
+}
