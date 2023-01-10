@@ -11,15 +11,15 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
-	std::string cmd_list_string[81] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
-	"ERROR", "HELP", "info", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
+	std::string cmd_list_string[82] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
-	"USERIP", "USERS", "version", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP" };
+	"USERIP", "USERS", "version", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
 
 	i = -1;
-	while (++i < 81)
+	while (++i < 82)
 		this->_cmd_list.push_back(cmd_list_string[i]);
 	this->_fds_list = 0;
 	return ;
@@ -353,21 +353,22 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->QuitCmd(this);
 	else if (cmd == "version")
 		msg->VersionCmd();
-	else if (cmd == "info")
-		msg->InfoCmd();
 	else if (cmd == "PRIVMSG")
 		msg->PrivMsgCmd(this);
 	else if (cmd == "NOTICE")
 		msg->NoticeCmd(this);
 	else if (cmd == "JOIN")
 		msg->JoinCmd(this);
+	else if (cmd == "info")
+		msg->InfoCmd();
+	else if (cmd == "NAME")
+		msg->NamesCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
 {
-	std::cout << RED << "MSG === " << WHITE << Msg << std::endl;
-	Msg = ClientMsg.GetPrefix() + Msg;
-	std::cout << BLUE << "MSG with prfix === " << PURPLE << Msg << std::endl;
+	Msg = ClientMsg.GetPrefix() + " " + Msg;
+	//std::cout << RED << "MSG with prfix === " << YELLOW << Msg << std::endl;
 
 	SendMsgBackToClients(ClientMsg, Msg);
 }
@@ -378,6 +379,7 @@ void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 
 	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
 	{
+		std::cout << RED << "final Msg sent to client = " << WHITE << Msg << NORMAL << std::endl;
 		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));

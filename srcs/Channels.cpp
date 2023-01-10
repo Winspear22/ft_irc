@@ -102,13 +102,23 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom )
 {
 	std::map<Clients*, int>::iterator it;
+	int									ret_send;
 
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
-		if (it->first != SentFrom)
-			SendMsgBackToClients(*msg, msg_sent);
+		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
+		{	
+			std::cout << "Send msgto all = " << it->first->GetClientsNickname() << std::endl;
+			std::cout << "msg sent in broadcast == " << msg_sent << std::endl;
+			std::cout << "msg == " << msg->GetClients()->GetClientsNickname() << std::endl;
+			std::cout << "FD == " << msg->GetClients()->GetClientsFd() << std::endl;
+			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+			if (ret_send == ERROR_SERVER)
+				return(loop_errors_handlers_msg(ERROR_SEND));
+		//	SendMsgBackWithPrefix(*msg, msg_sent);
+		}
 		it++;
 	}
 }

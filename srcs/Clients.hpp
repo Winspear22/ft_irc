@@ -48,6 +48,10 @@ public:
 
 	std::string GetClientsMessage( void );
 	void		SetClientsMessage( std::string msg_recv );
+	int			DeleteClientsMode( char DeleteMode );
+	int			AddClientsMode( char AddMode );
+
+
 private:
     Clients(/* ARG*/);
 	int 		_ClientFd;
