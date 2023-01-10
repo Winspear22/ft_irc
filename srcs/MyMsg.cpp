@@ -204,7 +204,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 		j = -1;
 		while (special_characters[++j])
 		{
-			if (nickcheck->at(i) != special_characters[j])
+			if (nickcheck->at(i) == special_characters[j])
 			{
 				std::cout << nickcheck->at(i) << " is an accepted special character" << std::endl;
 				not_a_special_character = 1;
@@ -216,7 +216,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 				not_a_special_character = 0;
 			}
 		}
-		if (not_a_special_character == 1 && j == 8 && !isalnum(nickcheck->at(i)))
+		if (not_a_special_character == 0 && !isalnum(nickcheck->at(i)))
 			return (FAILURE);
 		i++;
 	}

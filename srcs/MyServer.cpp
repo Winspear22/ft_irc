@@ -361,6 +361,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->JoinCmd(this);
 	else if (cmd == "info")
 		msg->InfoCmd();
+	else if (cmd == "NAME")
+		msg->NamesCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
