@@ -9,7 +9,6 @@ MyMsg::MyMsg( void )
 	return ;
 }
 
-
 MyMsg::MyMsg( Clients *client, std::string MyMsg )
 {
 	this->_Message = MyMsg;
@@ -277,8 +276,9 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) == NULL && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->GetClientsNickname().size() != 0)
 	{
+		std::cout << RED << "TEEESSSSSST " << *it << "\n";
 		//std::cout << RED << "je suis la et nick == " << WHITE << *it << NORMAL << std::endl;
-		this->_SentFrom->SetClientsNickname(*it);
+		// this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
 		msg_sent = msg_sent + *it + "\r\n";
 		channels_it = IRC_Server->channels_list.begin();
@@ -295,13 +295,12 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		}
 		//std::cout << RED << "je suis la et nick == " << WHITE << *it << NORMAL << std::endl;
 		SendMsgBackWithPrefix(*this, msg_sent);
-
+		this->_SentFrom->SetClientsNickname(*it);
 
 		return (SUCCESS);
 	}
 	return (FAILURE);
 }
-
 
 /*LA COMMANDE USER QUI SET LE USERNAME, LE mode ET LE REALNAME */
 int	MyMsg::UserCmd( MyServer *IRC_Server )
