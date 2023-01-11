@@ -10,6 +10,7 @@ Channels::Channels( Clients *CreatedBy, std::string ChannelName )
 {
 	std::cout << PURPLE << "Channels constructor used." << NORMAL << std::endl;
 	this->_ChannelName = ChannelName;
+//	std::cout << GREEN << "This is the Channel's name == " << WHITE << this->GetChannelName() << std::endl;
 	this->_CreatedBy = CreatedBy;
 	return ;
 }
@@ -34,8 +35,6 @@ Channels & Channels::operator=( Channels const & rhs )
 Channels::~Channels( void )
 {
 	std::cout << RED << "Channels Destructor called." << NORMAL << std::endl;
-	
-	
 	return ;
 }
 

@@ -6,7 +6,7 @@ std::string RPL_WELCOME(MyMsg msg)
 {
     std::string reply;
 
-    reply = "001 " + msg.GetClients()->GetClientsNickname() + ": \033[1;33mWelcome to the ft_irc Network.\033[1;37m\r\n";
+    reply = "001 " + msg.GetClients()->GetClientsNickname() + " : \033[1;33mWelcome to the ft_irc Network.\033[1;37m\r\n";
 
     return (reply);
 }
@@ -15,7 +15,7 @@ std::string RPL_YOURHOST(MyMsg msg)
 {
     std::string reply;
 
-    reply = "002 " + msg.GetClients()->GetClientsNickname() + ": Your host is \033[1;31m localhost:6667.\r\n";
+    reply = "002 " + msg.GetClients()->GetClientsNickname() + " : Your host is \033[1;31m localhost:6667.\r\n";
 
     return (reply);
 }
@@ -26,7 +26,7 @@ std::string RPL_CREATED(MyMsg msg)
     time_t 		tmp;
 	
 	tmp = time(NULL);
-    reply = "003 " + msg.GetClients()->GetClientsNickname() + ": This server was created \033[1;31m" + std::string(ctime(&tmp))  + "\r\n";
+    reply = "003 " + msg.GetClients()->GetClientsNickname() + " : This server was created \033[1;31m" + std::string(ctime(&tmp))  + "\r\n";
     return (reply);
 }
 
