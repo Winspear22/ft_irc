@@ -657,6 +657,32 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+int		MyMsg::WhoisCmd( MyServer *IRC_Server )
+{
+	std::string							msg_sent;
+	char								*tmp;
+	std::vector<std::string> 			channels;
+	std::vector<std::string>::iterator	it;
+	std::cout << this->Params[0] <<std::endl;
+	if (this->Params.empty())
+	{
+		std::cout << "ON A BIEN QU'UN SEUL ARGUMENT" << std::endl;
+		msg_sent = ERR_NONICKNAMEGIVEN();
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else
+	{
+		tmp = strdup(this->Params.at(0).c_str());
+		channels = IRC_Server->SplitByEndline(tmp, ",");
+		it = channels.begin();
+		free(tmp);
+		return (0);
+	}
+	return (SUCCESS);
+
+
+}
+
 int		MyMsg::NamesCmd( MyServer *IRC_Server )
 {
 	(void)IRC_Server;

@@ -363,6 +363,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->InfoCmd();
 	else if (cmd == "NAME")
 		msg->NamesCmd(this);
+	else if (cmd == "WHOIS")
+		msg->WhoisCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
