@@ -177,7 +177,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 	unsigned int 	i;
 	int 			j;
 	int				not_a_special_character;
-	char 			special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '\'', '|'};
+	char 			special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '`', '|'};
 	
 	i = 1;
 	j = -1;
@@ -205,15 +205,11 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 		{
 			if (nickcheck->at(i) == special_characters[j])
 			{
-				std::cout << nickcheck->at(i) << " is an accepted special character" << std::endl;
 				not_a_special_character = 1;
 				break ;
 			}
 			else
-			{
-				std::cout << nickcheck->at(i) << " is not an accepted special character" << std::endl;
 				not_a_special_character = 0;
-			}
 		}
 		if (not_a_special_character == 0 && !isalnum(nickcheck->at(i)))
 			return (FAILURE);
@@ -248,17 +244,20 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	}
 	else if (it->size() > 9 || it->size() == 0) // La taille du NICK est plus grand que 9 ou vide --> NICK lolololololo OU NICK ""
 	{
+		std::cout << RED << "TESSSSSSSST1 " << *it << "\n";
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (this->NickFormatCheck(nick_format_check) == FAILURE) // Format illégal du NICK --> NICK 1popo 
 	{
+		std::cout << RED << "TESSSSSSSST2 " << *it << "\n";
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
 	{
-		msg_sent = ERR_NICKNAMEINUSE(*this);
+		std::cout << RED << "TESSSSSSSST3 " << *it << "\n";
+		msg_sent = ERR_NICKNAMEINUSE(*this, it);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->GetClientsNickname().size() == 0) // Tout va bien, alors je peux remplir le Nickname
@@ -267,7 +266,6 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = "NICK ";
 		msg_sent = msg_sent + *it + "\r\n"; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
 		SendMsgBackWithPrefix(*this, msg_sent);
-		/*Si le NICK et le USER sont OK, alors tout est OK*/
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
 		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
@@ -390,7 +388,7 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	}
 	else if (ret_find_first_of == 0)
 		return (FAILURE);
-	else if (this->Params.at(0) != this->_SentFrom->GetClientsNickname() + ':') //+':' mais je sais pas pk sa marche pas sans
+	else if (this->Params.at(0) != this->_SentFrom->GetClientsNickname()) //+':' mais je sais pas pk sa marche pas sans
 	{
 		msg_sent = ERR_USERSDONTMATCH(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
@@ -494,13 +492,19 @@ int			MyMsg::MotdCmd( void )
 	std::vector<std::string> file_content;
 	std::vector<std::string>::iterator it;
 
-	if (this->Params.size() > 4) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
+	/*if (this->Params.size() > 1) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
 	{
+		it = this->Params.begin();
+		while (it != this->Params.end())
+		{
+			std::cout << "Params == " << *it << std::endl;
+			it++;
+		}
 		msg_sent = ERR_NOMOTD(*this, 1);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else
-	{
+	{*/
 		std::ifstream motd_file("./srcs/motd.txt");
 		if (!motd_file.good()) // Si le fichier n'existe pas
 		{
@@ -524,7 +528,7 @@ int			MyMsg::MotdCmd( void )
 		motd_file.close();
 		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
 		SendMsgBackWithPrefix(*this, msg_sent);
-	}
+	//}
 	return (SUCCESS);
 }
 
@@ -563,13 +567,10 @@ int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 			tmp = this->_Message.substr(ping_pos);
 		if (ret_find_first_of == 0)
 		{
-			//std::cout << PURPLE << "Je suis dans PRIVMSG channel !" << NORMAL << std::endl;
 			msg_sent = "PRIVMSG ";
-			msg_sent = msg_sent + this->Params.at(0) + " " + tmp + "\r\n";
+			msg_sent = msg_sent + this->Params.at(0) + " " + tmp;// + "\r\n";
 			Irc_Server->GetChannelsByName(this->Params.at(0))->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
-			std::cout << GREEN << "Channel name == " << Irc_Server->GetChannelsByName(this->Params.at(0)) << NORMAL << std::endl;
-
-		//	SendMsgBackWithPrefix(*this, msg_sent);
+			std::cout << PURPLE << "Channel name == " << Irc_Server->GetChannelsByName(this->Params.at(0)) << NORMAL << std::endl;
 		}
 		else
 			RPL_PRIVMSG(this, tmp, 0); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
@@ -623,6 +624,7 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 	char								*tmp;
 	std::vector<std::string> 			channels;
 	std::vector<std::string>::iterator	it;
+	Channels							*chan;
 
 	if (this->Params.empty())
 	{
@@ -642,10 +644,11 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 			if (it->size() > 50) //CHANLIMIT
 				it->resize(50);
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
-				IRC_Server->CreateChannels(new Channels(this->_SentFrom, *it));
+				chan = new Channels(this->_SentFrom, *it);
+			
+			IRC_Server->CreateChannels(chan);
 			IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
 			msg_sent = "JOIN " + *it;
-			//std::cout << "msg_sent in JOIN === " << msg_sent << std::endl;
 			SendMsgBackWithPrefix(*this, msg_sent);
 			IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			//Commande NAMES

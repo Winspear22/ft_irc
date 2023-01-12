@@ -87,11 +87,13 @@ std::string ERR_ERRONEUSNICKNAME(MyMsg msg)
 
     return (reply);
 }
-std::string ERR_NICKNAMEINUSE(MyMsg msg)
+std::string ERR_NICKNAMEINUSE(MyMsg msg, std::vector<std::string>::iterator it)
 {
     std::string reply;
+    std::string content = *it;
 
-    reply = "433 " + msg.GetClients()->GetClientsNickname() + ": Nickname is already in use\r\n";
+    (void)msg;
+    reply = "433 " + content + " " + content + " : Nickname is already in use\r\n";
 
     return (reply);
 }

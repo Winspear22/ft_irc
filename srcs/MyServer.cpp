@@ -368,8 +368,6 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
 {
 	Msg = ClientMsg.GetPrefix() + " " + Msg;
-	//std::cout << RED << "MSG with prfix === " << YELLOW << Msg << std::endl;
-
 	SendMsgBackToClients(ClientMsg, Msg);
 }
 
@@ -379,7 +377,7 @@ void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 
 	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
 	{
-		std::cout << RED << "final Msg sent to client = " << WHITE << Msg << NORMAL << std::endl;
+		std::cout << RED << "final Msg sent to client = " << WHITE << Msg << NORMAL;
 		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
@@ -435,6 +433,7 @@ void		MyServer::CreateChannels( Channels *ChannelCreated )
 	it = this->channels_list.begin();
 	if (ChannelCreated == NULL)
 		return ;
+	//ChannelCreated->SetChannelName(ChannelCreated->GetChannelName());
 	while (it != this->channels_list.end())
 	{
 		if (ChannelCreated->GetChannelName() == it->first->GetChannelName())
