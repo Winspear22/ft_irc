@@ -573,7 +573,7 @@ int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 			std::cout << PURPLE << "Channel name == " << Irc_Server->GetChannelsByName(this->Params.at(0)) << NORMAL << std::endl;
 		}
 		else
-			RPL_PRIVMSG(this, tmp, 0); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+			RPL_PRIVMSG(this, tmp, 0, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
 	}
 	return (SUCCESS);
 }
@@ -599,7 +599,7 @@ int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 		if (ping_pos != std::string::npos)
 		{
 			tmp = this->_Message.substr(ping_pos);
-			RPL_PRIVMSG(this, tmp, 1); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+			RPL_PRIVMSG(this, tmp, 1, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
 		}
 	}
 	return (SUCCESS);
@@ -727,7 +727,6 @@ int		MyMsg::InfoCmd( void )
 	}
 	return (SUCCESS);
 }
-
 
 int		MyMsg::ValidateClientsConnections( void )
 {
