@@ -419,20 +419,52 @@ Channels	*MyServer::GetChannelsByName( std::string ChannelName )
 	it = this->channels_list.begin();
 	while (it != this->channels_list.end())
 	{
-		if (it->first->GetChannelName() == ChannelName && it->second == ChannelName)
+		if (it->first->GetChannelName() == ChannelName)// && it->second == ChannelName)
 			return (it->first);
 		it++;
 	}
 	return (NULL);
 }
 
-void		MyServer::CreateChannels( Channels *ChannelCreated )
+
+Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
+{
+	std::map<Channels *, std::string>::iterator it;
+	Channels *NewChannel = new Channels(client, Channelname);
+
+	it = this->channels_list.begin();
+	std::cout << YELLOW << "Apres le begin" << NORMAL << std::endl;
+	if (it == this->channels_list.end())
+	{
+		std::cout << YELLOW << "dans le premier return" << NORMAL << std::endl;
+		this->channels_list.insert(std::make_pair(NewChannel, NewChannel->GetChannelName()));
+		return (NewChannel);
+	}
+	else
+	{
+		std::cout << PURPLE << "Apres le begin" << NORMAL << std::endl;
+		while (it != this->channels_list.end())
+		{
+			if (Channelname == it->first->GetChannelName())
+			{
+				std::cout << RED << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
+				delete NewChannel;
+				return (NULL);
+			}
+			it++;
+		}
+	}
+	std::cout << GREEN << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
+	this->channels_list.insert(std::make_pair(NewChannel, NewChannel->GetChannelName()));
+	return (NewChannel);
+}
+
+/*MISE EN COMMENTAIRE POUR TESTER UN NOUVEAU CREATECHANNELS*/
+/*Channels		*MyServer::CreateChannels( std::string Channelname )
 {
 	std::map<Channels*, std::string>::iterator it;
 
 	it = this->channels_list.begin();
-	if (ChannelCreated == NULL)
-		return ;
 	//ChannelCreated->SetChannelName(ChannelCreated->GetChannelName());
 	while (it != this->channels_list.end())
 	{
@@ -444,7 +476,7 @@ void		MyServer::CreateChannels( Channels *ChannelCreated )
 		it++;
 	}
 	this->channels_list.insert(std::make_pair(ChannelCreated, ChannelCreated->GetChannelName()));
-}
+}*/
 
 /*void		MyServer::SendMsgToAllInChannels( std::string msg_sent )
 {

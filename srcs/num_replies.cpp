@@ -87,11 +87,13 @@ std::string ERR_ERRONEUSNICKNAME(MyMsg msg)
 
     return (reply);
 }
-std::string ERR_NICKNAMEINUSE(MyMsg msg)
+std::string ERR_NICKNAMEINUSE(MyMsg msg, std::vector<std::string>::iterator it)
 {
     std::string reply;
+    std::string content = *it;
 
-    reply = "433 " + msg.GetClients()->GetClientsNickname() + ": Nickname is already in use\r\n";
+    (void)msg;
+    reply = "433 " + content + " " + content + " : Nickname is already in use\r\n";
 
     return (reply);
 }
@@ -229,7 +231,7 @@ std::string ERR_NOSUCHNICK(MyMsg msg)
     return (reply);
 }
 
-void	 RPL_PRIVMSG(MyMsg *msg, std::string tmp, int version)
+void	 RPL_PRIVMSG(MyMsg *msg, std::string tmp, int version, MyServer * irc)
 {
     std::string 	reply;
 	int         	i;
@@ -249,7 +251,7 @@ void	 RPL_PRIVMSG(MyMsg *msg, std::string tmp, int version)
     while (i < msg_len)
     {
 		std::cout << PURPLE << "msg == " << WHITE << &msg_sent[i] << NORMAL << std::endl;
-        ret_send = send(msg->GetClients()->GetClientsFd(), &msg_sent[i], msg_len - i, MSG_NOSIGNAL);
+        ret_send = send(irc->GetClientsThroughName(msg->Params.at(0))->GetClientsFd(), &msg_sent[i], msg_len - i, MSG_NOSIGNAL);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
         i = i + ret_send;

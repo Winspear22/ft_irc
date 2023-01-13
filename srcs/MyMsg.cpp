@@ -177,7 +177,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 	unsigned int 	i;
 	int 			j;
 	int				not_a_special_character;
-	char 			special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '\'', '|'};
+	char 			special_characters[9] = {'-', '_', '[', ']', '{', '}', '\\', '`', '|'};
 	
 	i = 1;
 	j = -1;
@@ -219,9 +219,6 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 }
 
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
-/*PAS ENCORE TERMINE IL RESTE A DETERMINE LA DERNIERE ETAPE CELLE AVEC 
-UN CHANNEL*/
-
 int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -244,17 +241,20 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	}
 	else if (it->size() > 9 || it->size() == 0) // La taille du NICK est plus grand que 9 ou vide --> NICK lolololololo OU NICK ""
 	{
+		std::cout << RED << "TESSSSSSSST1 " << *it << "\n";
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (this->NickFormatCheck(nick_format_check) == FAILURE) // Format illégal du NICK --> NICK 1popo 
 	{
+		std::cout << RED << "TESSSSSSSST2 " << *it << "\n";
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
 	{
-		msg_sent = ERR_NICKNAMEINUSE(*this);
+		std::cout << RED << "TESSSSSSSST3 " << *it << "\n";
+		msg_sent = ERR_NICKNAMEINUSE(*this, it);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->GetClientsNickname().size() == 0) // Tout va bien, alors je peux remplir le Nickname
@@ -366,8 +366,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
-/*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -441,7 +439,6 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-/*PING NON FONCTIONNEL ENCORE*/
 int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -570,7 +567,7 @@ int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 			std::cout << PURPLE << "Channel name == " << Irc_Server->GetChannelsByName(this->Params.at(0)) << NORMAL << std::endl;
 		}
 		else
-			RPL_PRIVMSG(this, tmp, 0); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+			RPL_PRIVMSG(this, tmp, 0, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
 	}
 	return (SUCCESS);
 }
@@ -596,7 +593,7 @@ int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 		if (ping_pos != std::string::npos)
 		{
 			tmp = this->_Message.substr(ping_pos);
-			RPL_PRIVMSG(this, tmp, 1); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+			RPL_PRIVMSG(this, tmp, 1, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
 		}
 	}
 	return (SUCCESS);
@@ -641,14 +638,23 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 			if (it->size() > 50) //CHANLIMIT
 				it->resize(50);
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
-				chan = new Channels(this->_SentFrom, *it);
-			
-			IRC_Server->CreateChannels(chan);
-			IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
-			msg_sent = "JOIN " + *it;
-			SendMsgBackWithPrefix(*this, msg_sent);
-			IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			{
+				chan = IRC_Server->CreateChannels(*it, this->_SentFrom);//new Channels(this->_SentFrom, *it);
+				chan->AddClientsToChannelMemberList(this->_SentFrom);
+			//IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
+				msg_sent = "JOIN " + *it;
+				SendMsgBackWithPrefix(*this, msg_sent);
+				chan->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			//IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			//Commande NAMES
+			}
+			else
+			{
+				IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
+				msg_sent = "JOIN " + *it;
+				SendMsgBackWithPrefix(*this, msg_sent);
+				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			}
 			it++;
 		}
 	}
@@ -724,7 +730,6 @@ int		MyMsg::InfoCmd( void )
 	}
 	return (SUCCESS);
 }
-
 
 int		MyMsg::ValidateClientsConnections( void )
 {

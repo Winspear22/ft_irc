@@ -100,7 +100,7 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 
 void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom )
 {
-	std::map<Clients*, int>::iterator it;
+	std::map<Clients*, int>::iterator	it;
 	int									ret_send;
 
 	it = this->_MemberOfTheChannelList.begin();
@@ -121,4 +121,3 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 		it++;
 	}
 }
-
