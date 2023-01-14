@@ -77,7 +77,18 @@ void		Channels::AddClientsToChannelMemberList( Clients *client )
 	if (client == NULL)
 		return ;
 	else
+	{
 		this->_MemberOfTheChannelList.insert(std::make_pair(client, client->GetClientsFd()));
+		std::cout << CYAN << "Le client = " << WHITE << client->GetClientsNickname() << CYAN << " a été ajouté" << \
+		"au channel " << WHITE << this->GetChannelName() << CYAN << " qui a été crée par == " << WHITE \
+		<< this->GetChannelCreator()->GetClientsNickname() << CYAN << " et qui contient les utilisateurs : " <<  NORMAL <<  std::endl;
+		std::map<Clients*, int>::iterator it = this->_MemberOfTheChannelList.begin();
+		while (it != this->_MemberOfTheChannelList.end())
+		{
+			std::cout << "fd = " << it->second << " name = " << it->first->GetClientsNickname() << std::endl;
+			it++;
+		}
+	}
 }
 
 void		Channels::DeleteClientsToChannelMemberList( Clients *client )

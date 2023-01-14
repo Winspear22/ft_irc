@@ -51,6 +51,11 @@ public:
 	int			DeleteClientsMode( char DeleteMode );
 	int			AddClientsMode( char AddMode );
 
+/*A SUPPRIMER A LA FIN DU TEST*/
+
+void	resetTime(void);
+
+
 
 private:
     Clients(/* ARG*/);
@@ -78,7 +83,9 @@ private:
 	int			_ConnectionStatus;
 	/*Clients Message*/
 	std::string	_ClientMessage;
-
+	
+	/*A supprimer à la fin du test*/
+	time_t	_last_com;
 
 
 };

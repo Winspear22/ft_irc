@@ -27,13 +27,16 @@ public:
 	void					AddClientsToChannelMemberList( Clients *client );
 	void					DeleteClientsToChannelMemberList( Clients *client );
 	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	std::map<Clients*, int> _MemberOfTheChannelList;
+	std::string				_ChannelName;
+	Clients					*_CreatedBy;
 
 private:
     Channels(/*ARG*/);
 
-	std::string				_ChannelName;
-	std::map<Clients*, int> _MemberOfTheChannelList;
-	Clients					*_CreatedBy;
+	//std::string				_ChannelName;
+	//std::map<Clients*, int> _MemberOfTheChannelList;
+	//Clients					*_CreatedBy;
 };
 
 #endif

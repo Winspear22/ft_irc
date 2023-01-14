@@ -44,8 +44,19 @@ public:
 	int			JoinCmd( MyServer *IRC_Server );
 	int			NamesCmd( MyServer *IRC_Server );
 	int			InfoCmd( void );
+	int			NamesCmd( MyServer *IRC_Server, MyMsg &msg );
+	int			IsTheUserVisible( Channels *channel, Clients *sender );
 
 	int			ValidateClientsConnections( void );
+
+
+	/*TEST A EFFACER ENSUITE -- TESTER LE PARSING DE SMAUGDELA*/
+	bool	parse_msg(void);
+	bool 	Check_command(std::string str);
+	void 	SetParams2(std::vector<std::string> params);
+
+
+	/*======================*/
 	std::string					Prefix;
 	std::string					Command;
 	std::vector<std::string>	Params;
