@@ -65,8 +65,8 @@ private:
 
 	/*RSI section 2.3.1 Message format in augmented BNF*/
 	std::string 				_Message;
-	std::string					_Prefix;
-	std::string					_Command;
+	//std::string					_Prefix;
+	//std::string					_Command;
 //	std::vector<std::string>	_Params;
 	/*pour savoir de qui vient le message grace au socketfd*/
 	Clients						*_SentFrom;

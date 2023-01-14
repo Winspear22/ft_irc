@@ -46,27 +46,27 @@ std::string MyMsg::GetMsg( void )
 
 std::string MyMsg::GetPrefix( void )
 {
-	std::string tmp;
+	std::string tmp = "";
 
-	if (!this->_SentFrom->GetClientsNickname().empty())
+	if (this->_SentFrom->_Nickname.size())
 	{
-		tmp = ":" + this->_SentFrom->GetClientsNickname();
-		if (!this->_SentFrom->GetClientsUsername().empty())
-			tmp = tmp + "!" + this->_SentFrom->GetClientsUsername();
-		if (!this->_SentFrom->GetClientsUsername().empty())
-			tmp = tmp + "@" + this->_SentFrom->GetClientsHostname();
+		tmp = ":" + this->_SentFrom->_Nickname;
+		if (this->_SentFrom->_Nickname.size())
+			tmp = tmp + "!" + this->_SentFrom->_Nickname;
+		if (this->_SentFrom->_Nickname.size())
+			tmp = tmp + "@" + this->_SentFrom->_Hostname;
 		else
-			tmp = tmp + "@" + this->_SentFrom->GetClientsHostAdress();
+			tmp = tmp + "@" + this->_SentFrom->_HostAdress;
 	}
 	else
-		tmp = ":" + this->_SentFrom->GetServerName();
-	this->_Prefix = tmp;
-	return (this->_Prefix);
+		tmp = ":" + this->_SentFrom->_ServerName;
+	this->Prefix = tmp;
+	return (this->Prefix);
 }
 
 std::string MyMsg::GetCmd( void )
 {
-	return (this->_Command);
+	return (this->Command);
 }
 
 /*std::string MyMsg::GetParams( void )
@@ -257,7 +257,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_NICKNAMEINUSE(*this, it);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->GetClientsNickname().size() == 0) // Tout va bien, alors je peux remplir le Nickname
+	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() == 0) // Tout va bien, alors je peux remplir le Nickname
 	{
 		this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
@@ -269,7 +269,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 			ValidateClientsConnections();
 		return (SUCCESS);
 	}
-	else if (IRC_Server->GetClientsThroughName(*it) == NULL && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->GetClientsNickname().size() != 0)
+	else if (IRC_Server->GetClientsThroughName(*it) == NULL && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() != 0)
 	{
 		std::cout << RED << "TEEESSSSSST " << *it << "\n";
 		//std::cout << RED << "je suis la et nick == " << WHITE << *it << NORMAL << std::endl;
@@ -337,7 +337,7 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		while (it != this->Params.end())
 		{
 			if (it->empty()) // Si aucun realname n'est renseigné, il doit etre remplacé par le NICK
-				realname = this->_SentFrom->GetClientsNickname();
+				realname = this->_SentFrom->_Nickname;
 			else // Sinon, tout ce qui suit après le 3e arguments = realname
 			{	
 				if (it->at(0) == ':') // S'il y'a plusieurs ':' les uns à la suite des autres, seul le premier ':' doit être évité
@@ -385,7 +385,7 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	}
 	else if (ret_find_first_of == 0)
 		return (FAILURE);
-	else if (this->Params.at(0) != this->_SentFrom->GetClientsNickname()) //+':' mais je sais pas pk sa marche pas sans
+	else if (this->Params.at(0) != this->_SentFrom->_Nickname) //+':' mais je sais pas pk sa marche pas sans
 	{
 		msg_sent = ERR_USERSDONTMATCH(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
@@ -451,7 +451,7 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 	}
 	else
 	{
-		msg_sent = "PONG " + this->_SentFrom->GetClientsNickname() + " :" + this->Params.at(0) + " \r\n";
+		msg_sent = "PONG " + this->_SentFrom->_Nickname + " :" + this->Params.at(0) + " \r\n";
 		this->_SentFrom->SetClientsLastPing(std::time(0));
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -469,7 +469,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	msg_sent = "Quit: "; //message renvoyé selon le RFC modern.ircdocs.horse
 	i = -1;
 	if (this->Params.empty())
-		msg_sent += this->_SentFrom->GetClientsNickname();  //message renvoyé selon si le Client n'a pas spécifié de raison
+		msg_sent += this->_SentFrom->_Nickname;  //message renvoyé selon si le Client n'a pas spécifié de raison
 	if (this->Params.size() >= 1)
 	{
 		while (++i < this->Params.size())
@@ -558,7 +558,7 @@ int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 	}
 	else
 	{
-		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
+		ping_pos = this->_Message.find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 		if (ping_pos != std::string::npos)
 		{
 			tmp = this->_Message.substr(ping_pos);
@@ -595,7 +595,7 @@ int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 		return (FAILURE);
 	else
 	{
-		ping_pos = this->_Message.find(':', this->_Prefix.size() + this->_Command.size() + this->Params.at(0).size());
+		ping_pos = this->_Message.find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 		if (ping_pos != std::string::npos)
 		{
 			tmp = this->_Message.substr(ping_pos);
@@ -627,7 +627,6 @@ int			MyMsg::IsTheUserVisible( Channels *channel, Clients *sender )
 	it = channel->_MemberOfTheChannelList.begin();
 	while (it != channel->_MemberOfTheChannelList.end())
 	{
-		std::cout << GREEN << "FD des users dans le channels === " << WHITE << it->second << NORMAL << std::endl;
 		if (it->first->GetClientsMode().find('i') == std::string::npos || it->first == sender)
 			return (SUCCESS);
 		it++;
@@ -648,15 +647,15 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 			std::map<Clients *, int> members = IRC_Server->GetChannelsByName(it->second)->_MemberOfTheChannelList;
 			std::map<Clients *, int>::iterator it2 = members.begin();
 			str = "353";
-			str += " " + msg._SentFrom->GetClientsNickname() + " =" + it->second + " :";
+			str += " " + msg._SentFrom->_Nickname + " =" + it->second + " :";
 			while (it2 != members.end())
 			{
-				str += it2->first->GetClientsNickname() + " ";
+				str += it2->first->_Nickname + " ";
 				it2++;
 			}
 			SendMsgBackWithPrefix(msg, str);
 			str = "366";
-			str += " " + msg._SentFrom->GetClientsNickname() + " ";
+			str += " " + msg._SentFrom->_Nickname + " ";
 			str += it->second + ":End of /NAMES list";
 			SendMsgBackWithPrefix(msg, str);
 			it++;
@@ -670,34 +669,37 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 		free(tmp);
 		while (it != channels.end())
 		{
-			std::cout << CYAN << "Le nom du channel dans NAMEs == " << WHITE << *it << NORMAL << std::endl;
-			if (msg.IsTheUserVisible(IRC_Server->GetChannelsByName(*it), msg._SentFrom) == SUCCESS)
+			if (IRC_Server->GetChannelsByName(*it) == NULL)
+				it++;
+			else
 			{
-				std::cout << CYAN << "Je suis rentré dans le IF de ISTheUserVisible" << NORMAL << std::endl;
-				std::map<Clients *, int> members = IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList;
-				std::map<Clients *, int>::iterator it2 = members.begin();
-				str = "353";
-				str += " " + msg._SentFrom->GetClientsNickname() + " = " + *it + " :";
-				while (it2 != members.end())
+				if (msg.IsTheUserVisible(IRC_Server->GetChannelsByName(*it), msg._SentFrom) == SUCCESS)
 				{
-					if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == msg._SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(msg._SentFrom->GetClientsNickname()))
+					std::map<Clients *, int> members = IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList;
+					std::map<Clients *, int>::iterator it2 = members.begin();
+					str = "353";
+					str += " " + msg._SentFrom->_Nickname + " = " + *it + " :";
+					while (it2 != members.end())
 					{
-						if (it2->second == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()->GetClientsFd()) //changer ici + fd
-							str += "@";
-						str += it2->first->GetClientsNickname() + " ";
-					}
-					it2++;
-				}			
+						if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == msg._SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(msg._SentFrom->_Nickname))
+						{
+							if (it2->second == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()->GetClientsFd()) //changer ici + fd
+								str += "@";
+							str += it2->first->_Nickname + " ";
+						}
+						it2++;
+					}			
+				}
+				if (IRC_Server->GetChannelsByName(*it) != NULL)
+				{
+					SendMsgBackWithPrefix(msg, str);
+					str = "366";
+					str += " " + msg._SentFrom->_Nickname + " ";
+					str += *it + " :End of /NAMES list";
+					SendMsgBackWithPrefix(msg, str);
+				}
+				it++;
 			}
-			if (IRC_Server->GetChannelsByName(*it) != NULL)
-			{
-				SendMsgBackWithPrefix(msg, str);
-				str = "366";
-				str += " " + msg._SentFrom->GetClientsNickname() + " ";
-				str += *it + " :End of /NAMES list";
-				SendMsgBackWithPrefix(msg, str);
-			}
-			it++;
 		}
 	}
 	return (SUCCESS);
@@ -832,7 +834,7 @@ int		MyMsg::ValidateClientsConnections( void )
 	SendMsgBackToClients(*this, ::RPL_MYINFO(*this));
 	SendMsgBackToClients(*this, "\r\n");
 
-	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->GetClientsNickname() + "\n";
+	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\n";
 	SendMsgBackToClients(*this, intro_new_nick);
 	this->MotdCmd();
 	return (SUCCESS);
@@ -853,15 +855,15 @@ int		MyMsg::ValidateClientsConnections( void )
 			std::map<Clients *, int> members = IRC_Server->GetChannelsByName(it->second)->GetAllClientsInChannelMemberList();
 			std::map<Clients *, int>::iterator it2 = members.begin();
 			str = "353";
-			str += " " + this->_SentFrom->GetClientsNickname() + " =" + it->second + " :";
+			str += " " + this->_SentFrom->_Nickname + " =" + it->second + " :";
 			while (it2 != members.end())
 			{
-				str += it2->first->GetClientsNickname() + " ";
+				str += it2->first->_Nickname + " ";
 				it2++;
 			}
 			SendMsgBackWithPrefix(*this, str);
 			str = "366";
-			str += " " + this->_SentFrom->GetClientsNickname() + " ";
+			str += " " + this->_SentFrom->_Nickname + " ";
 			str += it->second + ":End of /NAMES list";
 			SendMsgBackWithPrefix(*this, str);
 			it++;
@@ -880,14 +882,14 @@ int		MyMsg::ValidateClientsConnections( void )
 				std::map<Clients *, int> members = IRC_Server->GetChannelsByName(*it)->GetAllClientsInChannelMemberList();
 				std::map<Clients *, int>::iterator it2 = members.begin();
 				str = "353";
-				str += " " + this->_SentFrom->GetClientsNickname() + " = " + *it + " :";
+				str += " " + this->_SentFrom->_Nickname + " = " + *it + " :";
 				while (it2 != members.end())
 				{
-					if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == this->_SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()))
+					if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == this->_SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(this->_SentFrom->_Nickname))
 					{
 						if (it2->second == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()->GetClientsFd()) //changer ici + fd
 							str += "@";
-						str += it2->first->GetClientsNickname() + " ";
+						str += it2->first->_Nickname + " ";
 					}
 					it2++;
 				}			
@@ -896,7 +898,7 @@ int		MyMsg::ValidateClientsConnections( void )
 			{
 				SendMsgBackWithPrefix(*this, str);
 				str = "366";
-				str += " " + this->_SentFrom->GetClientsNickname() + " ";
+				str += " " + this->_SentFrom->_Nickname + " ";
 				str += *it + " :End of /NAMES list";
 				SendMsgBackWithPrefix(*this, str);
 			}

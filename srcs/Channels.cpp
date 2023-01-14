@@ -115,7 +115,7 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 	int									ret_send;
 
 	it = this->_MemberOfTheChannelList.begin();
-	msg_sent = msg->GetPrefix() + " " + msg_sent;
+	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
@@ -127,7 +127,7 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 			if (ret_send == ERROR_SERVER)
 				return(loop_errors_handlers_msg(ERROR_SEND));
-		//	SendMsgBackWithPrefix(*msg, msg_sent);
+			//SendMsgBackWithPrefix(*msg, msg_sent);
 		}
 		it++;
 	}

@@ -258,7 +258,7 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 
 
 
-/*void		MyServer::RecvClientsMsg( int ClientsFd )
+void		MyServer::RecvClientsMsg( int ClientsFd )
 {
 	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
 	char								*msg_buffer;
@@ -329,9 +329,9 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 		}
 		free(msg_buffer);
 	}
-}*/
+}
 
-void	MyServer::buf_to_cmd( int ClientFd )
+/*void	MyServer::buf_to_cmd( int ClientFd )
 {
 	char *buffer = strdup(this->GetClientsThroughSocketFd(ClientFd)->GetClientsBuffer().c_str());
 	std::vector<std::string> buf_list(this->SplitByEndline(buffer, "\r\n"));
@@ -382,7 +382,7 @@ void	MyServer::RecvClientsMsg( int ClientFd )
 		this->buf_to_cmd(ClientFd);
 	}
 	
-}
+}*/
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
@@ -432,6 +432,7 @@ void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 
 	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
 	{
+		Msg += "\r\n";
 		std::cout << GREEN << "To client: " << WHITE << Msg << NORMAL;
 		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
@@ -474,10 +475,11 @@ Channels	*MyServer::GetChannelsByName( std::string ChannelName )
 	it = this->channels_list.begin();
 	while (it != this->channels_list.end())
 	{
-		if (it->first->_ChannelName == ChannelName)// && it->second == ChannelName)
+		if (it->first->_ChannelName == ChannelName && it->second == ChannelName)
 			return (it->first);
 		it++;
 	}
+	std::cout << "J'ai retourné NULL" << std::endl;
 	return (NULL);
 }
 
