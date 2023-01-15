@@ -219,9 +219,6 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 }
 
 /*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
-/*PAS ENCORE TERMINE IL RESTE A DETERMINE LA DERNIERE ETAPE CELLE AVEC 
-UN CHANNEL*/
-
 int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -369,8 +366,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
-/*MODE NON FONCTIONNEL ENCORE*/
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -444,7 +439,6 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-/*PING NON FONCTIONNEL ENCORE*/
 int			MyMsg::PingCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -644,18 +638,83 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 			if (it->size() > 50) //CHANLIMIT
 				it->resize(50);
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
-				chan = new Channels(this->_SentFrom, *it);
-			
-			IRC_Server->CreateChannels(chan);
-			IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
-			msg_sent = "JOIN " + *it;
-			SendMsgBackWithPrefix(*this, msg_sent);
-			IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			{
+				chan = IRC_Server->CreateChannels(*it, this->_SentFrom);//new Channels(this->_SentFrom, *it);
+				chan->AddClientsToChannelMemberList(this->_SentFrom);
+			//IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
+				msg_sent = "JOIN " + *it + "\r\n";
+				SendMsgBackWithPrefix(*this, msg_sent);
+				chan->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			//IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			//Commande NAMES
+			}
+			else
+			{
+				IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
+				msg_sent = "JOIN " + *it + "\r\n";
+				SendMsgBackWithPrefix(*this, msg_sent);
+				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			}
 			it++;
 		}
 	}
 	
+	return (SUCCESS);
+}
+
+#include <sstream>
+
+int		MyMsg::ListCmd( MyServer *IRC_Server )
+{
+	std::string 								msg_sent;
+	char										*tmp;
+	std::vector<std::string> 					channels;
+	std::map<Channels*, std::string>::iterator	it1;
+	std::vector<std::string>::iterator 			it2;
+	Channels									*chan;
+	std::string									name_chan;
+	std::string									nb_members;
+	size_t										nb_memberss;
+
+	if (this->Params.empty())
+	{
+		it1 = IRC_Server->channels_list.begin();
+		while (it1 != IRC_Server->channels_list.end())
+		{
+			chan = it1->first;
+			name_chan = chan->GetChannelName();
+			nb_memberss = chan->GetAllClientsInChannelMemberList().size();
+			std::ostringstream convert;
+			convert << nb_memberss;
+			nb_members = convert.str();
+			msg_sent = RPL_LIST(*this, name_chan, nb_members);
+			SendMsgBackToClients(*this, msg_sent);
+			it1++;
+		}
+	}
+	else
+	{
+		tmp = strdup(this->Params.at(0).c_str());
+		channels = IRC_Server->SplitByEndline(tmp, ",");
+		it2 = channels.begin();
+		free(tmp);
+		while (it2 != channels.end())
+		{
+			if (IRC_Server->GetChannelsByName(*it2) != NULL)
+			{
+				name_chan = *it2;
+				nb_memberss = IRC_Server->GetChannelsByName(*it2)->GetAllClientsInChannelMemberList().size();
+				std::ostringstream convert;
+				convert << nb_memberss;
+				nb_members = convert.str();
+				msg_sent = RPL_LIST(*this, name_chan, nb_members);
+				SendMsgBackToClients(*this, msg_sent);
+			}
+			it2++;
+		}
+		msg_sent = RPL_LISTEND(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
 	return (SUCCESS);
 }
 

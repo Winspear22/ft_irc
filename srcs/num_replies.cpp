@@ -267,7 +267,6 @@ std::string RPL_VERSION(MyMsg msg)
 	return (reply);
 }
 
-
 std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
 {
 	std::string reply;
@@ -282,5 +281,22 @@ std::string RPL_ENDOFINFO(MyMsg msg)
 	std::string reply;
 
 	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m" + "\r\n";;
+	return (reply);
+}
+
+std::string RPL_LIST(MyMsg msg, std::string name, std::string nb)
+{
+	std::string reply;
+
+	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " " + nb + "\r\n";;
+
+    return (reply);
+}
+
+std::string RPL_LISTEND(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "323 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of list\033[0m" + "\r\n";;
 	return (reply);
 }

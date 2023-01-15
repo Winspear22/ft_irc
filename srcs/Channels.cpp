@@ -94,7 +94,7 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 			if (client == it->first)
 				this->_MemberOfTheChannelList.erase(client);
 			it++;
-		}	
+		}
 	}
 }
 

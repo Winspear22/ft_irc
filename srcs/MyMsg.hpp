@@ -4,6 +4,7 @@
 # include "Clients.hpp"
 # include "MyServer.hpp"
 # include "Channels.hpp"
+# include <stdlib.h>
 
 class Clients;
 class MyServer;
@@ -44,6 +45,7 @@ public:
 	int			JoinCmd( MyServer *IRC_Server );
 	int			NamesCmd( MyServer *IRC_Server );
 	int			InfoCmd( void );
+	int			ListCmd( MyServer *IRC_Server );
 
 	int			ValidateClientsConnections( void );
 	std::string					Prefix;
