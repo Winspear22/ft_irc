@@ -470,7 +470,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	msg_sent = "QUIT"; //message renvoyé selon le RFC modern.ircdocs.horse
 	i = -1;
 	if (this->Params.empty())
-		msg_sent +=  " " + this->_SentFrom->_Nickname;  //message renvoyé selon si le Client n'a pas spécifié de raison
+		msg_sent = msg_sent +  " " + ":Client quit";  //message renvoyé selon si le Client n'a pas spécifié de raison
 	if (this->Params.size() >= 1)
 	{
 		while (++i < this->Params.size())
