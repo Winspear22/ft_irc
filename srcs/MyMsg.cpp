@@ -712,9 +712,9 @@ int		MyMsg::ListCmd( MyServer *IRC_Server )
 			}
 			it2++;
 		}
-		msg_sent = RPL_LISTEND(*this);
-		SendMsgBackWithPrefix(*this, msg_sent);
 	}
+	msg_sent = RPL_LISTEND(*this);
+	SendMsgBackWithPrefix(*this, msg_sent);
 	return (SUCCESS);
 }
 
