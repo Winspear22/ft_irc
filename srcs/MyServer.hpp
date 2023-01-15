@@ -36,7 +36,7 @@ public:
 
 	int			SelectClients( void );
 	void		CreateClients( void );
-	void		RecvClientsMsg( int ClientsFd );
+//	void		RecvClientsMsg( int ClientsFd );
 	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
 	void		ExecuteCommand(std::string cmd, MyMsg *msg);
 
@@ -51,7 +51,11 @@ public:
 	void		SendMsgToAllInChannels( std::string msg_sent );
 
 
+	/*A EFFACER A LA FIN DU TEST*/
+	void	buf_to_cmd( int ClientFd );
+	void	RecvClientsMsg( int ClientFd );
 
+	/*==========================*/
 
 
 	std::map<Clients*, int> 			_clients_list;

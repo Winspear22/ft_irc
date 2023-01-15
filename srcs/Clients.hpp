@@ -51,12 +51,23 @@ public:
 	int			DeleteClientsMode( char DeleteMode );
 	int			AddClientsMode( char AddMode );
 
+/*A SUPPRIMER A LA FIN DU TEST*/
+
+void	resetTime(void);
+std::string	_Nickname;
+std::string _Hostname;
+	std::string	_HostAdress;
+std::string _ServerName;
+
+/*========================*/
+
+
 
 private:
     Clients(/* ARG*/);
 	int 		_ClientFd;
 	sockaddr_in _New_Address;
-	std::string _ServerName;
+//	std::string _ServerName;
 	std::string _Buffer;
 
 	/*Clients Identity*/
@@ -64,9 +75,9 @@ private:
 	std::string _Mode; // Sert à la commande MODE, il y'a 2 modes --> à voir plus tard lors de la prgmtion de MODE
 	std::string	_Unused; // ce paramètre n'est pas utilisé par les clients selon RFC
 	std::string _Realname;
-	std::string	_Nickname;
-	std::string _Hostname;
-	std::string	_HostAdress;
+	//std::string	_Nickname;
+	//std::string _Hostname;
+	//std::string	_HostAdress;
 	time_t		_LastPing;
 
 	/*On utilise les deux derniers booléens car Nick et User peuvent être faits dans des ordres différents*/
@@ -78,7 +89,9 @@ private:
 	int			_ConnectionStatus;
 	/*Clients Message*/
 	std::string	_ClientMessage;
-
+	
+	/*A supprimer à la fin du test*/
+	time_t	_last_com;
 
 
 };
