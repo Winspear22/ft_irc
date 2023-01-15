@@ -13,6 +13,9 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	int ret;
 
 	this->_ClientFd = ClientFd;
+	//a supprimer à la fin du test :
+	this->_last_com = time(0);
+	//----------
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
 	this->_HasTheClientsBeenAccepted = NO;
@@ -237,4 +240,11 @@ int			Clients::AddClientsMode( char AddMode )
 	else
 		this->_Mode = this->_Mode + AddMode;
 	return (SUCCESS);
+}
+
+/*a supprimer a la fin du test*/
+
+void	Clients::resetTime(void)
+{
+	this->_last_com = time(0);
 }

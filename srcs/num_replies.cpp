@@ -267,6 +267,7 @@ std::string RPL_VERSION(MyMsg msg)
 	return (reply);
 }
 
+
 std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
 {
 	std::string reply;

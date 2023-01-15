@@ -4,7 +4,6 @@
 # include "Clients.hpp"
 # include "MyServer.hpp"
 # include "Channels.hpp"
-# include <stdlib.h>
 
 class Clients;
 class MyServer;
@@ -44,10 +43,21 @@ public:
 	int			NoticeCmd( MyServer *Irc_Server );
 	int			JoinCmd( MyServer *IRC_Server );
 	int			NamesCmd( MyServer *IRC_Server );
-	int			InfoCmd( void );
 	int			ListCmd( MyServer *IRC_Server );
+	int			InfoCmd( void );
+	int			NamesCmd( MyServer *IRC_Server, MyMsg &msg );
+	int			IsTheUserVisible( Channels *channel, Clients *sender );
 
 	int			ValidateClientsConnections( void );
+
+
+	/*TEST A EFFACER ENSUITE -- TESTER LE PARSING DE SMAUGDELA*/
+	bool	parse_msg(void);
+	bool 	Check_command(std::string str);
+	void 	SetParams2(std::vector<std::string> params);
+
+
+	/*======================*/
 	std::string					Prefix;
 	std::string					Command;
 	std::vector<std::string>	Params;
@@ -56,8 +66,8 @@ private:
 
 	/*RSI section 2.3.1 Message format in augmented BNF*/
 	std::string 				_Message;
-	std::string					_Prefix;
-	std::string					_Command;
+	//std::string					_Prefix;
+	//std::string					_Command;
 //	std::vector<std::string>	_Params;
 	/*pour savoir de qui vient le message grace au socketfd*/
 	Clients						*_SentFrom;

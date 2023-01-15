@@ -77,7 +77,18 @@ void		Channels::AddClientsToChannelMemberList( Clients *client )
 	if (client == NULL)
 		return ;
 	else
+	{
 		this->_MemberOfTheChannelList.insert(std::make_pair(client, client->GetClientsFd()));
+		std::cout << CYAN << "Le client = " << WHITE << client->GetClientsNickname() << CYAN << " a été ajouté" << \
+		"au channel " << WHITE << this->GetChannelName() << CYAN << " qui a été crée par == " << WHITE \
+		<< this->GetChannelCreator()->GetClientsNickname() << CYAN << " et qui contient les utilisateurs : " <<  NORMAL <<  std::endl;
+		std::map<Clients*, int>::iterator it = this->_MemberOfTheChannelList.begin();
+		while (it != this->_MemberOfTheChannelList.end())
+		{
+			std::cout << "fd = " << it->second << " name = " << it->first->GetClientsNickname() << std::endl;
+			it++;
+		}
+	}
 }
 
 void		Channels::DeleteClientsToChannelMemberList( Clients *client )
@@ -94,7 +105,7 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 			if (client == it->first)
 				this->_MemberOfTheChannelList.erase(client);
 			it++;
-		}
+		}	
 	}
 }
 
@@ -104,7 +115,7 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 	int									ret_send;
 
 	it = this->_MemberOfTheChannelList.begin();
-	msg_sent = msg->GetPrefix() + " " + msg_sent;
+	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
@@ -116,7 +127,7 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 			if (ret_send == ERROR_SERVER)
 				return(loop_errors_handlers_msg(ERROR_SEND));
-		//	SendMsgBackWithPrefix(*msg, msg_sent);
+			//SendMsgBackWithPrefix(*msg, msg_sent);
 		}
 		it++;
 	}

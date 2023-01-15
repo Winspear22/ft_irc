@@ -256,6 +256,8 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 	return (splitted_str);
 }
 
+
+
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
 	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
@@ -329,6 +331,59 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	}
 }
 
+/*void	MyServer::buf_to_cmd( int ClientFd )
+{
+	char *buffer = strdup(this->GetClientsThroughSocketFd(ClientFd)->GetClientsBuffer().c_str());
+	std::vector<std::string> buf_list(this->SplitByEndline(buffer, "\r\n"));
+	std::vector<std::string>::iterator it;
+	free(buffer);
+	this->GetClientsThroughSocketFd(ClientFd)->SetClientsBuffer("");
+
+	it = buf_list.begin();
+	while (it != buf_list.end())
+	{
+		MyMsg new_msg(this->GetClientsThroughSocketFd(ClientFd), *it);
+		std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientFd)->GetClientsFd()  << NORMAL << std::endl;
+
+		if (new_msg.parse_msg()) //rajouter le && cmdlist.find(new_msg.getCommand()) != cmdlist.end()
+			this->CheckClientsAuthentification(new_msg.Command, &new_msg);
+		it++;
+	}
+}
+
+void	MyServer::RecvClientsMsg( int ClientFd )
+{
+	char		buffer[512 + 1];
+	ssize_t		len;
+
+	if (!this->GetClientsThroughSocketFd(ClientFd))
+		return ;
+	memset(buffer, 0, 512 + 1);
+	len = recv(ClientFd, buffer, 512, MSG_DONTWAIT);
+	std::string buf_str(buffer);
+
+	this->GetClientsThroughSocketFd(ClientFd)->resetTime();
+
+	if (len < 0)
+	{
+	//	std::cout << RED << "Error recv(): " << NORMAL << std::endl;
+		this->GetClientsThroughSocketFd(ClientFd)->SetClientsBuffer("");
+	}
+//	else if (len == 0)
+//		this->GetClientsThroughSocketFd(ClientFd)->
+	else if (len > 0 && (buf_str.rfind("\r\n") != buf_str.size() - 2))
+	{
+		std::cout << "Message was incomplete, adding it to the buffer." << std::endl;
+		this->GetClientsThroughSocketFd(ClientFd)->SetClientsBuffer(this->GetClientsThroughSocketFd(ClientFd)->GetClientsBuffer() + buffer);
+	}
+	else
+	{
+		this->GetClientsThroughSocketFd(ClientFd)->SetClientsBuffer(this->GetClientsThroughSocketFd(ClientFd)->GetClientsBuffer() + buffer);
+		this->buf_to_cmd(ClientFd);
+	}
+	
+}*/
+
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
 	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
@@ -361,8 +416,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->JoinCmd(this);
 	else if (cmd == "info")
 		msg->InfoCmd();
-	else if (cmd == "NAME")
-		msg->NamesCmd(this);
+	else if (cmd == "NAMES")
+		msg->NamesCmd(this, *msg);
 	else if (cmd == "LIST")
 		msg->ListCmd(this);
 }
@@ -379,7 +434,8 @@ void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 
 	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
 	{
-		std::cout << RED << "final Msg sent to client = " << WHITE << Msg << NORMAL;
+		Msg += "\r\n";
+		std::cout << GREEN << "To client: " << WHITE << Msg << NORMAL;
 		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
@@ -421,10 +477,11 @@ Channels	*MyServer::GetChannelsByName( std::string ChannelName )
 	it = this->channels_list.begin();
 	while (it != this->channels_list.end())
 	{
-		if (it->first->GetChannelName() == ChannelName)// && it->second == ChannelName)
+		if (it->first->_ChannelName == ChannelName && it->second == ChannelName)
 			return (it->first);
 		it++;
 	}
+	std::cout << "J'ai retourné NULL" << std::endl;
 	return (NULL);
 }
 
@@ -435,21 +492,19 @@ Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
 	Channels *NewChannel = new Channels(client, Channelname);
 
 	it = this->channels_list.begin();
-	std::cout << YELLOW << "Apres le begin" << NORMAL << std::endl;
 	if (it == this->channels_list.end())
 	{
 		std::cout << YELLOW << "dans le premier return" << NORMAL << std::endl;
-		this->channels_list.insert(std::make_pair(NewChannel, NewChannel->GetChannelName()));
+		this->channels_list.insert(std::make_pair(NewChannel, NewChannel->_ChannelName));
 		return (NewChannel);
 	}
 	else
 	{
-		std::cout << PURPLE << "Apres le begin" << NORMAL << std::endl;
 		while (it != this->channels_list.end())
 		{
-			if (Channelname == it->first->GetChannelName())
+			if (Channelname == it->first->_ChannelName)
 			{
-				std::cout << RED << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
+				std::cout << RED << "Je suis sorti par delete et return NULL" << NORMAL << std::endl;
 				delete NewChannel;
 				return (NULL);
 			}
@@ -457,7 +512,7 @@ Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
 		}
 	}
 	std::cout << GREEN << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
-	this->channels_list.insert(std::make_pair(NewChannel, NewChannel->GetChannelName()));
+	this->channels_list.insert(std::make_pair(NewChannel, NewChannel->_ChannelName));
 	return (NewChannel);
 }
 
