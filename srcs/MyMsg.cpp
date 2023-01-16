@@ -119,16 +119,33 @@ void MyMsg::SetParams( std::string Params )
 /*verifier la pertinence de cette fct par rapport au RFC car il y'a un bail avec la grammaire des commandes : 1 chifres et 3 lettres*/
 int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
-	std::vector<std::string>::iterator it;
+	std::vector<std::string>::iterator 	it;
+	int									i;
+	unsigned long						j;
 	
 	it = cmd_list.begin();
-	while (it != cmd_list.end())
+	i = 0;
+	j = 0;
+	if (cmd->empty())
+		return (FAILURE);
+	if (isdigit(cmd->at(0)) != SUCCESS && cmd->size() == 3)
 	{
-		if (*it == *cmd)
-			return (SUCCESS);
-		it++;
+		while (i < 3)
+		{
+			if (isdigit(cmd->at(i)) != SUCCESS)
+				return (FAILURE);
+			i++;
+		}
+		return (SUCCESS);
 	}
-	return (FAILURE);
+	while (j < cmd->size())
+	{
+		if (isalpha(cmd->at(i)) == SUCCESS)
+			return (FAILURE);
+		j++;
+	}
+	(void)cmd_list;
+	return (SUCCESS);
 }
 
 /*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
@@ -308,6 +325,7 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	it = this->Params.begin();
 	if (this->Params.size() < 4)
 	{
+
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -362,6 +380,11 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
 			ValidateClientsConnections();
 	}
+	std::cout << "Username == " << this->_SentFrom->GetClientsUsername() << std::endl;
+	std::cout << "mode == " << this->_SentFrom->GetClientsMode() << std::endl;
+	std::cout << "useless == " << this->_SentFrom->GetClientsUnused() << std::endl;
+	std::cout << "realname == " << this->_SentFrom->GetClientsRealname() << std::endl;
+
 	return (SUCCESS);
 }
 
@@ -459,8 +482,6 @@ int			MyMsg::PingCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-# include <unistd.h>
-/*QUIT NON FONCTIONNEL ENCORE*/
 int			MyMsg::QuitCmd( MyServer *IRC_Server )
 {
 	unsigned int								i;
@@ -488,6 +509,11 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	}
 	
 	SendMsgBackWithPrefix(*this, msg_sent);
+	if (IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()) != NULL && this->_SentFrom != NULL)
+	{
+		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
+		delete this->_SentFrom;
+	}
 	return (SUCCESS);
 }
 
