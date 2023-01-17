@@ -1011,6 +1011,7 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 		{
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
 			{
+				std::cout << "TESSSSSSST" << *it << "\n"; 
 				stmp = *it;
 				msg_sent = ERR_NOSUCHCHANNEL(*this, stmp);
 				SendMsgBackToClients(*this, msg_sent);
@@ -1038,8 +1039,10 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 				}
 				else
 					msg_sent = "PART " + *it + " " + this->GetClients()->GetClientsNickname() + "\r\n";
-				SendMsgBackWithPrefix(*this, msg_sent);
 				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this,msg_sent,this->_SentFrom);
+				SendMsgBackWithPrefix(*this, msg_sent);
+				if (IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList.empty())
+					IRC_Server->channels_list.erase(IRC_Server->GetChannelsByName(*it));
 			}
 			it++;
 		}
