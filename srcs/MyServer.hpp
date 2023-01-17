@@ -36,7 +36,8 @@ public:
 
 	int			SelectClients( void );
 	void		CreateClients( void );
-//	void		RecvClientsMsg( int ClientsFd );
+	int			DeleteChannelsWithoutClients( void );
+
 	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
 	void		ExecuteCommand(std::string cmd, MyMsg *msg);
 

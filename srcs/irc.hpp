@@ -55,6 +55,12 @@
 /*                                                DEFINES                                                        */
 /*===============================================================================================================*/
 
+
+/*                                              OPERATOR ID                                                      */
+# define PASSWORD_OF_OPERATORS "1234"
+# define ID_OF_OPERATORS      "oper"  
+
+
 /*                                             RETURN VALUES                                                     */
 
 # define FAILURE -1

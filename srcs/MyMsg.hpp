@@ -49,6 +49,9 @@ public:
 	int			IsTheUserVisible( Channels *channel, Clients *sender );
 	int			KickCmd( MyServer *IRC_Server );
 	int			PartCmd( MyServer *IRC_Server );
+	int			WallopsCmd( MyServer *IRC_Server );
+	int			OperCmd( MyServer *IRC_Server );
+
 
 	int			ValidateClientsConnections( void );
 
