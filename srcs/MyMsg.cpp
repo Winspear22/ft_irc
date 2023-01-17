@@ -486,8 +486,8 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 		if (it->first->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) != NULL)
 		{
 			std::cout << "User supprimé du channel" << std::endl;
-			if (it->first->GetChannelCreator()->GetClientsNickname() == this->_SentFrom->GetClientsNickname())
-				it->first->SetHasAChannelCreator(NO);
+		//	if (it->first->GetChannelCreator()->GetClientsNickname() == this->_SentFrom->GetClientsNickname())
+		//		it->first->SetHasAChannelCreator(NO);
 			it->first->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			it->first->DeleteClientsToChannelMemberList(this->_SentFrom);
 		}
@@ -701,9 +701,9 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 					{
 						if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == msg._SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(msg._SentFrom->_Nickname))
 						{
-							if (IRC_Server->GetChannelsByName(*it)->GetHasAChannelCreator() == YES)
+							if (IRC_Server->GetChannelsByName(*it)->GetChannelCreator() != NULL)
 							{
-								if (it2->second == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()->GetClientsFd()) //changer ici + fd
+								if (it2->first == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()) //changer ici + fd
 									str += "@";
 								str += it2->first->_Nickname + " ";
 							}
@@ -1025,23 +1025,8 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this,msg_sent,this->_SentFrom);
 				SendMsgBackWithPrefix(*this, msg_sent);
 				if (IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList.empty())
-				{	
 					std::cout << "J'ai supprimé le channel : " << *it << std::endl;
-					/*std::map<Channels*, std::string>::iterator free_chan;
 
-					free_chan = IRC_Server->channels_list.begin();
-					while (free_chan != IRC_Server->channels_list.end())
-					{
-						if (free_chan->first == IRC_Server->GetChannelsByName(*it))
-						{
-							delete free_chan->first;
-							IRC_Server->channels_list.erase(IRC_Server->GetChannelsByName(*it));
-							break ;
-						}
-
-						free_chan++;
-					}*/
-				}
 			}
 			it++;
 		}
