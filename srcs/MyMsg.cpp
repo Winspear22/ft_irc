@@ -565,6 +565,37 @@ int			MyMsg::MotdCmd( void )
 	return (SUCCESS);
 }
 
+int			MyMsg::WhoisCmd( MyServer *IRC_Server )
+{
+	std::string msg_sent;
+
+
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NONICKNAMEGIVEN();
+		SendMsgBackWithPrefix(*this, msg_sent);
+		return (SUCCESS);
+	}
+	else
+	{
+		std::vector<std::string>::iterator it;
+
+		std::cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+		if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
+		{
+			msg_sent = ERR_NOSUCHNICK(*this);
+			SendMsgBackWithPrefix(*this, msg_sent);
+		}
+		std::cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~2~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+	}
+	std::cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~3~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+	msg_sent = RPL_ENDOFWHOIS(*this);
+	std::cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~4~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+	SendMsgBackWithPrefix(*this, msg_sent);
+	std::cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~5~~~~~~~~~~~~~~~~~~~~~~~~~~~"<<std::endl;
+	return (SUCCESS);
+}
+
 int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 {
 	std::string msg_sent;
@@ -749,6 +780,7 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 	std::vector<std::string> 			channels;
 	std::vector<std::string>::iterator	it;
 	Channels							*chan;
+
 
 	if (this->Params.empty())
 	{
@@ -1168,6 +1200,7 @@ bool	MyMsg::parse_msg(void)
 	const char *delim = " ";
 	char*	tmp = strdup(this->_Message.c_str());
 
+	//std::cout << "TADAM        == " << tmp << std::endl;
 	std::vector<std::string> 			tab_parse;
 	std::vector<std::string>::iterator	str;
 

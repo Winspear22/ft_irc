@@ -207,6 +207,14 @@ std::string RPL_ENDOFMOTD(MyMsg msg)
 	return (reply);
 }
 
+std::string RPL_ENDOFWHOIS(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "318 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of /WHOIS list\033[0m" + "\r\n";
+	return (reply);
+}
+
 std::string ERR_NORECIPENT(MyMsg msg)
 {
     std::string reply;

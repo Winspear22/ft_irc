@@ -37,6 +37,7 @@ public:
 	int			MotdCmd( void );
 	int			ModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );
+	int			WhoisCmd( MyServer *IRC_Server );
 	int			VersionCmd( void );
 	int			QuitCmd( MyServer *IRC_Server );
 	int			PrivMsgCmd( MyServer *Irc_Server );
