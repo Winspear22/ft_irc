@@ -11,15 +11,15 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
-	std::string cmd_list_string[83] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	std::string cmd_list_string[84] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
 	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
-	"USERIP", "USERS", "version", "VERSION", "userhost", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
+	"USERIP", "USERS", "version", "wallops", "VERSION", "userhost", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
 
 	i = -1;
-	while (++i < 83)
+	while (++i < 84)
 		this->_cmd_list.push_back(cmd_list_string[i]);
 	this->_fds_list = 0;
 	return ;
@@ -214,6 +214,31 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
+	this->DeleteChannelsWithoutClients();
+	return (SUCCESS);
+}
+
+int			MyServer::DeleteChannelsWithoutClients( void )
+{
+	std::map<Channels *, std::string>::iterator it;
+
+		it = this->channels_list.begin();
+	while (it != this->channels_list.end())
+	{
+		if (it->first->GetAllClientsInChannelMemberList().empty())
+		{
+			if (it->first != NULL && this->GetChannelsByName(it->second) != NULL)
+			{
+				delete this->GetChannelsByName(it->second);
+				this->channels_list.erase(it->first);
+				break ;
+			}
+			it = this->channels_list.begin();
+			if (it == this->channels_list.end())
+				return (SUCCESS);
+		}
+		it++;
+	}
 	return (SUCCESS);
 }
 
@@ -295,27 +320,23 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			str = tab_parse.begin();
 			if (str->at(0) == ':')
 			{
-				//this->new_msg->SetPrefix(*str);
 				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
 				str++;
 			}
 			if (this->new_msg->CheckFormatCmd(str, this->_cmd_list) == SUCCESS)
 			{
-				std::cout << "Je suis dans Checkformat SUCCESS" << std::endl;
 				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
 				str++;
 				this->new_msg->SetCmdExistence(CMD_EXISTS);
 			}
 			else
 			{
-				std::cout << "Je suis dans Checkformat FAILURE" << std::endl;
 				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
 				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
 			}
 			while (str != tab_parse.end())
 			{
 				this->new_msg->SetParams(*str);
-				//this->new_msg->Params.push_back(*str);
 				str++;
 			}
 			if (this->new_msg->GetCmdExistence() == CMD_EXISTS)
@@ -390,15 +411,6 @@ void	MyServer::RecvClientsMsg( int ClientFd )
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
-	std::vector<std::string>::iterator it;
-
-	it = msg->Params.begin();
-	std::cout << "cmd == " << cmd << std::endl;
-	while (it != msg->Params.end())
-	{
-		std::cout << "params == " << *it << std::endl;
-		it++;
-	}
 	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
 		this->ExecuteCommand(cmd, msg);
 }
@@ -435,6 +447,12 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->ListCmd(this);
 	else if (cmd == "KICK")
 		msg->KickCmd(this);
+	else if (cmd == "PART")
+		msg->PartCmd(this);
+	else if (cmd == "wallops")
+		msg->WallopsCmd(this);
+	else if (cmd == "OPER")
+		msg->OperCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
@@ -496,7 +514,6 @@ Channels	*MyServer::GetChannelsByName( std::string ChannelName )
 			return (it->first);
 		it++;
 	}
-	std::cout << "J'ai retourné NULL" << std::endl;
 	return (NULL);
 }
 
@@ -509,7 +526,6 @@ Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
 	it = this->channels_list.begin();
 	if (it == this->channels_list.end())
 	{
-		std::cout << YELLOW << "dans le premier return" << NORMAL << std::endl;
 		this->channels_list.insert(std::make_pair(NewChannel, NewChannel->_ChannelName));
 		return (NewChannel);
 	}
@@ -519,14 +535,12 @@ Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
 		{
 			if (Channelname == it->first->_ChannelName)
 			{
-				std::cout << RED << "Je suis sorti par delete et return NULL" << NORMAL << std::endl;
 				delete NewChannel;
 				return (NULL);
 			}
 			it++;
 		}
 	}
-	std::cout << GREEN << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
 	this->channels_list.insert(std::make_pair(NewChannel, NewChannel->_ChannelName));
 	return (NewChannel);
 }

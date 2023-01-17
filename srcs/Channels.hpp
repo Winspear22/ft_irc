@@ -27,6 +27,10 @@ public:
 	void					AddClientsToChannelMemberList( Clients *client );
 	void					DeleteClientsToChannelMemberList( Clients *client );
 	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	int						GetHasAChannelCreator( void );
+	void					SetHasAChannelCreator( int status );
+
+
 	std::map<Clients*, int> _MemberOfTheChannelList;
 	std::string				_ChannelName;
 	Clients					*_CreatedBy;
@@ -34,9 +38,8 @@ public:
 private:
     Channels(/*ARG*/);
 
-	//std::string				_ChannelName;
-	//std::map<Clients*, int> _MemberOfTheChannelList;
-	//Clients					*_CreatedBy;
+	int						_HasAChannelCreator;
+
 };
 
 #endif
