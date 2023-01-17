@@ -1011,7 +1011,6 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 		{
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
 			{
-				std::cout << "TESSSSSSST" << *it << "\n"; 
 				stmp = *it;
 				msg_sent = ERR_NOSUCHCHANNEL(*this, stmp);
 				SendMsgBackToClients(*this, msg_sent);
