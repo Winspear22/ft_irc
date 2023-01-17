@@ -103,7 +103,10 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 		while (it != this->_MemberOfTheChannelList.end())
 		{
 			if (client == it->first)
+			{
 				this->_MemberOfTheChannelList.erase(client);
+				break ;
+			}
 			it++;
 		}	
 	}

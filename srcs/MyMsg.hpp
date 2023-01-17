@@ -47,6 +47,8 @@ public:
 	int			InfoCmd( void );
 	int			NamesCmd( MyServer *IRC_Server, MyMsg &msg );
 	int			IsTheUserVisible( Channels *channel, Clients *sender );
+	int			KickCmd( MyServer *IRC_Server );
+	int			PartCmd( MyServer *IRC_Server );
 
 	int			ValidateClientsConnections( void );
 

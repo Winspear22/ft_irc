@@ -11,15 +11,15 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
-	std::string cmd_list_string[82] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	std::string cmd_list_string[83] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
 	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
-	"USERIP", "USERS", "version", "VERSION", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
+	"USERIP", "USERS", "version", "VERSION", "userhost", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
 
 	i = -1;
-	while (++i < 82)
+	while (++i < 83)
 		this->_cmd_list.push_back(cmd_list_string[i]);
 	this->_fds_list = 0;
 	return ;
@@ -38,6 +38,7 @@ MyServer::~MyServer( void )
 	std::map<Clients*, int>::iterator it;
 	std::map<Channels*, std::string>::iterator itt;
 	
+	this->MyServerDestructorMsg();
 	it = this->_clients_list.begin();	
 	while (it != this->_clients_list.end())
 	{
@@ -50,6 +51,7 @@ MyServer::~MyServer( void )
 	itt = this->channels_list.begin();
 	while (itt != this->channels_list.end())
 	{
+
 		std::cout << YELLOW << "Deleting Channel named : " << WHITE << itt->second << NORMAL << std::endl;
 		delete itt->first;
 		itt++;
@@ -299,12 +301,14 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			}
 			if (this->new_msg->CheckFormatCmd(str, this->_cmd_list) == SUCCESS)
 			{
+				std::cout << "Je suis dans Checkformat SUCCESS" << std::endl;
 				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
 				str++;
 				this->new_msg->SetCmdExistence(CMD_EXISTS);
 			}
 			else
 			{
+				std::cout << "Je suis dans Checkformat FAILURE" << std::endl;
 				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
 				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
 			}
@@ -320,7 +324,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 				while (this->_it_cmd != this->_cmd_list.end())
 				{
 					if (*this->_it_cmd == this->new_msg->Command)
-						this->CheckClientsAuthentification(*this->_it_cmd, this->new_msg);
+						this->CheckClientsAuthentification(this->new_msg->Command, this->new_msg);
 					this->_it_cmd++;
 				}
 			}
@@ -386,6 +390,15 @@ void	MyServer::RecvClientsMsg( int ClientFd )
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
+	std::vector<std::string>::iterator it;
+
+	it = msg->Params.begin();
+	std::cout << "cmd == " << cmd << std::endl;
+	while (it != msg->Params.end())
+	{
+		std::cout << "params == " << *it << std::endl;
+		it++;
+	}
 	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
 		this->ExecuteCommand(cmd, msg);
 }
@@ -396,7 +409,7 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->PassCmd(this);
 	else if (cmd == "NICK")
 		msg->NickCmd(this);
-	else if (cmd == "USER")
+	else if (cmd == "USER" || msg->Command == "userhost")
 		msg->UserCmd(this);
 	else if (cmd == "motd")
 		msg->MotdCmd();
@@ -420,6 +433,10 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->NamesCmd(this, *msg);
 	else if (cmd == "LIST")
 		msg->ListCmd(this);
+	else if (cmd == "KICK")
+		msg->KickCmd(this);
+	else if (cmd == "PART")
+		msg->PartCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
@@ -514,6 +531,21 @@ Channels		*MyServer::CreateChannels( std::string Channelname, Clients *client )
 	std::cout << GREEN << "Je suis sorti par return NewChannel" << NORMAL << std::endl;
 	this->channels_list.insert(std::make_pair(NewChannel, NewChannel->_ChannelName));
 	return (NewChannel);
+}
+
+void	MyServer::MyServerDestructorMsg( void )
+{
+	std::map<Clients*, int>::iterator	it;
+	std::string							msg;
+
+	it = this->_clients_list.begin();
+	msg = "QUIT :Server shutdown";
+	while (it != this->_clients_list.end())
+	{
+		MyMsg msg_sent(it->first, msg);
+		SendMsgBackWithPrefix(msg_sent, msg);
+		it++;
+	}
 }
 
 /*MISE EN COMMENTAIRE POUR TESTER UN NOUVEAU CREATECHANNELS*/

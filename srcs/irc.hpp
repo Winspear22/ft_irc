@@ -25,6 +25,7 @@
 
 /*atoi*/
 # include <stdlib.h>
+# include <unistd.h>
 
 /*strlen*/
 # include <string.h>

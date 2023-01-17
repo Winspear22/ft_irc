@@ -46,7 +46,7 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
     if (msg.GetClients()->GetClientsNickname().size() == 0)
         reply = "461 *" + msg.GetCmd() + ":Not enough parameters" + "\r\n";
     else
-        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters" + "\r\n";;
+        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters" + "\r\n";
     return (reply);
 }
 
@@ -57,7 +57,7 @@ std::string ERR_ALREADYREGISTRED(MyMsg msg)
     if (msg.GetClients()->GetClientsNickname().size() == 0)
         reply = "462 *" + msg.GetCmd() + ":Unauthorized command (already registered)\r\n";
     else
-        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Unauthorized command (already registered)" + "\r\n";;
+        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Unauthorized command (already registered)" + "\r\n";
     return (reply);
 }
 
@@ -149,7 +149,7 @@ std::string ERR_NOPRIVILEGES(MyMsg msg)
 {
     std::string reply;
 
-    reply = "481 " + msg.GetClients()->GetClientsNickname() + " : Permission Denied- You're not an IRC operator" + "\r\n";;
+    reply = "481 " + msg.GetClients()->GetClientsNickname() + " : Permission Denied- You're not an IRC operator" + "\r\n";
 
     return (reply);
 }
@@ -159,7 +159,7 @@ std::string ERR_NOSUCHSERVER(MyMsg msg, std::vector<std::string>::iterator it)
     std::string reply;
     std::string iterator_content = *it;
 
-    reply = "402 " + msg.GetClients()->GetClientsNickname() + ": " + iterator_content + ": No such server" + "\r\n";;
+    reply = "402 " + msg.GetClients()->GetClientsNickname() + ": " + iterator_content + ": No such server" + "\r\n";
 
     return (reply);
 }
@@ -168,7 +168,7 @@ std::string ERR_NOORIGIN(MyMsg msg)
 {
     std::string reply;
 
-    reply = "409 " + msg.GetClients()->GetClientsNickname() + " :No origin specified"  + "\r\n";;
+    reply = "409 " + msg.GetClients()->GetClientsNickname() + " :No origin specified"  + "\r\n";
     return (reply);
 }
 
@@ -179,7 +179,7 @@ std::string ERR_NOMOTD(MyMsg msg, int msg_type)
     if (msg_type == 1)
         reply = "422 " + msg.GetClients()->GetClientsNickname() + " :Too much parameters" + "\r\n";
 	else if (msg_type == 2)
-		reply = "422 " + msg.GetClients()->GetClientsNickname() + " :MOTD File is missing" + "\r\n";;
+		reply = "422 " + msg.GetClients()->GetClientsNickname() + " :MOTD File is missing" + "\r\n";
 	return (reply);
 }
 
@@ -187,7 +187,7 @@ std::string RPL_MOTDSTART(MyMsg msg)
 {
 	std::string reply;
 
-	reply = "375 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " +  ":- \033[1;35m" + msg.GetClients()->GetServerName() + " \033[1;36mMessage of the day - \033[0m" + "\r\n";;
+	reply = "375 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " +  ":- \033[1;35m" + msg.GetClients()->GetServerName() + " \033[1;36mMessage of the day - \033[0m" + "\r\n";
 	return (reply);
 }
 
@@ -203,7 +203,7 @@ std::string RPL_ENDOFMOTD(MyMsg msg)
 {
 	std::string reply;
 
-	reply = "376 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of MOTD command\033[0m" + "\r\n";;
+	reply = "376 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of MOTD command\033[0m" + "\r\n";
 	return (reply);
 }
 
@@ -263,7 +263,7 @@ std::string RPL_VERSION(MyMsg msg)
 {
 	std::string reply;
 	/*S'assurer de la bonne version dans le RPL*/
-	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m" + "\r\n";;
+	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m" + "\r\n";
 	return (reply);
 }
 
@@ -273,7 +273,7 @@ std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
 	std::string reply;
     std::string iterator_content = *it;
 	/*S'assurer de la bonne version dans le RPL*/
-	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content + "\r\n";;
+	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content + "\r\n";
 	return (reply);
 }
 
@@ -281,7 +281,7 @@ std::string RPL_ENDOFINFO(MyMsg msg)
 {
 	std::string reply;
 
-	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m" + "\r\n";;
+	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m" + "\r\n";
 	return (reply);
 }
 
@@ -289,7 +289,7 @@ std::string RPL_LIST(MyMsg msg, std::string name, std::string nb)
 {
 	std::string reply;
 
-	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " " + nb + "\r\n";;
+	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " " + nb + "\r\n";
 
     return (reply);
 }
@@ -298,6 +298,24 @@ std::string RPL_LISTEND(MyMsg msg)
 {
 	std::string reply;
 
-	reply = "323 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of list\033[0m" + "\r\n";;
+	reply = "323 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of list\033[0m" + "\r\n";
 	return (reply);
+}
+
+std::string ERR_NOSUCHCHANNEL(MyMsg msg, std::string it)
+{
+    std::string reply;
+
+    reply = "403 " + msg.GetClients()->GetClientsNickname() + " " + it + " :No such channel.";
+    return (reply);
+}
+
+std::string ERR_NOTONCHANNEL(MyMsg msg, std::vector<std::string>::iterator it)
+{
+    std::string reply;
+    std::string iterator_content = *it;
+
+    reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + iterator_content + " :You're not on that channel" + "\r\n";;
+
+    return (reply);
 }

@@ -49,6 +49,8 @@ public:
 	//void		CreateChannels( Channels *ChannelCreated );
 	Channels	*CreateChannels( std::string Channelname, Clients *client );
 	void		SendMsgToAllInChannels( std::string msg_sent );
+	void		MyServerDestructorMsg( void );
+
 
 
 	/*A EFFACER A LA FIN DU TEST*/
