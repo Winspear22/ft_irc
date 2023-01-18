@@ -321,16 +321,28 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 
 	memset(recv_buffer, 0, 512 + 1);
 	ret_rcv = recv(ClientsFd, recv_buffer, 512, MSG_DONTWAIT);
+	std::string buf_str(recv_buffer);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
-	if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) == NULL)
+	else if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) == NULL)
 		return ;  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
-	else if (ret_rcv != ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL && this->GetClientsThroughSocketFd(ClientsFd)->GetClientsConnectionStatus() == YES)
+	else if (ret_rcv > 0 && (buf_str.rfind("\r\n") != buf_str.size() - 2))
 	{
-		GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(recv_buffer);
-		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsMessage().c_str());
+		std::cout << WHITE << "You have a message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
+		<< CYAN << " but it is not complete. Adding it to the buffer." << NORMAL << std::endl;
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
+		std::cout << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() << std::endl; 
+	}
+	else //(ret_rcv != ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL && this->GetClientsThroughSocketFd(ClientsFd)->GetClientsConnectionStatus() == YES)
+	{
+		//this->GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer());
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
+
+		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer().c_str());
 		splitted_msg = this->SplitByEndline(msg_buffer, "\r\n");
 		it = splitted_msg.begin();
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer());
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer("");
 		while (it != splitted_msg.end())
 		{	
 			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
@@ -432,7 +444,13 @@ void	MyServer::RecvClientsMsg( int ClientFd )
 
 void		MyServer::CheckClientsAuthentification( std::string cmd, MyMsg *msg )
 {
-	if (cmd == "PASS" || cmd == "NICK" || cmd == "USER" || msg->GetClients()->GetClientsConnectionPermission() == YES)
+	if (cmd == "PASS")
+		this->ExecuteCommand(cmd, msg);
+	else if (cmd == "NICK" && msg->GetClients()->GetClientsConnectionAuthorisation() == YES)
+		this->ExecuteCommand(cmd, msg);
+	else if (cmd == "USER" && msg->GetClients()->GetClientsConnectionAuthorisation() == YES)
+		this->ExecuteCommand(cmd, msg);
+	else if (msg->GetClients()->GetClientsConnectionPermission() == YES)
 		this->ExecuteCommand(cmd, msg);
 }
 
