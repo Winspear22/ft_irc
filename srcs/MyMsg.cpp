@@ -336,8 +336,8 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
 		it++;
-		this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
-		it++;
+		//this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
+		//it++;
 		this->_SentFrom->SetClientsUnused(*it);
 		it++;
 		while (it != this->Params.end())
@@ -404,12 +404,8 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	else
 	{
 		mode = this->Params.at(1);
-		static int start = 0;
-		if (start == 0)
-		{
+		if (this->_SentFrom->GetClientsMode().empty())
 			this->_SentFrom->SetClientsMode(mode);
-			start++;
-		}
 		while (i < mode.size())
 		{
 			if (mode[i] == '-')
