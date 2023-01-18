@@ -326,10 +326,10 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	else if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) == NULL)
 		return ;  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
-	else if (ret_rcv > 0 && (buf_str.rfind("\r\n") != buf_str.size() - 2))
+	else if (ret_rcv > 0 && (buf_str.rfind("\r") != buf_str.size() - 1) && (buf_str.rfind("\n") != buf_str.size() - 1))
 	{
-		std::cout << WHITE << "You have a message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
-		<< CYAN << " but it is not complete. Adding it to the buffer." << NORMAL << std::endl;
+		std::cout << WHITE << "Incomplete new message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
+		<< CYAN << " Adding it to the buffer." << NORMAL << std::endl;
 		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
 		std::cout << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() << std::endl; 
 	}
