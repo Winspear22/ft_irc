@@ -36,6 +36,7 @@ public:
 
 	int			SelectClients( void );
 	void		CreateClients( void );
+	int			DeleteAFKClients( void );
 	int			DeleteChannelsWithoutClients( void );
 
 	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
@@ -47,7 +48,6 @@ public:
 	std::vector<std::string> SplitByEndline(char *str, const char *delim);
 
 	Channels	*GetChannelsByName( std::string ChannelName );
-	//void		CreateChannels( Channels *ChannelCreated );
 	Channels	*CreateChannels( std::string Channelname, Clients *client );
 	void		SendMsgToAllInChannels( std::string msg_sent );
 	void		MyServerDestructorMsg( void );

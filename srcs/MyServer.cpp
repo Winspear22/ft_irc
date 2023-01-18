@@ -214,7 +214,28 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
+	//this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
+	return (SUCCESS);
+}
+
+int			MyServer::DeleteAFKClients( void )
+{
+	std::map<Clients*, int>::iterator	it;
+
+	it = this->_clients_list.begin();
+	while (it != this->_clients_list.end())
+	{
+		if (it->first->GetClientsLastPing() >= 200000)
+		{
+			MyMsg msg(it->first, "QUIT :Client disconnected.");
+			msg.parse_msg();
+			msg.QuitCmd(this);
+			break ;
+		}
+		it++;
+
+	}
 	return (SUCCESS);
 }
 

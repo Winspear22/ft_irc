@@ -6,7 +6,7 @@ std::string RPL_WELCOME(MyMsg msg)
 {
     std::string reply;
 
-    reply = "001 " + msg.GetClients()->GetClientsNickname() + " : \033[1;33mWelcome to the ft_irc Network.\033[1;37m";
+    reply = "001 " + msg.GetClients()->GetClientsNickname() + " : Welcome to the \033[1;32mft_irc Network. \033[0m";
 
     return (reply);
 }
@@ -15,7 +15,7 @@ std::string RPL_YOURHOST(MyMsg msg)
 {
     std::string reply;
 
-    reply = "002 " + msg.GetClients()->GetClientsNickname() + " : Your host is \033[1;31m localhost:6667.";
+    reply = "002 " + msg.GetClients()->GetClientsNickname() + " : Your host is \033[1;36m" + msg.GetClients()->GetServerName() + "\033[0m";
 
     return (reply);
 }
@@ -24,9 +24,15 @@ std::string RPL_CREATED(MyMsg msg)
 {
     std::string reply;
     time_t 		tmp;
+    std::string timestamp;
+    std::string timestamp_2;
+    size_t      pos;
 	
 	tmp = time(NULL);
-    reply = "003 " + msg.GetClients()->GetClientsNickname() + " : This server was created \033[1;31m" + std::string(ctime(&tmp));
+    timestamp = std::string(ctime(&tmp));
+    pos = timestamp.find("\n");
+    timestamp_2 = timestamp.erase(pos);
+    reply = "003 " + msg.GetClients()->GetClientsNickname() + " : This server was created \033[1;32m" + timestamp_2 + "\033[0m";
     return (reply);
 }
 
@@ -34,11 +40,10 @@ std::string RPL_MYINFO(MyMsg msg)
 {
     std::string reply;
 
-    reply = "004 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetServerName() + " 0.2";// SET <available umodes> <available cmodes> [<cmodes with param>]
-
+    reply = "004 " + msg.GetClients()->GetClientsNickname() + " " + ": \033[1;36m" + msg.GetClients()->GetServerName() + " \033[1;32mv1\033[0m";// SET <available umodes> <available cmodes> [<cmodes with param>]
+    reply += " Modes accessible : \033[1;35mi, w, o, O\033[0m";
     return (reply);
 }
-
 std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
@@ -315,7 +320,23 @@ std::string ERR_NOTONCHANNEL(MyMsg msg, std::vector<std::string>::iterator it)
     std::string reply;
     std::string iterator_content = *it;
 
-    reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + iterator_content + " :You're not on that channel";;
+    reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + iterator_content + ":You're not on that channel";
 
+    return (reply);
+}
+
+std::string ERR_NEEDMOREPARAMS2(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "461 " + msg.GetClients()->GetClientsNickname() + " " + ":Not enough parameters";
+    return (reply);
+}
+
+std::string RPL_YOUREOPER(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "381 " + msg.GetClients()->GetClientsNickname() + " " + ":You are now an IRC operator";
     return (reply);
 }

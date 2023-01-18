@@ -272,7 +272,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	{
 		this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
-		msg_sent = msg_sent + *it + "\r\n"; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
+		msg_sent = msg_sent + *it; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
 		SendMsgBackWithPrefix(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
@@ -283,7 +283,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	else if (IRC_Server->GetClientsThroughName(*it) == NULL && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() != 0)
 	{
 		msg_sent = "NICK ";
-		msg_sent = msg_sent + *it + "\r\n";
+		msg_sent = msg_sent + *it;
 		channels_it = IRC_Server->channels_list.begin();
 		while (channels_it != IRC_Server->channels_list.end())
 		{
@@ -1042,14 +1042,16 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 
 	if (this->Params.empty())
 	{
-		msg_sent = "461";
-		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Not enough parameters";
+		//msg_sent = "461";
+		//msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Not enough parameters";
+		msg_sent = ERR_NEEDMOREPARAMS2(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (this->_SentFrom->GetClientsMode().find('o') == std::string::npos)
 	{
-		msg_sent = "481";
-		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Permission denied- You're not an IRC operator";
+		//msg_sent = "481";
+		//msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Permission denied- You're not an IRC operator";
+		msg_sent = ERR_NOPRIVILEGES(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
@@ -1062,11 +1064,12 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 		std::map<Clients*, int>::iterator it;
 		it = IRC_Server->_clients_list.begin();
 		int ret_send;
+		msg_sent += "\r\n";
+
 		while (it != IRC_Server->_clients_list.end())
 		{
 			if (it->first->GetClientsMode().find('w') != std::string::npos)
 			{
-				msg_sent += "\r\n";
 				ret_send = send(it->second, msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 				if (ret_send == ERROR_SERVER)
 					std::cout << RED << "Error, send() in WALLOPS" << NORMAL << std::endl;
@@ -1085,20 +1088,23 @@ int		MyMsg::OperCmd( MyServer *IRC_Server )
 
 	if (this->Params.at(0) != ID_OF_OPERATORS || this->Params.at(1) != PASSWORD_OF_OPERATORS)
 	{
-		msg_sent = "464";
-		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Password incorrect";
+		//msg_sent = "464";
+		//msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Password incorrect";
+		msg_sent = ERR_PASSWDMISMATCH();
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (this->Params.size() < 2)
 	{
-		msg_sent = "461";
-		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Not enough parameters";
+		//msg_sent = "461";
+		//msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Not enough parameters";
+		msg_sent = ERR_NEEDMOREPARAMS2(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else
 	{
-		msg_sent = "381";
-		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":You are now an IRC operator";
+		//msg_sent = "381";
+		//msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":You are now an IRC operator";
+		msg_sent = RPL_YOUREOPER(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 		this->_SentFrom->AddClientsMode('o');
 	}
@@ -1113,13 +1119,13 @@ int		MyMsg::ValidateClientsConnections( void )
 	this->_SentFrom->SetClientsConnectionPermission(YES);
 	std::cout << GREEN << "Client validé" << NORMAL << std::endl;
 
-	SendMsgBackToClients(*this, ::RPL_WELCOME(*this));
-	SendMsgBackToClients(*this, ::RPL_YOURHOST(*this));
-	SendMsgBackToClients(*this, ::RPL_CREATED(*this));
-	SendMsgBackToClients(*this, ::RPL_MYINFO(*this));
+	SendMsgBackWithPrefix(*this, ::RPL_WELCOME(*this));
+	SendMsgBackWithPrefix(*this, ::RPL_YOURHOST(*this));
+	SendMsgBackWithPrefix(*this, ::RPL_CREATED(*this));
+	SendMsgBackWithPrefix(*this, ::RPL_MYINFO(*this));
 
-	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\r\n";
-	SendMsgBackToClients(*this, intro_new_nick);
+	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
+	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
 	return (SUCCESS);
 }
