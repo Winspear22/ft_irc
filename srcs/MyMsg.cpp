@@ -336,8 +336,8 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
 		it++;
-		this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
-		it++;
+		//this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
+		//it++;
 		this->_SentFrom->SetClientsUnused(*it);
 		it++;
 		while (it != this->Params.end())
@@ -404,7 +404,8 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 	else
 	{
 		mode = this->Params.at(1);
-		this->_SentFrom->SetClientsMode(mode);
+		if (this->_SentFrom->GetClientsMode().empty())
+			this->_SentFrom->SetClientsMode(mode);
 		while (i < mode.size())
 		{
 			if (mode[i] == '-')
@@ -1038,11 +1039,9 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 
-	std::cout << GREEN << "Je suis dans WALLOPS normal" << std::endl;
 
 	if (this->Params.empty())
 	{
-		std::cout << GREEN << "Je suis dans WALLOPS error" << std::endl;
 		msg_sent = "461";
 		msg_sent += " " + this->_SentFrom->GetClientsNickname() + " " + ":Not enough parameters";
 		SendMsgBackWithPrefix(*this, msg_sent);
@@ -1055,7 +1054,6 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 	}
 	else if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
 	{
-		std::cout << GREEN << "Je suis dans WALLOPS" << std::endl;
 		size_t start = this->_Message.find(':', this->Prefix.size() + this->Command.size());
 		std::string text = "";
 		if (start != std::string::npos)
@@ -1063,10 +1061,16 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 		msg_sent = this->Prefix + " WALLOPS " + text;
 		std::map<Clients*, int>::iterator it;
 		it = IRC_Server->_clients_list.begin();
+		int ret_send;
 		while (it != IRC_Server->_clients_list.end())
 		{
 			if (it->first->GetClientsMode().find('w') != std::string::npos)
-				SendMsgBackToClients(*this, msg_sent);
+			{
+				msg_sent += "\r\n";
+				ret_send = send(it->second, msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+				if (ret_send == ERROR_SERVER)
+					std::cout << RED << "Error, send() in WALLOPS" << NORMAL << std::endl;
+			}
 			it++;
 		}
 	}
