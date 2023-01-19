@@ -509,19 +509,13 @@ int			MyMsg::MotdCmd( void )
 	std::vector<std::string> file_content;
 	std::vector<std::string>::iterator it;
 
-	/*if (this->Params.size() > 1) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
+	if (this->Params.size() > 1) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
 	{
-		it = this->Params.begin();
-		while (it != this->Params.end())
-		{
-			std::cout << "Params == " << *it << std::endl;
-			it++;
-		}
 		msg_sent = ERR_NOMOTD(*this, 1);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else
-	{*/
+	{
 		std::ifstream motd_file("./srcs/motd.txt");
 		if (!motd_file.good()) // Si le fichier n'existe pas
 		{
@@ -545,7 +539,7 @@ int			MyMsg::MotdCmd( void )
 		motd_file.close();
 		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
 		SendMsgBackWithPrefix(*this, msg_sent);
-	//}
+	}
 	return (SUCCESS);
 }
 

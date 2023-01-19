@@ -682,9 +682,13 @@ void	MyServer::MyServerDestructorMsg( void )
 {
 	std::map<Clients*, int>::iterator	it;
 	std::string							msg;
+	int i = 0;
+
 
 	it = this->_clients_list.begin();
 	msg = "QUIT :Server shutdown";
+	if (it != this->_clients_list.end())
+		return ;
 	while (it != this->_clients_list.end())
 	{
 		MyMsg msg_sent(it->first, msg);
@@ -692,34 +696,3 @@ void	MyServer::MyServerDestructorMsg( void )
 		it++;
 	}
 }
-
-/*MISE EN COMMENTAIRE POUR TESTER UN NOUVEAU CREATECHANNELS*/
-/*Channels		*MyServer::CreateChannels( std::string Channelname )
-{
-	std::map<Channels*, std::string>::iterator it;
-
-	it = this->channels_list.begin();
-	//ChannelCreated->SetChannelName(ChannelCreated->GetChannelName());
-	while (it != this->channels_list.end())
-	{
-		if (ChannelCreated->GetChannelName() == it->first->GetChannelName())
-		{//Si on rentre dans ce if, çavut dire que le channel existe déjà, il faut alors delete l'allocation de mémoire
-			delete ChannelCreated; 
-			return ;
-		}
-		it++;
-	}
-	this->channels_list.insert(std::make_pair(ChannelCreated, ChannelCreated->GetChannelName()));
-}*/
-
-/*void		MyServer::SendMsgToAllInChannels( std::string msg_sent )
-{
-	std::map<Clients*, int>::iterator it;
-
-	it = this->_clients_list.begin();
-	while (it != this->_clients_list.end())
-	{
-		SendMsgBackWithPrefix(*this->new_msg, msg_sent);
-		it++;
-	}
-}*/
