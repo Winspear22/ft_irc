@@ -22,6 +22,8 @@ public:
 	Clients					*GetChannelCreator( void );
 	Clients					*GetClientsInChannelMemberList( std::string NickName );
 	std::map<Clients*, int> GetAllClientsInChannelMemberList( void );
+	std::string				GetChannelstopic( void );
+	void					SetChannelstopic( std::string topic );
 
 
 	void					AddClientsToChannelMemberList( Clients *client );
@@ -37,7 +39,7 @@ public:
 
 private:
     Channels(/*ARG*/);
-
+	std::string				_Topic;
 	int						_HasAChannelCreator;
 
 };

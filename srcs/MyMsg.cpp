@@ -1186,3 +1186,110 @@ bool	MyMsg::parse_msg(void)
 	}
 	return true;
 }
+
+// MEV
+/*Command: TOPIC
+   Parameters: <channel> [ <topic> ]
+
+   The TOPIC command is used to change or view the topic of a channel.
+   The topic for channel <channel> is returned if there is no <topic>
+   given.  If the <topic> parameter is present, the topic for that
+   channel will be changed, if this action is allowed for the user
+   requesting it.  If the <topic> parameter is an empty string, the
+   topic for that channel will be removed.
+
+Numeric Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+           RPL_NOTOPIC                     RPL_TOPIC
+           ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
+
+   Examples:
+
+   :WiZ!jto@tolsun.oulu.fi TOPIC #test :New topic ; User Wiz setting the
+                                   topic.
+
+   TOPIC #test :another topic      ; Command to set the topic on #test
+                                   to "another topic".
+
+   TOPIC #test :                   ; Command to clear the topic on
+                                   #test.
+
+   TOPIC #test                     ; Command to check the topic for
+                                   #test.
+*/
+
+int		MyMsg::TopicCmd( MyServer *IRC_Server )
+{
+	std::string 								msg_sent;
+	std::map<Channels*, std::string>::iterator	it1;
+
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	it1 = IRC_Server->channels_list.begin();
+	if (this->Params.size() == 1)
+	{
+		while (it1 != IRC_Server->channels_list.end())
+		{
+			if (this->Params[0] == it1->second)
+			{
+				if (it1->first->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) == NULL)
+				{
+					msg_sent = ERR_NOTONCHANNEL(it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				} 
+				else
+				{
+					if (it1->first->GetChannelstopic().empty())
+					{
+						msg_sent = RPL_NOTOPIC();
+						SendMsgBackWithPrefix(*this, msg_sent);
+					}
+					else
+					{
+						msg_sent = RPL_TOPIC(it1);
+						SendMsgBackWithPrefix(*this, msg_sent);
+					}
+				}
+			}
+			it1++;
+		}
+	}
+	else if (this->Params.size() >= 2)
+	{
+		while (it1 != IRC_Server->channels_list.end())
+		{
+			if (it1->second == this->Params[0])
+			{
+				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
+				{
+					std::vector<std::string>::iterator topic;
+					std::string tmp;
+
+					topic = this->Params.begin();
+					topic++;
+					while (topic != this->Params.end())
+					{
+						tmp = *topic;
+						tmp += " ";
+					//	it1->first->SetChannelstopic(tmp);
+						topic++;
+					}
+					it1->first->SetChannelstopic(tmp);
+					msg_sent = RPL_TOPIC(it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				}
+				else
+				{
+					msg_sent = ERR_CHANOPRIVSNEEDED(*this, it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				}
+			}
+			it1++;
+		}
+	}
+	return (SUCCESS);
+}

@@ -13,6 +13,7 @@ Channels::Channels( Clients *CreatedBy, std::string ChannelName )
 //	std::cout << GREEN << "This is the Channel's name == " << WHITE << this->GetChannelName() << std::endl;
 	this->_CreatedBy = CreatedBy;
 	this->_HasAChannelCreator = YES;
+	this->_Topic = "";
 	return ;
 }
 
@@ -47,6 +48,15 @@ std::string			Channels::GetChannelName( void )
 void				Channels::SetChannelName( std::string name )
 {
 	this->_ChannelName = name;
+}
+std::string				Channels::GetChannelstopic( void )
+{
+	return (this->_Topic);
+}
+
+void					Channels::SetChannelstopic( std::string topic )
+{
+	this->_Topic = topic;
 }
 
 Clients				*Channels::GetChannelCreator( void )

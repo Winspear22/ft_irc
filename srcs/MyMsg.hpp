@@ -51,6 +51,7 @@ public:
 	int			PartCmd( MyServer *IRC_Server );
 	int			WallopsCmd( MyServer *IRC_Server );
 	int			OperCmd( MyServer *IRC_Server );
+	int			TopicCmd( MyServer *IRC_Server ); // MEV
 
 
 	int			ValidateClientsConnections( void );

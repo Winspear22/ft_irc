@@ -320,8 +320,8 @@ std::string ERR_NOTONCHANNEL(MyMsg msg, std::vector<std::string>::iterator it)
     std::string reply;
     std::string iterator_content = *it;
 
+    
     reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + iterator_content + ":You're not on that channel";
-
     return (reply);
 }
 
@@ -338,5 +338,39 @@ std::string RPL_YOUREOPER(MyMsg msg)
     std::string reply;
 
     reply = "381 " + msg.GetClients()->GetClientsNickname() + " " + ":You are now an IRC operator";
+    return (reply);
+}
+
+// MEV
+std::string RPL_NOTOPIC( void )
+{
+    std::string reply;
+
+	reply = "331 : No topic is set";
+    return (reply);
+}
+
+std::string RPL_TOPIC(std::map<Channels *, std::string>::iterator it)
+{
+    std::string reply;
+
+    reply = "332 " + it->second + " :" + it->first->GetChannelstopic();
+    
+    return (reply);
+}
+
+std::string ERR_CHANOPRIVSNEEDED(MyMsg msg, std::map<Channels *, std::string>::iterator it)
+{
+    std::string reply;
+
+    reply = "482 " + msg.GetClients()->GetClientsNickname() + " " + it->second + " :" + "You're not channel operator";
+    return (reply); 
+}
+
+std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it)
+{
+    std::string reply;
+
+    reply = "442 " + it->second + " :" + "You're not on that channel";
     return (reply);
 }
