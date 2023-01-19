@@ -682,8 +682,6 @@ void	MyServer::MyServerDestructorMsg( void )
 {
 	std::map<Clients*, int>::iterator	it;
 	std::string							msg;
-	int i = 0;
-
 
 	it = this->_clients_list.begin();
 	msg = "QUIT :Server shutdown";
