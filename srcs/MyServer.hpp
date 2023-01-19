@@ -28,6 +28,23 @@ public:
     std::string GetPassword( void );
 	int			GetSocketFd( void );
 
+	/*Setters and getters for Server identity -- need config.txt file to function*/
+	int			ConfigurateMyServer( void );
+	std::string GetServerName( void );
+	std::string	GetServerversion( void );
+	std::string GetOperlogname( void );
+	std::string GetOpermdp( void );
+	size_t		GetMaxPing( void );
+	size_t		GetMaxUser( void );
+	void 		SetServerName( std::string ServerName );
+	void		SetServerversion( std::string ServerVersion );
+	void 		SetOperlogname( std::string Operlogname );
+	void 		SetOpermdp( std::string Opermdp );
+	void		SetMaxPing( size_t MaxPing );
+	void		SetMaxUser( size_t MaxUsers );
+	/*------------------------------------------*/
+
+
 	int			CreateSocketFd( void );
 	int			SetSocketOptions( void );
 	int			BindSocketFd( void );
@@ -84,6 +101,14 @@ private:
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
+
+	/*Server identity*/
+	std::string		_Servername;
+	std::string		_Serverversion;
+	std::string		_Operlogname;
+	std::string		_Opermdp;
+	size_t			_MaxPing;
+	size_t			_MaxUsers;
 
 };
 

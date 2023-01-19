@@ -85,6 +85,7 @@
 # define ERROR_SEND 9
 # define ERROR_SELECT 10
 # define ERROR_NEW 11
+# define ERROR_CONFIG 12
 # define TIMEOUT 0
 # define CMD_EXISTS 0
 # define CMD_DOESNT_EXIST 1

@@ -371,9 +371,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
-
-
 int			MyMsg::ModeCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -554,71 +551,77 @@ int			MyMsg::MotdCmd( void )
 
 int	MyMsg::PrivMsgCmd( MyServer *Irc_Server )
 {
-	std::string msg_sent;
-	std::string	tmp;
-	int			ret_find_first_of;
+	std::string	msg_sent;
 	size_t		ping_pos;
-
-	ret_find_first_of = this->Params.at(0).find_first_of("!#+&");
-	if (this->Params.empty())
-	{
+	int 		ret_send;
+	std::string	tmp;
+	
+	tmp = "";
+	if (this->Params.size() == 0)
 		msg_sent = ERR_NORECIPENT(*this);
-		SendMsgBackWithPrefix(*this, msg_sent);
-	}
 	else if (this->Params.size() == 1)
-	{
 		msg_sent = ERR_NOTEXTTOSEND(*this);
-		SendMsgBackWithPrefix(*this, msg_sent);
-	}
-	else if (ret_find_first_of != 0 && Irc_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
-	{
+	else if (Irc_Server->GetClientsThroughName(this->Params[0]) == NULL && this->Params[0].find_first_of("!#+&") != 0)
 		msg_sent = ERR_NOSUCHNICK(*this);
-		SendMsgBackWithPrefix(*this, msg_sent);
-	}
-	else if (ret_find_first_of == 0 && Irc_Server->GetChannelsByName(this->Params.at(0)) == NULL)
-	{
+	else if (Irc_Server->GetChannelsByName(this->Params[0]) == NULL && this->Params[0].find_first_of("!#+&") == 0)
 		msg_sent = ERR_NOSUCHNICK(*this);
-		SendMsgBackWithPrefix(*this, msg_sent);
-	}
 	else
 	{
-		ping_pos = this->_Message.find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
+		ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 		if (ping_pos != std::string::npos)
-			tmp = this->_Message.substr(ping_pos);
-		if (ret_find_first_of == 0)
+			tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos);
+		if (this->Params[0].find_first_of("!#+&") == 0)
 		{
-			msg_sent = "PRIVMSG ";
-			msg_sent = msg_sent + this->Params.at(0) + " " + tmp;// + "\r\n";
+			msg_sent = "PRIVMSG " + this->Params.at(0) + " " + tmp;
 			Irc_Server->GetChannelsByName(this->Params.at(0))->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+			return (SUCCESS);
 		}
 		else
-			RPL_PRIVMSG(this, tmp, 0, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+		{
+			msg_sent = this->GetPrefix() + " PRIVMSG " + this->Params[0] + " " + tmp + "\r\n";
+			ret_send = send(Irc_Server->GetClientsThroughName(this->Params[0])->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+			if (ret_send == ERROR_SERVER)
+				std::cerr << RED << "Error" << WHITE << " send(); " << RED << "in PRIVMSG did not send anything." << NORMAL << std::endl;
+			return (SUCCESS);
+		}
 	}
+	SendMsgBackWithPrefix(*this, msg_sent);
 	return (SUCCESS);
 }
+
 
 int	MyMsg::NoticeCmd( MyServer *Irc_Server )
 {
 	std::string msg_sent;
+	int			ret_send;
 	int			ret_find_first_of;
 	std::string	tmp;
 	size_t		ping_pos;
 
-
+	tmp = "";
 	ret_find_first_of = this->Params.at(0).find_first_of("!#+&");
 	if (this->Params.size() < 2)
 		return (FAILURE);
-	else if (ret_find_first_of != 0 && Irc_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
+	else if (Irc_Server->GetClientsThroughName(this->Params.at(0)) == NULL && ret_find_first_of != 0)
 		return (FAILURE);
-	else if (ret_find_first_of == 0 && Irc_Server->GetChannelsByName(this->Params.at(0)) == NULL)
+	else if (Irc_Server->GetChannelsByName(this->Params.at(0)) == NULL && ret_find_first_of == 0)
 		return (FAILURE);
 	else
 	{
-		ping_pos = this->_Message.find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
+		ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 		if (ping_pos != std::string::npos)
-		{
 			tmp = this->_Message.substr(ping_pos);
-			RPL_PRIVMSG(this, tmp, 1, Irc_Server); // RPL que j'ai inventé, ce RPL n'existe pas dans le RFC
+		if (ret_find_first_of == 0)
+		{
+			msg_sent = "NOTICE " + this->Params.at(0) + " " + tmp;
+			Irc_Server->GetChannelsByName(this->Params.at(0))->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+		}
+		else
+		{
+			msg_sent = this->GetPrefix() + " NOTICE " + this->Params[0] + " " + tmp + "\r\n";
+			ret_send = send(Irc_Server->GetClientsThroughName(this->Params[0])->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+			if (ret_send == ERROR_SERVER)
+				std::cerr << RED << "Error" << WHITE << " send(); " << RED << "in NOTICE did not send anything." << NORMAL << std::endl;
 		}
 	}
 	return (SUCCESS);
@@ -1067,7 +1070,7 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 			{
 				ret_send = send(it->second, msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 				if (ret_send == ERROR_SERVER)
-					std::cout << RED << "Error, send() in WALLOPS" << NORMAL << std::endl;
+					std::cerr << RED << "Error, send() in WALLOPS" << NORMAL << std::endl;
 			}
 			it++;
 		}

@@ -74,6 +74,33 @@ MyServer & MyServer::operator=( MyServer const & rhs )
 	return (*this);
 }
 
+
+/*-----------------------------CONFIGURATION FUNCTION--------------------*/
+
+/*int		MyServer::ConfigurateMyServer( void )
+{
+	std::ifstream 	ifs("srcs/config.txt", std::ifstream::in);
+	std::string		tmp;
+
+	if (!ifs.good())
+		return (errors_handlers_msg(ERROR_CONFIG));
+	else
+	{
+		while (getline(ifs, tmp))
+		{
+			if (!tmp.empty())
+			{
+				std::string::iterator it
+			}
+		}
+		}
+	}
+
+	return(SUCCESS);
+}*/
+
+/*----------------------------ALL THE SETTERS --------------------------*/
+
 void        MyServer::SetPort( char *str )
 {
 	this->_port = atoi(str);
@@ -88,6 +115,39 @@ void        MyServer::SetServerStatus( int ServerStatus )
 {
 	this->_server_status = ServerStatus;
 }
+
+void 		MyServer::SetServerName( std::string ServerName )
+{
+	this->_Servername = ServerName;
+}
+
+void		MyServer::SetServerversion( std::string ServerVersion )
+{
+	this->_Serverversion = ServerVersion;
+}
+
+void 		MyServer::SetOperlogname( std::string Operlogname )
+{
+	this->_Operlogname = Operlogname;
+}
+
+void 		MyServer::SetOpermdp( std::string Opermdp )
+{
+	this->_Opermdp = Opermdp;
+}
+
+void		MyServer::SetMaxPing( size_t MaxPing )
+{
+	this->_MaxPing = MaxPing;
+}
+
+void		MyServer::SetMaxUser( size_t MaxUsers )
+{
+	this->_MaxUsers = MaxUsers;
+}
+
+
+/*------------------------------ END OF SETTERS -----------------------------*/
 
 /*								ALL THE GETTERS								*/
 
@@ -118,6 +178,37 @@ void		MyServer::InitVariables( void )
 	this->_right_password_used = FAILURE;
 }
 
+std::string MyServer::GetServerName( void )
+{
+	return (this->_Servername);
+}
+
+std::string	MyServer::GetServerversion( void )
+{
+	return (this->_Serverversion);
+}
+	
+std::string MyServer::GetOperlogname( void )
+{
+	return (this->_Operlogname);
+}
+	
+std::string MyServer::GetOpermdp( void )
+{
+	return (this->_Opermdp);
+}
+
+size_t		MyServer::GetMaxPing( void )
+{
+	return (this->_MaxPing);
+}
+
+size_t		MyServer::GetMaxUser( void )
+{
+	return (this->_MaxUsers);
+}
+
+/*-----------------------------------------------------------END OF GETTERS ---------------------------------------------*/
 
 int			MyServer::CreateSocketFd( void )
 {
@@ -214,7 +305,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	//this->DeleteAFKClients();
+	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	return (SUCCESS);
 }
@@ -222,11 +313,14 @@ int			MyServer::SelectClients( void )
 int			MyServer::DeleteAFKClients( void )
 {
 	std::map<Clients*, int>::iterator	it;
+	time_t								timeout;
+	std::string							timestamp;
 
 	it = this->_clients_list.begin();
+	timeout = time(NULL) + 5;
 	while (it != this->_clients_list.end())
 	{
-		if (it->first->GetClientsLastPing() >= 200000)
+		if (it->first->GetClientsLastPing() == timeout)
 		{
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
@@ -335,7 +429,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	}
 	else //(ret_rcv != ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) != NULL && this->GetClientsThroughSocketFd(ClientsFd)->GetClientsConnectionStatus() == YES)
 	{
-		//this->GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer());
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer());
 		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
 
 		msg_buffer = strdup(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer().c_str());
