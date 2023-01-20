@@ -1293,17 +1293,12 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	{
 		// KILL PART
 		msg_sent = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
-		msg_sent += "KILL " + this->Params.at(0) + " ";
+		msg_sent += "KILL " + this->Params.at(0);
 		if (this->Params.size() > 1)
 		{
-			i = 1;
-			while (i < this->Params.size())
-			{
-				msg_sent += this->Params.at(i);
-				if (i < this->Params.size() - 1)
-					msg_sent += " ";
-				i++;
-			}
+			i = 0;
+			while (++i < this->Params.size())
+				msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
 		}
 		msg_sent += "\r\n";
 		std::cout << GREEN << "To client: " << WHITE << msg_sent << NORMAL;
@@ -1318,21 +1313,9 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
-		// it = IRC_Server->channels_list.begin();
-		// while (it != IRC_Server->channels_list.end())
-		// {
-		// 	if (it->first->GetClientsInChannelMemberList(this->Params.at(0)) != NULL)
-		// 	{
-		// 		std::cout << "User supprimé du channel" << std::endl;
-		// 	//	if (it->first->GetChannelCreator()->GetClientsNickname() == this->_SentFrom->GetClientsNickname())
-		// 	//		it->first->SetHasAChannelCreator(NO);
-		// 		it->first->SendMsgToAllInChannels(this, msg_sent2, IRC_Server->GetClientsThroughName(this->Params.at(0)));
-		// 		it->first->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(this->Params.at(0)));
-		// 	}
-		// 	it++;
-		// }
-		// IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
-		// delete IRC_Server->GetClientsThroughName(this->Params.at(0));
+
+		// A FAIRE
+		// l'enlever des channels et de la liste des clients connectés pour le mettre en connection lost
 	}
 }
 
