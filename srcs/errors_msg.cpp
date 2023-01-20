@@ -40,6 +40,11 @@ int errors_handlers_msg( int error_code )
 		std::cerr << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The socket was not set to non-blocking status."<< NORMAL << std::endl;
 		return (FAILURE);
 	}
+	if (error_code == ERROR_CONFIG)
+	{
+		std::cerr << RED << "Error." << WHITE << " Config step " << RED << "did not go as intended. The server did not start." << NORMAL << std::endl;
+		return (FAILURE);
+	}
 	return (SUCCESS);
 
 }

@@ -32,7 +32,6 @@ public:
 	int			PassCmd( MyServer *IRC_Server );
 	int			NickCmd( MyServer *IRC_Server );
 	int			NickFormatCheck( std::vector<std::string>::iterator nickcheck );
-	//int			NickFormatCheck( std::string nickcheck );
 	int			UserCmd( MyServer *IRC_Server );
 	int			MotdCmd( void );
 	int			ModeCmd( MyServer *IRC_Server );
@@ -51,9 +50,11 @@ public:
 	int			PartCmd( MyServer *IRC_Server );
 	int			WallopsCmd( MyServer *IRC_Server );
 	int			OperCmd( MyServer *IRC_Server );
+	int			TopicCmd( MyServer *IRC_Server );
+	void		KillCmd( MyServer *IRC_Server );
+	void		InviteCmd( MyServer *IRC_Server );
 
-
-	int			ValidateClientsConnections( void );
+	int			ValidateClientsConnections( MyServer *IRC_Server );
 
 
 	/*TEST A EFFACER ENSUITE -- TESTER LE PARSING DE SMAUGDELA*/

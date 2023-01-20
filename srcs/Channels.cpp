@@ -54,6 +54,16 @@ Clients				*Channels::GetChannelCreator( void )
 	return (this->_CreatedBy);
 }
 
+std::string				Channels::GetChannelstopic( void )
+{
+	return (this->_Topic);
+}
+
+void					Channels::SetChannelstopic( std::string topic )
+{
+	this->_Topic = topic;
+}
+
 Clients		*Channels::GetClientsInChannelMemberList( std::string NickName )
 {
 	std::map<Clients*, int>::iterator it;

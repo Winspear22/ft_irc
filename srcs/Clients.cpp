@@ -14,7 +14,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 
 	this->_ClientFd = ClientFd;
 	//a supprimer à la fin du test :
-	this->_last_com = time(0);
+	//this->_last_com = time(0);
 	//----------
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
@@ -24,6 +24,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_HasTheClientsNickBeenChosen = NO;
 	this->_ConnectionStatus = YES;
 	this->_HostAdress = inet_ntoa(New_Address.sin_addr);
+	this->_LastPing = time(0);
 	ret = getnameinfo(((struct sockaddr *)&New_Address), sizeof(New_Address), hostname, NI_MAXHOST, NULL, 0, 0);
 	if (ret == SUCCESS)
 		this->_Hostname = hostname;
@@ -215,7 +216,7 @@ void		Clients::SetServerName( std::string ServerName )
 
 time_t		Clients::GetClientsLastPing( void )
 {
-	return (this->_LastPing);
+	return (time(0) - this->_LastPing);
 }
 void		Clients::SetClientsLastPing( time_t ping )
 {

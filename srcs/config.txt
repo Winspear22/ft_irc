@@ -1,0 +1,10 @@
+name=MyServerName
+version=1.0
+motd=motd.txt
+info=info.txt
+oper_user=oper
+oper_password=1234
+ping=60
+timeout=5000
+max_backlogs=10
+max_users=10
