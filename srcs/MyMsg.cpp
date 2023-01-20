@@ -1272,6 +1272,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	int				ret_send;
 	size_t			i;
 	std::map<Channels *, std::string>::iterator it;
+	fd_set fds;
 
 	if (this->Params.empty())
 	{
@@ -1285,7 +1286,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	}
 	else if (IRC_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
 	{
-		//std::cout << "TESST " << this->Params.at(0) << std::endl;
 		msg_sent = ERR_NOSUCHNICK(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -1313,9 +1313,12 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
-
-		// A FAIRE
-		// l'enlever des channels et de la liste des clients connectés pour le mettre en connection lost
+		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
+		FD_CLR(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), &fds);
+		close(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd());
+		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
+		// TO DO // free le client qui s'est fait kill
+		//Marche pas //delete IRC_Server->GetClientsThroughName(this->Params.at(0));
 	}
 }
 
