@@ -216,7 +216,7 @@ void		Clients::SetServerName( std::string ServerName )
 
 time_t		Clients::GetClientsLastPing( void )
 {
-	return (this->_LastPing);
+	return (time(0) - this->_LastPing);
 }
 void		Clients::SetClientsLastPing( time_t ping )
 {

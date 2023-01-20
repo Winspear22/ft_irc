@@ -277,7 +277,7 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
 		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
-			ValidateClientsConnections();
+			ValidateClientsConnections(IRC_Server);
 		return (SUCCESS);
 	}
 	else if (IRC_Server->GetClientsThroughName(*it) == NULL && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() != 0)
@@ -366,7 +366,7 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		this->_SentFrom->SetClientsConnectionUserCmd(YES);
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \
 		&& this->_SentFrom->GetClientsConnectionPermission() == NO)
-			ValidateClientsConnections();
+			ValidateClientsConnections(IRC_Server);
 	}
 	return (SUCCESS);
 }
@@ -484,8 +484,6 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 		if (it->first->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) != NULL)
 		{
 			std::cout << "User supprimé du channel" << std::endl;
-		//	if (it->first->GetChannelCreator()->GetClientsNickname() == this->_SentFrom->GetClientsNickname())
-		//		it->first->SetHasAChannelCreator(NO);
 			it->first->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			it->first->DeleteClientsToChannelMemberList(this->_SentFrom);
 		}
@@ -498,6 +496,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
 		delete this->_SentFrom;
 	}
+	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() - 1);
 	return (SUCCESS);
 }
 
@@ -905,7 +904,7 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else
+	else if (this->Params.size() >= 1)
 	{
 		char *tmp = strdup(this->Params[0].c_str());
 		std::vector<std::string> channels = IRC_Server->SplitByEndline(tmp, ",");
@@ -934,6 +933,11 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 				msg_sent += " " + this->_SentFrom->GetClientsNickname();
 				msg_sent += " " + *it;
 				msg_sent += " :You're not channel operator";
+				SendMsgBackWithPrefix(*this, msg_sent);
+			}
+			else if (IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) == NULL)
+			{
+				msg_sent = ERR_NOTONCHANNEL(*this, *it);
 				SendMsgBackWithPrefix(*this, msg_sent);
 			}
 			else
@@ -1022,9 +1026,6 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 					msg_sent = "PART " + *it + " " + this->GetClients()->GetClientsNickname() + "\r\n";
 				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this,msg_sent,this->_SentFrom);
 				SendMsgBackWithPrefix(*this, msg_sent);
-				if (IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList.empty())
-					std::cout << "J'ai supprimé le channel : " << *it << std::endl;
-
 			}
 			it++;
 		}
@@ -1098,7 +1099,7 @@ int		MyMsg::OperCmd( MyServer *IRC_Server )
 }
 
 
-int		MyMsg::ValidateClientsConnections( void )
+int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 {
 	std::string intro_new_nick;
 
@@ -1113,6 +1114,8 @@ int		MyMsg::ValidateClientsConnections( void )
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
+	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
+	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
 	return (SUCCESS);
 }
 

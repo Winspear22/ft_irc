@@ -312,3 +312,12 @@ std::string RPL_YOUREOPER(MyMsg msg)
     reply = "381 " + msg.GetClients()->GetClientsNickname() + " " + ":You are now an IRC operator";
     return (reply);
 }
+
+std::string ERR_NOTONCHANNEL(MyMsg msg, std::string chan_name)
+{
+    std::string reply;
+
+    reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + chan_name + " :" + "You're not on that channel"; 
+    //  "<client> <channel> :You're not on that channel"
+    return (reply);
+}

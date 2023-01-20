@@ -36,12 +36,14 @@ public:
 	std::string GetOpermdp( void );
 	size_t		GetMaxPing( void );
 	size_t		GetMaxUser( void );
+	int			GetCurrentClientsNb( void );
 	void 		SetServerName( std::string ServerName );
 	void		SetServerversion( std::string ServerVersion );
 	void 		SetOperlogname( std::string Operlogname );
 	void 		SetOpermdp( std::string Opermdp );
 	void		SetMaxPing( size_t MaxPing );
 	void		SetMaxUser( size_t MaxUsers );
+	void		SetCurrentClientsNb( int CurrentNb );
 	/*------------------------------------------*/
 
 
@@ -81,6 +83,8 @@ public:
 	std::map<Clients*, int> 			_clients_list;
 	std::map<Channels*, std::string>	channels_list;
 	MyMsg								*new_msg;
+	fd_set			ready_fds; //mes fds etant prets a transmettre des donnes
+	fd_set			readfds; // mes sets de fds pouvant lire
 
 private:
     MyServer(/* ARG */);
@@ -109,7 +113,6 @@ private:
 	std::string		_Opermdp;
 	size_t			_MaxPing;
 	size_t			_MaxUsers;
-
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
