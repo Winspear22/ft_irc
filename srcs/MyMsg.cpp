@@ -1271,7 +1271,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	std::string		msg_sent2;
 	int				ret_send;
 	size_t			i;
-	std::map<Channels *, std::string>::iterator it;
 	fd_set fds;
 
 	if (this->Params.empty())
@@ -1305,6 +1304,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
+	
 		// QUIT PART
 		msg_sent2 = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
 		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
@@ -1314,11 +1314,31 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
 		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
+		
+		std::map<Channels*, std::string>::iterator it_chan;
+		std::map<Clients*, int>::iterator it_client;
+		it_chan = IRC_Server->channels_list.begin();
+		it_client = IRC_Server->_clients_list.begin();
+		while (it_chan != IRC_Server->channels_list.end())
+		{
+			it_chan->first->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(this->Params.at(0)));
+			it_chan++;
+		}
+		while (it_client != IRC_Server->_clients_list.end())
+		{
+			if (it_client->first->GetClientsNickname() != this->Params.at(0))
+			{
+				ret_send = send(it_client->first->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
+				if (ret_send == ERROR_SERVER)
+					return (loop_errors_handlers_msg(ERROR_SEND));
+			}
+			it_client++;
+		}
 		FD_CLR(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), &fds);
 		close(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd());
 		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
 		// TO DO // free le client qui s'est fait kill
-		//Marche pas //delete IRC_Server->GetClientsThroughName(this->Params.at(0));
+		//delete IRC_Server->GetClientsThroughName(this->Params.at(0));
 	}
 }
 
