@@ -355,3 +355,27 @@ std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it)
     return (reply);
 }
 /*------------------------------------------------------*/
+std::string ERR_USERONCHANNEL(MyMsg msg, std::string user_invited, std::string channel)
+{
+    std::string reply;
+
+    reply = "443 " + msg.GetClients()->GetClientsNickname() + " " + user_invited + + " " + channel + " :is already on channel";
+    return (reply);
+}
+
+std::string ERR_CHANOPRIVSNEEDED(MyMsg msg, std::string channel)
+{
+    std::string reply;
+
+    reply = "482 " + msg.GetClients()->GetClientsNickname() + " " + channel + " :You're not channel operator";
+
+    return (reply);
+}
+
+std::string RPL_INVITING(MyMsg msg, std::string user_invited, std::string channel)
+{
+    std::string reply;
+
+    reply = "341 " + msg.GetClients()->GetClientsNickname() + " " + channel + + " " + user_invited;
+    return (reply);
+}

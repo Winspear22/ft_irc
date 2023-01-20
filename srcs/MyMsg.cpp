@@ -1264,3 +1264,127 @@ bool	MyMsg::parse_msg(void)
 	}
 	return true;
 }
+
+void		MyMsg::KillCmd( MyServer *IRC_Server )
+{
+	std::string		msg_sent;
+	std::string		msg_sent2;
+	int				ret_send;
+	size_t			i;
+	fd_set fds;
+
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (this->GetClients()->GetClientsMode().find('o') == std::string::npos)
+	{
+		msg_sent = ERR_NOPRIVILEGES(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (IRC_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
+	{
+		msg_sent = ERR_NOSUCHNICK(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else
+	{
+		// KILL PART
+		msg_sent = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
+		msg_sent += "KILL " + this->Params.at(0);
+		if (this->Params.size() > 1)
+		{
+			i = 0;
+			while (++i < this->Params.size())
+				msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
+		}
+		msg_sent += "\r\n";
+		std::cout << GREEN << "To client: " << WHITE << msg_sent << NORMAL;
+		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+		if (ret_send == ERROR_SERVER)
+			return (loop_errors_handlers_msg(ERROR_SEND));
+	
+		// QUIT PART
+		msg_sent2 = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
+		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
+		msg_sent2 += "\r\n";
+		std::cout << GREEN << "To client2: " << WHITE << msg_sent2 << NORMAL;
+		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
+		if (ret_send == ERROR_SERVER)
+			return (loop_errors_handlers_msg(ERROR_SEND));
+		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
+		
+		std::map<Channels*, std::string>::iterator it_chan;
+		std::map<Clients*, int>::iterator it_client;
+		it_chan = IRC_Server->channels_list.begin();
+		it_client = IRC_Server->_clients_list.begin();
+		while (it_chan != IRC_Server->channels_list.end())
+		{
+			it_chan->first->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(this->Params.at(0)));
+			it_chan++;
+		}
+		while (it_client != IRC_Server->_clients_list.end())
+		{
+			if (it_client->first->GetClientsNickname() != this->Params.at(0))
+			{
+				ret_send = send(it_client->first->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
+				if (ret_send == ERROR_SERVER)
+					return (loop_errors_handlers_msg(ERROR_SEND));
+			}
+			it_client++;
+		}
+		FD_CLR(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), &fds);
+		close(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd());
+		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
+		// TO DO // free le client qui s'est fait kill
+		//delete IRC_Server->GetClientsThroughName(this->Params.at(0));
+	}
+}
+
+void		MyMsg::InviteCmd( MyServer *IRC_Server )
+{
+	std::string		nick;
+	std::string		chan;
+	std::string		msg_sent;
+	int				ret_send;
+	std::string		prefix;
+
+	if (this->Params.size() < 2)
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackToClients(*this, msg_sent);
+	}
+	else if (IRC_Server->GetClientsThroughName(this->Params.at(0)) == NULL)
+	{
+		msg_sent = ERR_NOSUCHNICK(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (IRC_Server->GetChannelsByName(this->Params.at(1)) == NULL)
+	{
+		//ne rien faire
+	}
+	else if (IRC_Server->GetChannelsByName(this->Params.at(1))->GetClientsInChannelMemberList(this->GetClients()->GetClientsNickname()) == NULL)
+	{
+		msg_sent = ERR_NOTONCHANNEL(*this, this->Params.at(1));
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (IRC_Server->GetChannelsByName(this->Params.at(1))->GetClientsInChannelMemberList(this->Params.at(0)) != NULL)
+	{
+		msg_sent = ERR_USERONCHANNEL(*this, this->Params.at(0), this->Params.at(1));
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else
+	{
+		prefix = ":" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsNickname() + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->_Hostname;
+		//msg_sent = ":" + this->_SentFrom->_ServerName;
+		msg_sent = RPL_INVITING(*this, this->Params.at(1), this->Params.at(0));
+		SendMsgBackWithPrefix(*this, msg_sent);
+		prefix += " " + msg_sent;
+		prefix += "\r\n";
+		std::cout << GREEN << "To client: " << WHITE << prefix << NORMAL;
+		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), prefix.c_str(), strlen(prefix.c_str()), MSG_DONTWAIT);
+		if (ret_send == ERROR_SERVER)
+			return (loop_errors_handlers_msg(ERROR_SEND));
+	}
+}

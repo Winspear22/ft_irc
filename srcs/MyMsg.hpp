@@ -51,6 +51,8 @@ public:
 	int			WallopsCmd( MyServer *IRC_Server );
 	int			OperCmd( MyServer *IRC_Server );
 	int			TopicCmd( MyServer *IRC_Server );
+	void		KillCmd( MyServer *IRC_Server );
+	void		InviteCmd( MyServer *IRC_Server );
 
 
 	int			ValidateClientsConnections( MyServer *IRC_Server );

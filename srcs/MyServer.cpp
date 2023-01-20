@@ -318,7 +318,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	//this->DeleteAFKClients();
+	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	return (SUCCESS);
 }
@@ -332,10 +332,11 @@ int			MyServer::DeleteAFKClients( void )
 		return (SUCCESS);
 	while (it != this->_clients_list.end())
 	{
-		if (it->first->GetClientsLastPing() >= 60 && it->first->GetClientsConnectionStatus() == YES)
+		if (it->first->GetClientsLastPing() >= 10 && it->first->GetClientsConnectionStatus() == YES)
 		{
 			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
+			close(it->second);
 			FD_CLR(it->first->GetClientsFd(), &this->ready_fds);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
@@ -551,6 +552,10 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->OperCmd(this);
 	else if (cmd == "TOPIC")
 		msg->TopicCmd(this);
+	else if (cmd == "kill")
+		msg->KillCmd(this);
+	else if (cmd == "INVITE")
+		msg->InviteCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
