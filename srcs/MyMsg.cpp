@@ -1098,6 +1098,84 @@ int		MyMsg::OperCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
+int		MyMsg::TopicCmd( MyServer *IRC_Server )
+{
+	std::string 								msg_sent;
+	std::map<Channels*, std::string>::iterator	it1;
+
+	if (this->Params.empty())
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	it1 = IRC_Server->channels_list.begin();
+	if (this->Params.size() == 1)
+	{
+		while (it1 != IRC_Server->channels_list.end())
+		{
+			if (this->Params[0] == it1->second)
+			{
+				if (it1->first->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) == NULL)
+				{
+					msg_sent = ERR_NOTONCHANNEL(it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				} 
+				else
+				{
+					if (it1->first->GetChannelstopic().empty())
+					{
+						msg_sent = RPL_NOTOPIC();
+						SendMsgBackWithPrefix(*this, msg_sent);
+					}
+					else
+					{
+						msg_sent = RPL_TOPIC(it1);
+						SendMsgBackWithPrefix(*this, msg_sent);
+					}
+				}
+			}
+			it1++;
+		}
+	}
+	else if (this->Params.size() >= 2)
+	{
+		while (it1 != IRC_Server->channels_list.end())
+		{
+			if (it1->second == this->Params[0])
+			{
+				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
+				{
+					std::vector<std::string>::iterator topic;
+					std::string tmp;
+
+					topic = this->Params.begin();
+					topic++;
+					while (topic != this->Params.end())
+					{
+						tmp = *topic;
+						tmp += " ";
+					//	it1->first->SetChannelstopic(tmp);
+						topic++;
+					}
+					it1->first->SetChannelstopic(tmp);
+					msg_sent = RPL_TOPIC(it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				}
+				else
+				{
+					msg_sent = ERR_CHANOPRIVSNEEDED(*this, it1);
+					SendMsgBackWithPrefix(*this, msg_sent);
+				}
+			}
+			it1++;
+		}
+	}
+	return (SUCCESS);
+}
+
+
+
+
 
 int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 {

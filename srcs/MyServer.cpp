@@ -549,6 +549,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->WallopsCmd(this);
 	else if (cmd == "OPER")
 		msg->OperCmd(this);
+	else if (cmd == "TOPIC")
+		msg->TopicCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
