@@ -43,6 +43,8 @@ MyServer::~MyServer( void )
 	while (it != this->_clients_list.end())
 	{
 		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
+		FD_CLR(it->second, &this->ready_fds);
+		close(it->second);
 		delete it->first;
 		it++;
 	}
@@ -57,6 +59,7 @@ MyServer::~MyServer( void )
 		itt++;
 	}
 	this->channels_list.clear();
+	close(this->GetSocketFd());
 	std::cout << CYAN << "All Channels were freed. No Leaks. :)" << NORMAL << std::endl;
 
 	return ;
@@ -287,7 +290,7 @@ int			MyServer::SelectClients( void )
 
 
 	memset(&timeout, 0, sizeof(struct timeval));
-	timeout.tv_usec = 200000;
+	timeout.tv_usec = 2000;
 	this->_fds_list = 0;
 	FD_ZERO(&this->ready_fds);
 	FD_SET(this->_socketfd, &this->ready_fds);
@@ -301,16 +304,16 @@ int			MyServer::SelectClients( void )
 	{
 		if (FD_ISSET(this->_fds_list, &this->readfds)) // C'est un client qui a ete trouve
 		{
-		//	if (this->_nb_of_clients <= 10)
-		//	{
+			if (this->_nb_of_clients < 10)
+			{
 				this->CreateClients();
 				FD_SET(this->_new_fd_nb, &this->ready_fds);
 				if (this->_new_fd_nb > this->_maximum_fds)
          	    	 this->_maximum_fds = this->_new_fd_nb;
-		//	}
+			}
 		//	else
 		//	{
-				//std::cerr << RED << "Error. Only " << WHITE << "10 clients " << RED << "at a time are allowed on the server." << NORMAL << std::endl; 
+		//		//std::cerr << RED << "Error. Only " << WHITE << "10 clients " << RED << "at a time are allowed on the server." << NORMAL << std::endl; 
 		//		break ;
 		//	}
 		}
@@ -318,7 +321,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	//this->DeleteAFKClients();
+//	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	return (SUCCESS);
 }
@@ -332,12 +335,10 @@ int			MyServer::DeleteAFKClients( void )
 		return (SUCCESS);
 	while (it != this->_clients_list.end())
 	{
-		if (it->first->GetClientsLastPing() >= 10 && it->first->GetClientsConnectionStatus() == YES)
+		if (it->first->GetClientsLastPing() >= 120 && it->first->GetClientsConnectionStatus() == YES)
 		{
 			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
-			//close(it->second);
-			//FD_CLR(it->first->GetClientsFd(), &this->ready_fds);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
 			msg.QuitCmd(this);
