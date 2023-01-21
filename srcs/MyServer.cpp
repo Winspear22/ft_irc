@@ -12,7 +12,7 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
 	std::string cmd_list_string[84] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
-	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "KILL", "KNOCKS", "LINKS", "LIST", \
+	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "kill", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
 	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
@@ -318,7 +318,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	this->DeleteAFKClients();
+	//this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	return (SUCCESS);
 }
@@ -336,18 +336,16 @@ int			MyServer::DeleteAFKClients( void )
 		{
 			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
-			close(it->second);
-			FD_CLR(it->first->GetClientsFd(), &this->ready_fds);
+			//close(it->second);
+			//FD_CLR(it->first->GetClientsFd(), &this->ready_fds);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
 			msg.QuitCmd(this);
 			it = this->_clients_list.begin();
 			if (it == this->_clients_list.end())
 				return (SUCCESS);
-			//break ;
 		}
 		it++;
-
 	}
 	return (SUCCESS);
 }

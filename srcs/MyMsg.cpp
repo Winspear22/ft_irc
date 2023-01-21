@@ -468,7 +468,9 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	unsigned int								i;
 	std::string				 					msg_sent;
 	std::map<Channels *, std::string>::iterator it;
+	int											fd;
 
+	fd = this->_SentFrom->GetClientsFd();
 	msg_sent = "QUIT"; //message renvoyé selon le RFC modern.ircdocs.horse
 	i = -1;
 	if (this->Params.empty())
@@ -496,6 +498,8 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
 		delete this->_SentFrom;
 	}
+	close(fd);
+	FD_CLR(fd, &IRC_Server->ready_fds);
 	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() - 1);
 	return (SUCCESS);
 }
@@ -1173,10 +1177,6 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
-
-
-
 int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 {
 	std::string intro_new_nick;
@@ -1271,7 +1271,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	std::string		msg_sent2;
 	int				ret_send;
 	size_t			i;
-	fd_set fds;
 
 	if (this->Params.empty())
 	{
@@ -1306,7 +1305,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			return (loop_errors_handlers_msg(ERROR_SEND));
 	
 		// QUIT PART
-		msg_sent2 = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
+		msg_sent2 = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
 		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
 		msg_sent2 += "\r\n";
 		std::cout << GREEN << "To client2: " << WHITE << msg_sent2 << NORMAL;
@@ -1314,7 +1313,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
 		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
-		
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;
 		it_chan = IRC_Server->channels_list.begin();
@@ -1334,11 +1332,9 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			}
 			it_client++;
 		}
-		FD_CLR(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), &fds);
-		close(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd());
-		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
-		// TO DO // free le client qui s'est fait kill
-		//delete IRC_Server->GetClientsThroughName(this->Params.at(0));
+		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT :Client disconnected.");
+		msg.parse_msg();
+		msg.QuitCmd(IRC_Server);
 	}
 }
 
