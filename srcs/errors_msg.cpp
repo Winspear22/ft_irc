@@ -54,7 +54,7 @@ IL FAUR AVOIR DES FONCTIONS VOID POUR PAS AVOIR DE RETURN FAILURE QUI VONT NOUS
 SORTIR DE LA BOUCLE*/
 void loop_errors_handlers_msg( int error_code )
 {
-	if (error_code == ERROR_ACCEPT)
+/*	if (error_code == ERROR_ACCEPT)
 		std::cerr << RED << "Error." << WHITE << " Accept(); " << RED << "had an error and returned -1. No connection was accepted." << NORMAL << std::endl;
 	if (error_code == ERROR_SEND)
 		std::cerr << RED << "Error." << WHITE << " Send(); " << RED << "had an error and returned -1. Nothing was sent." << NORMAL << std::endl;
@@ -62,6 +62,11 @@ void loop_errors_handlers_msg( int error_code )
 		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "had an error and returned -1. No client was selected." << NORMAL << std::endl;
 	if (error_code == ERROR_NONBLOCKING)
 		std::cerr << RED << "Error." << WHITE << " Fcntl(); " << RED << "had an error and returned -1. The client created fd is not set to non-blocking option." << NORMAL << std::endl;
+	if (error_code == ERROR_TOOMUCHCLIENTS)
+		std::cerr << RED << "Error." << WHITE << " connection " << RED << "there are too much clients. The limit of clients you can connect to the server is " << WHITE << "6" << NORMAL << std::endl;
+*/
+return ;
+(void)error_code;
 //	if (error_code == TIMEOUT)
 //		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
 }

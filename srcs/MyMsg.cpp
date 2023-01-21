@@ -501,6 +501,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	close(fd);
 	FD_CLR(fd, &IRC_Server->ready_fds);
 	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() - 1);
+	std::cout << CYAN << "Current nb of Clients after QUIT : " << WHITE << IRC_Server->GetCurrentClientsNb() << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
@@ -1186,7 +1187,7 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
-	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
+	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
 	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
 	return (SUCCESS);
 }

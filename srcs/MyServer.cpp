@@ -283,11 +283,8 @@ int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 
 int			MyServer::SelectClients( void )
 {
-	//fd_set				this->ready_fds; //mes fds etant prets a transmettre des donnes
-	//fd_set				this->readfds; // mes sets de fds pouvant lire
 	int					ret_select; //return de select pour les erreurs
 	struct timeval		timeout;
-
 
 	memset(&timeout, 0, sizeof(struct timeval));
 	timeout.tv_usec = 2000;
@@ -304,24 +301,17 @@ int			MyServer::SelectClients( void )
 	{
 		if (FD_ISSET(this->_fds_list, &this->readfds)) // C'est un client qui a ete trouve
 		{
-			if (this->_nb_of_clients < 10)
-			{
-				this->CreateClients();
-				FD_SET(this->_new_fd_nb, &this->ready_fds);
-				if (this->_new_fd_nb > this->_maximum_fds)
-         	    	 this->_maximum_fds = this->_new_fd_nb;
-			}
-		//	else
-		//	{
-		//		//std::cerr << RED << "Error. Only " << WHITE << "10 clients " << RED << "at a time are allowed on the server." << NORMAL << std::endl; 
-		//		break ;
-		//	}
+			this->CreateClients();
+			FD_SET(this->_new_fd_nb, &this->ready_fds);
+			if (this->_new_fd_nb > this->_maximum_fds)
+         		this->_maximum_fds = this->_new_fd_nb;
+
 		}
 		else
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-//	this->DeleteAFKClients();
+	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	return (SUCCESS);
 }
@@ -335,7 +325,8 @@ int			MyServer::DeleteAFKClients( void )
 		return (SUCCESS);
 	while (it != this->_clients_list.end())
 	{
-		if (it->first->GetClientsLastPing() >= 120 && it->first->GetClientsConnectionStatus() == YES)
+		if ((it->first->GetClientsConnectionStatus() == NO) || 
+		(it->first->GetClientsLastPing() >= 120))
 		{
 			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
@@ -355,7 +346,7 @@ int			MyServer::DeleteChannelsWithoutClients( void )
 {
 	std::map<Channels *, std::string>::iterator it;
 
-		it = this->channels_list.begin();
+	it = this->channels_list.begin();
 	while (it != this->channels_list.end())
 	{
 		if (it->first->GetAllClientsInChannelMemberList().empty())
@@ -394,6 +385,13 @@ void			MyServer::CreateClients( void )
 	{
 		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
 		this->_clients_list.insert(std::make_pair(client_created, client_created_fd));
+		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
+		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
+		if (this->GetCurrentClientsNb() > 8)
+		{
+			client_created->SetClientsConnectionStatus(NO);
+			return ;
+		}
 		this->_new_fd_nb = client_created_fd;
 		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
 	}
@@ -435,8 +433,8 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	std::string buf_str(recv_buffer);
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
-	else if (ret_rcv == ERROR_USER_DISCONNECTED && this->GetClientsThroughSocketFd(ClientsFd) == NULL)
-		return ;  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
+	else if (ret_rcv == ERROR_USER_DISCONNECTED)
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
 	else if (ret_rcv > 0 && (buf_str.rfind("\r") != buf_str.size() - 1) && (buf_str.rfind("\n") != buf_str.size() - 1))
 	{
 		std::cout << WHITE << "Incomplete new message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
