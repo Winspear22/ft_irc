@@ -1,4 +1,5 @@
 # include "Clients.hpp"
+# include "MyMsg.hpp"
 
 Clients::Clients( void )
 {

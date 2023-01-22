@@ -1,8 +1,10 @@
 # include "MyMsg.hpp"
 # include "MyServer.hpp"
+# include "Channels.hpp"
+# include "Clients.hpp"
 # include <sys/socket.h>
 # include <sys/types.h>
-//# include "num_replies.cpp"
+# include "num_replies.cpp"
 
 MyMsg::MyMsg( void )
 {

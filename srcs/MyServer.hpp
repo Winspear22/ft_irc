@@ -1,10 +1,11 @@
 #ifndef MYSERVER_HPP
 # define MYSERVER_HPP
 
-# include "Clients.hpp"
+//# include "Clients.hpp"
 //# include "MyMsg.hpp"
 //# include "Channels.hpp"
 //# include "Cmd.hpp"
+# include "irc.hpp"
 
 class Clients;
 class MyMsg;

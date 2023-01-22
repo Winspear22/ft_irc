@@ -3,10 +3,10 @@
 
 //# include "Clients.hpp"
 //# include "MyServer.hpp"
-# include "Channels.hpp"
-# include "Cmd.hpp"
+//# include "Channels.hpp"
+# include "irc.hpp"
 
-//class Clients;
+class Clients;
 class MyServer;
 class Channels;
 

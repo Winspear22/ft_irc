@@ -1,13 +1,10 @@
 #ifndef CMD_HPP
 # define CMD_HPP
 
-//# include "Clients.hpp"
 # include "MyServer.hpp"
 # include "Channels.hpp"
-
-//class MyServer;
-//class MyMsg;
-//class Clients;
+# include "Clients.hpp"
+# include "irc.hpp"
 
 # include "MyMsgInfoCmd.cpp"
 # include "MyMsgInviteCmd.cpp"
