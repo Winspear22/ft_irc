@@ -48,10 +48,7 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
 
-    if (msg.GetClients()->GetClientsNickname().size() == 0)
-        reply = "461 *" + msg.GetCmd() + ":Not enough parameters";
-    else
-        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters";
+    reply = "461 " + msg.GetCmd() + " " + ":Not enough parameters";
     return (reply);
 }
 
@@ -334,8 +331,8 @@ std::string RPL_TOPIC(std::map<Channels *, std::string>::iterator it)
 {
     std::string reply;
 
-    reply = "332 " + it->second + " :" + it->first->GetChannelstopic();
-    
+    reply = "332 " + it->first->GetChannelName() + " :" + it->first->GetChannelstopic();
+    std::cout << "reply === " << reply << std::endl;
     return (reply);
 }
 

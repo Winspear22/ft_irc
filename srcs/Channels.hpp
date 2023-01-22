@@ -28,6 +28,8 @@ public:
 	void					AddClientsToChannelMemberList( Clients *client );
 	void					DeleteClientsToChannelMemberList( Clients *client );
 	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	void					SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+
 	int						GetHasAChannelCreator( void );
 	void					SetHasAChannelCreator( int status );
 

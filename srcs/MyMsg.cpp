@@ -158,12 +158,13 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 	std::string msg_sent;
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
-	if (this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == NO) // Pas sûr de la deuxième condition
+	if (this->Params.empty()) // Pas sûr de la deuxième condition
 	{
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
 		SendMsgBackToClients(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+		this->_SentFrom->SetClientsConnectionStatus(NO);
 	}
 	else if (*it != IRC_Server->GetPassword())
 	{
@@ -171,6 +172,8 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
 		SendMsgBackToClients(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+		this->_SentFrom->SetClientsConnectionStatus(NO);
+
 	}	
 	else if (!this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
 	{
@@ -313,7 +316,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	it = this->Params.begin();
 	if (this->Params.size() < 4)
 	{
-
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -336,8 +338,11 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
 		it++;
-		//this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
-		//it++;
+		/*Pas sûr pour mode*/
+		if (*it == "2")
+			this->_SentFrom->SetClientsMode("w");
+		else if (*it == "3")
+			this->_SentFrom->SetClientsMode("i");
 		this->_SentFrom->SetClientsUnused(*it);
 		it++;
 		while (it != this->Params.end())
@@ -1077,6 +1082,7 @@ int		MyMsg::OperCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 	(void)IRC_Server;
+	
 
 	if (this->Params.size() < 2)
 	{
@@ -1101,6 +1107,8 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 {
 	std::string 								msg_sent;
 	std::map<Channels*, std::string>::iterator	it1;
+	std::map<Clients*, int>::iterator it;
+
 
 	if (this->Params.empty())
 	{
@@ -1140,25 +1148,23 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 	{
 		while (it1 != IRC_Server->channels_list.end())
 		{
+			it = it1->first->GetAllClientsInChannelMemberList().begin();
+
 			if (it1->second == this->Params[0])
 			{
-				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
+				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos || this->_SentFrom->GetClientsMode().find('O') != std::string::npos)
 				{
-					std::vector<std::string>::iterator topic;
-					std::string tmp;
+					std::string 	tmp;
+					size_t			ping_pos;
 
-					topic = this->Params.begin();
-					topic++;
-					while (topic != this->Params.end())
-					{
-						tmp = *topic;
-						tmp += " ";
-					//	it1->first->SetChannelstopic(tmp);
-						topic++;
-					}
+					tmp = "";
+					ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
+					if (ping_pos != std::string::npos)
+						tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos + 1);
 					it1->first->SetChannelstopic(tmp);
 					msg_sent = RPL_TOPIC(it1);
-					SendMsgBackWithPrefix(*this, msg_sent);
+					std::string ret = "TOPIC " + it1->second + " :" + it1->first->GetChannelstopic();
+					it1->first->SendMsgToAllInChannelsForTopic(this, ret, this->_SentFrom);
 				}
 				else
 				{
@@ -1169,6 +1175,7 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 			it1++;
 		}
 	}
+
 	return (SUCCESS);
 }
 
@@ -1184,7 +1191,7 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	SendMsgBackWithPrefix(*this, ::RPL_CREATED(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_MYINFO(*this));
 
-	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
+	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
 	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
