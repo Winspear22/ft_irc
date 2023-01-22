@@ -106,7 +106,6 @@ private:
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
-	std::vector<std::string>	_unavailable_nickname;
 	std::map<std::string, clock_t> _unavailable_nicknames;
 	
 	/*Server identity*/
