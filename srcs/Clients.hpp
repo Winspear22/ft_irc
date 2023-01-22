@@ -43,6 +43,8 @@ public:
 	void		SetClientsConnectionStatus( int status );
 	time_t		GetClientsLastPing( void );
 	void		SetClientsLastPing( time_t ping);
+	int			GetFirstMOTD( void );
+	void		SetFirstMOTD( int motd );
 
 
 
@@ -89,6 +91,7 @@ private:
 	int			_ConnectionStatus;
 	/*Clients Message*/
 	std::string	_ClientMessage;
+	int			_FirstMOTD;
 	
 	/*A supprimer à la fin du test*/
 	time_t	_last_com;

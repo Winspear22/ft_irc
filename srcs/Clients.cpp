@@ -25,6 +25,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_ConnectionStatus = YES;
 	this->_HostAdress = inet_ntoa(New_Address.sin_addr);
 	this->_LastPing = time(0);
+	this->_FirstMOTD = 0;
 	ret = getnameinfo(((struct sockaddr *)&New_Address), sizeof(New_Address), hostname, NI_MAXHOST, NULL, 0, 0);
 	if (ret == SUCCESS)
 		this->_Hostname = hostname;
@@ -252,4 +253,14 @@ int			Clients::AddClientsMode( char AddMode )
 void	Clients::resetTime(void)
 {
 	this->_last_com = time(0);
+}
+
+int			Clients::GetFirstMOTD( void )
+{
+	return (this->_FirstMOTD);
+}
+
+void		Clients::SetFirstMOTD( int motd )
+{
+	this->_FirstMOTD = motd;
 }
