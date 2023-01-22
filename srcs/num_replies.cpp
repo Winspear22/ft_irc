@@ -392,3 +392,19 @@ std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
     reply = "441 " + client + " " + chan + " :" + "They aren't on that channel";
     return (reply);
 }
+
+std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "353 " + msg.GetClients()->GetClientsNickname() + " =" + channames + " :";
+    return (reply);
+}
+
+std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
+    return (reply);
+}

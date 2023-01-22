@@ -83,6 +83,19 @@ std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
 	return (this->_MemberOfTheChannelList);
 }
 
+
+/*std::map<Clients*, int> Channels::GetAllClientsNotInAnyChannels( void )
+{
+	std::map<Clients*, int>::iterator members;
+	
+	members = this->_MemberOfTheChannelList.begin();
+	while ()
+
+
+	return (NULL);
+}*/
+
+
 void		Channels::AddClientsToChannelMemberList( Clients *client )
 {
 	if (client == NULL)
