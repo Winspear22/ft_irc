@@ -69,6 +69,7 @@
 # define EXIT_FAILIURE -1
 # define NO 1
 # define YES 0
+# define DELAY 2 * CLOCKS_PER_SEC
 
 /*                                             ERRORS CODES                                                      */
 

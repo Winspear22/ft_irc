@@ -37,6 +37,9 @@ public:
 	size_t		GetMaxPing( void );
 	size_t		GetMaxUser( void );
 	int			GetCurrentClientsNb( void );
+	int			isUnavailableNickname(std::string nickame);
+	int			SetUnavailableNickname(std::string nickname);
+	void		deleteUnavailableNickname( void );
 	void 		SetServerName( std::string ServerName );
 	void		SetServerversion( std::string ServerVersion );
 	void 		SetOperlogname( std::string Operlogname );
@@ -71,8 +74,6 @@ public:
 	void		SendMsgToAllInChannels( std::string msg_sent );
 	void		MyServerDestructorMsg( void );
 
-
-
 	/*A EFFACER A LA FIN DU TEST*/
 	void	buf_to_cmd( int ClientFd );
 	void	RecvClientsMsg( int ClientFd );
@@ -105,7 +106,9 @@ private:
 	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
-
+	std::vector<std::string>	_unavailable_nickname;
+	std::map<std::string, clock_t> _unavailable_nicknames;
+	
 	/*Server identity*/
 	std::string		_Servername;
 	std::string		_Serverversion;

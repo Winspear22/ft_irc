@@ -263,6 +263,11 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
+	else if (IRC_Server->isUnavailableNickname(*it))
+	{
+		msg_sent = ERR_UNAVAILRESOURCE(*it);
+		SendMsgBackToClients(*this, msg_sent);
+	}
 	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
 	{
 		msg_sent = ERR_NICKNAMEINUSE(*this, it);
@@ -1298,7 +1303,8 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
-	
+		IRC_Server->SetUnavailableNickname(this->Params.at(0));
+
 		// QUIT PART
 		msg_sent2 = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
 		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
@@ -1327,10 +1333,9 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			}
 			it_client++;
 		}
-		
-		//MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT :Client disconnected. Killed by " + this->_SentFrom->GetClientsNickname());
-		//msg.parse_msg();
-		//msg.QuitCmd(IRC_Server);
+		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT :Client disconnected. Killed by " + this->_SentFrom->GetClientsNickname());
+		msg.parse_msg();
+		msg.QuitCmd(IRC_Server);
 	}
 }
 

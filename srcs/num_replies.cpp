@@ -103,14 +103,12 @@ std::string ERR_NICKNAMEINUSE(MyMsg msg, std::vector<std::string>::iterator it)
     return (reply);
 }
 
-std::string ERR_UNAVAILRESOURCE(MyMsg msg)
+std::string ERR_UNAVAILRESOURCE(std::string nick)
 {
     std::string reply;
     
-    if (msg.GetCmd() == "NICK")
-        reply = "437 " + msg.GetClients()->GetClientsNickname() + " : " + msg.GetClients()->GetClientsNickname() + "is temporarily unavailable";
-    // if (msg.GetCmd() == "JOIN")
-    //     reply = "437 " + msg.GetClients()->GetClientsNickname() + " :" + msg.getChannelName() + " is temporarily unavailable\n";
+    reply = "437 " + nick + " " + nick;
+
     return (reply);
 }
 

@@ -313,6 +313,7 @@ int			MyServer::SelectClients( void )
 	}
 	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
+	this->deleteUnavailableNickname();
 	return (SUCCESS);
 }
 
@@ -659,5 +660,55 @@ void	MyServer::MyServerDestructorMsg( void )
 		MyMsg msg_sent(it->first, msg);
 		SendMsgBackWithPrefix(msg_sent, msg);
 		it++;
+	}
+}
+
+int		MyServer::isUnavailableNickname(std::string nickname)
+{
+	std::map<std::string, clock_t>::iterator	it;
+
+
+	it = this->_unavailable_nicknames.begin();
+	while (it != this->_unavailable_nicknames.end())
+	{
+		if (it->first == nickname)
+		{
+			return 1;
+		}
+		it++;
+	}
+	return SUCCESS;
+}
+
+int		MyServer::SetUnavailableNickname(std::string nickname)
+{
+	clock_t	time;
+
+	time = clock();
+	this->_unavailable_nicknames.insert(std::make_pair(nickname, time));
+
+	return SUCCESS;
+}
+
+void		MyServer::deleteUnavailableNickname( void )
+{
+	std::map<std::string, clock_t>::iterator	it;
+	// int											delay = 3 * CLOCKS_PER_SEC;
+
+	if (!this->_unavailable_nicknames.empty())
+	{
+		it = this->_unavailable_nicknames.begin();
+		// std::cout << GREEN << "TESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSST111111111111111111111111\n";
+		// std::cout << clock() << "/" << it->second << "/" << RED << DELAY << "\n";
+		while (it != this->_unavailable_nicknames.end())
+		{
+			if (clock() - it->second >= DELAY)
+			{
+				std::cout << "Nickname " << GREEN << it->first << " is now available.\n";
+				this->_unavailable_nicknames.erase(it);
+				break;
+			}
+			it++;
+		}
 	}
 }
