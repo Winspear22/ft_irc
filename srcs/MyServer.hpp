@@ -13,8 +13,6 @@ class MyServer
 {
 public:
     MyServer( int port, std::string password );
-	MyServer( const MyServer & copy);
-    MyServer & operator=( const MyServer & server );
     ~MyServer( void );
 
 	void		InitVariables( void );
@@ -88,6 +86,9 @@ public:
 
 private:
     MyServer(/* ARG */);
+	MyServer( const MyServer & copy);
+    MyServer & operator=( const MyServer & server );
+
 
 
     int         	_port;

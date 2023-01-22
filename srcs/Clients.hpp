@@ -8,8 +8,6 @@ class Clients
 {
 public:
 	Clients( int ClientFd, struct sockaddr_in _New_Address, std::string ServerName );
-	Clients( const Clients & copy );
-	Clients & operator=( const Clients & client );
 	~Clients( void );
 
 	int			GetClientsFd( void );
@@ -67,6 +65,8 @@ std::string _ServerName;
 
 private:
     Clients(/* ARG*/);
+	Clients( const Clients & copy );
+	Clients & operator=( const Clients & client );
 	int 		_ClientFd;
 	sockaddr_in _New_Address;
 //	std::string _ServerName;
