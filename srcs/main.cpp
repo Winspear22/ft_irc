@@ -5,6 +5,10 @@ bool	ServerStatus;
 
 void    signal_handler( int sig )
 {
+	if (sig == SIGTERM)
+		std::cout << RED << "Fermeture de client détectée" << NORMAL << std::endl;
+	else if (sig == SIGPIPE)
+		std::cout << RED << "Fermeture de netcat détectée" << NORMAL << std::endl;
 	std::cout << std::endl;
     std::cout << GREEN << "Signal button pressed : " << YELLOW << "sig n° : " 
 	<< sig << WHITE << " - SIGINT." << NORMAL << std::endl;

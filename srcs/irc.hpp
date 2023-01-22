@@ -86,10 +86,12 @@
 # define ERROR_SELECT 10
 # define ERROR_NEW 11
 # define ERROR_CONFIG 12
+# define ERROR_TOOMUCHCLIENTS 13
 # define TIMEOUT 0
 # define CMD_EXISTS 0
 # define CMD_DOESNT_EXIST 1
 # define ERROR_USER_DISCONNECTED 0
+
 
 /*											   SERVER_STATUS													 */
 # define SERVER_ON 0

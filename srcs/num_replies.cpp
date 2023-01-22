@@ -60,9 +60,9 @@ std::string ERR_ALREADYREGISTRED(MyMsg msg)
     std::string reply;
 
     if (msg.GetClients()->GetClientsNickname().size() == 0)
-        reply = "462 *" + msg.GetCmd() + " :Unauthorized command (already registered)";
+        reply = "462 *" + msg.GetCmd() + ":Unauthorized command (already registered)";
     else
-        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + " :Unauthorized command (already registered)";
+        reply = "462 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Unauthorized command (already registered)";
     return (reply);
 }
 
@@ -347,6 +347,14 @@ std::string ERR_CHANOPRIVSNEEDED(MyMsg msg, std::map<Channels *, std::string>::i
     return (reply); 
 }
 
+std::string ERR_CHANOPRIVSNEEDED2(MyMsg msg, std::string it)
+{
+    std::string reply;
+
+    reply = "482 " + msg.GetClients()->GetClientsNickname() + " " + it + " :" + "You're not channel operator";
+    return (reply); 
+}
+
 std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it)
 {
     std::string reply;
@@ -355,7 +363,6 @@ std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it)
     return (reply);
 }
 /*------------------------------------------------------*/
-
 std::string ERR_USERONCHANNEL(MyMsg msg, std::string user_invited, std::string channel)
 {
     std::string reply;
@@ -378,5 +385,13 @@ std::string RPL_INVITING(MyMsg msg, std::string user_invited, std::string channe
     std::string reply;
 
     reply = "341 " + msg.GetClients()->GetClientsNickname() + " " + channel + + " " + user_invited;
+    return (reply);
+}
+
+std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
+{
+    std::string reply;
+
+    reply = "441 " + client + " " + chan + " :" + "They aren't on that channel";
     return (reply);
 }

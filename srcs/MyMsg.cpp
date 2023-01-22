@@ -468,7 +468,9 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	unsigned int								i;
 	std::string				 					msg_sent;
 	std::map<Channels *, std::string>::iterator it;
+	int											fd;
 
+	fd = this->_SentFrom->GetClientsFd();
 	msg_sent = "QUIT"; //message renvoyé selon le RFC modern.ircdocs.horse
 	i = -1;
 	if (this->Params.empty())
@@ -496,7 +498,10 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
 		delete this->_SentFrom;
 	}
+	close(fd);
+	FD_CLR(fd, &IRC_Server->ready_fds);
 	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() - 1);
+	std::cout << CYAN << "Current nb of Clients after QUIT : " << WHITE << IRC_Server->GetCurrentClientsNb() << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
@@ -904,7 +909,7 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (this->Params.size() >= 1)
+	else if (this->Params.size() >= 2)
 	{
 		char *tmp = strdup(this->Params[0].c_str());
 		std::vector<std::string> channels = IRC_Server->SplitByEndline(tmp, ",");
@@ -919,20 +924,12 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 		{
 			if (IRC_Server->GetChannelsByName(*it) == NULL)
 			{
-				msg_sent = "403";
-				msg_sent += " " + this->_SentFrom->GetClientsNickname();
-				msg_sent += " ";
-				msg_sent += *it;
-				msg_sent += " :No such channel.";
-				//msg_sent = ERR_NOSUCHCHANNEL(*this, *it);
+				msg_sent = ERR_NOSUCHCHANNEL(*this, *it);
 				SendMsgBackWithPrefix(*this, msg_sent); 
 			}
 			else if (this->_SentFrom->GetClientsMode().find('o') == std::string::npos)
 			{
-				msg_sent = "482";
-				msg_sent += " " + this->_SentFrom->GetClientsNickname();
-				msg_sent += " " + *it;
-				msg_sent += " :You're not channel operator";
+				msg_sent = ERR_CHANOPRIVSNEEDED2(*this, *it);
 				SendMsgBackWithPrefix(*this, msg_sent);
 			}
 			else if (IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) == NULL)
@@ -948,19 +945,16 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 				{
 					if (IRC_Server->GetClientsThroughName(*it2) == NULL || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(*it2) == NULL)
 					{
-						msg_sent = "441";
-						msg_sent += " " + this->_SentFrom->GetClientsNickname();
-						msg_sent += " " + *it2 + " " + *it;
-						msg_sent += " :They aren't on that channel.";
+						msg_sent = ERR_USERNOTINCHANNEL(*it2, *it);
 						SendMsgBackWithPrefix(*this, msg_sent);
 					}
 					else
 					{
-						size_t start = this->_Message.find(':', this->GetPrefix().size() + this->GetCmd().size() + this->Params[0].size() + this->Params[1].size());
-						std::string text = "";
-						if (start != std::string::npos)
-							text = this->_Message.substr(start);
-						msg_sent = "KICK " + *it + " " + *it2 + " " + text;
+						size_t ping_pos = this->_Message.find(':', this->GetPrefix().size() + this->GetCmd().size() + this->Params[0].size() + this->Params[1].size());
+						std::string tmp = "";
+						if (ping_pos != std::string::npos)
+							tmp = this->_Message.substr(ping_pos);
+						msg_sent = "KICK " + *it + " " + *it2 + " " + tmp;
 						IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 						SendMsgBackWithPrefix(*this, msg_sent);
 						IRC_Server->GetChannelsByName(*it)->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(*it2));
@@ -970,6 +964,11 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 			}
 			it++;
 		}
+	}
+	else
+	{
+		msg_sent = ERR_NEEDMOREPARAMS(*this);
+		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	return (SUCCESS);
 }
@@ -1050,11 +1049,11 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 	}
 	else if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
 	{
-		size_t start = this->_Message.find(':', this->Prefix.size() + this->Command.size());
-		std::string text = "";
-		if (start != std::string::npos)
-			text = this->_Message.substr(start);
-		msg_sent = this->Prefix + " WALLOPS " + text;
+		size_t ping_pos = this->_Message.find(':', this->Prefix.size() + this->Command.size());
+		std::string tmp = "";
+		if (ping_pos != std::string::npos)
+			tmp = this->_Message.substr(ping_pos);
+		msg_sent = this->Prefix + " WALLOPS " + tmp;
 		std::map<Clients*, int>::iterator it;
 		it = IRC_Server->_clients_list.begin();
 		int ret_send;
@@ -1173,10 +1172,6 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-
-
-
-
 int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 {
 	std::string intro_new_nick;
@@ -1192,7 +1187,7 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
-	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
+	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
 	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
 	return (SUCCESS);
 }
@@ -1271,7 +1266,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	std::string		msg_sent2;
 	int				ret_send;
 	size_t			i;
-	fd_set fds;
 
 	if (this->Params.empty())
 	{
@@ -1291,7 +1285,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	else
 	{
 		// KILL PART
-		msg_sent = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
+		msg_sent = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
 		msg_sent += "KILL " + this->Params.at(0);
 		if (this->Params.size() > 1)
 		{
@@ -1306,7 +1300,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			return (loop_errors_handlers_msg(ERROR_SEND));
 	
 		// QUIT PART
-		msg_sent2 = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
+		msg_sent2 = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
 		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
 		msg_sent2 += "\r\n";
 		std::cout << GREEN << "To client2: " << WHITE << msg_sent2 << NORMAL;
@@ -1314,7 +1308,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
 		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
-		
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;
 		it_chan = IRC_Server->channels_list.begin();
@@ -1334,11 +1327,10 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			}
 			it_client++;
 		}
-		FD_CLR(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), &fds);
-		close(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd());
-		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughName(this->Params.at(0)));
-		// TO DO // free le client qui s'est fait kill
-		//delete IRC_Server->GetClientsThroughName(this->Params.at(0));
+		
+		//MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT :Client disconnected. Killed by " + this->_SentFrom->GetClientsNickname());
+		//msg.parse_msg();
+		//msg.QuitCmd(IRC_Server);
 	}
 }
 
