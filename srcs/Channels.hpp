@@ -1,9 +1,9 @@
 #ifndef CHANNELS_HPP
 # define CHANNELS_HPP
 
-//# include "irc.hpp"
-# include "Clients.hpp"
+//# include "Clients.hpp"
 # include "MyMsg.hpp"
+# include "irc.hpp"
 
 class MyMsg;
 class MyServer;

@@ -1,5 +1,4 @@
 # include "MyMsg.hpp"
-
 // CONNECTION REGISTRATION
 
 std::string RPL_WELCOME(MyMsg msg)
@@ -7,7 +6,6 @@ std::string RPL_WELCOME(MyMsg msg)
     std::string reply;
 
     reply = "001 " + msg.GetClients()->GetClientsNickname() + " : Welcome to the \033[1;32mft_irc Network. \033[0m";
-
     return (reply);
 }
 
@@ -16,7 +14,6 @@ std::string RPL_YOURHOST(MyMsg msg)
     std::string reply;
 
     reply = "002 " + msg.GetClients()->GetClientsNickname() + " : Your host is \033[1;36m" + msg.GetClients()->GetServerName() + "\033[0m";
-
     return (reply);
 }
 

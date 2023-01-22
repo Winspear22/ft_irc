@@ -1,11 +1,12 @@
 #ifndef MYMSG_HPP
 # define MYMSG_HPP
 
-# include "Clients.hpp"
-# include "MyServer.hpp"
+//# include "Clients.hpp"
+//# include "MyServer.hpp"
 # include "Channels.hpp"
+# include "Cmd.hpp"
 
-class Clients;
+//class Clients;
 class MyServer;
 class Channels;
 

@@ -1,4 +1,7 @@
 # include "MyServer.hpp"
+# include "Channels.hpp"
+# include "Clients.hpp"
+# include "MyMsg.hpp"
 
 MyServer::MyServer( void )
 {
