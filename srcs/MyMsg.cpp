@@ -704,15 +704,10 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 				it = chans.begin();
 				while (it != chans.end())
 				{
-					if (it->first->GetClientsInChannelMemberList(EntireClientsList->first->GetClientsNickname()) != NULL)
-						std::cout << YELLOW << "member in chan" << NORMAL << std::endl;
-					else
+					if (it->first->GetClientsInChannelMemberList(EntireClientsList->first->GetClientsNickname()) == NULL)
 					{
 						if (EntireClientsList->first->GetClientsMode().find('i') == std::string::npos)
-						{
-							std::cout << GREEN << "member found" << NORMAL << std::endl;
 							ClientsNotInAnyChannel.insert(std::make_pair(EntireClientsList->first, EntireClientsList->second));
-						}
 					}
 					it++;
 				}
@@ -724,15 +719,11 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 		while (it_ClientsNoyInAnyChannel != ClientsNotInAnyChannel.end())
 		{
 			msg_sent += it_ClientsNoyInAnyChannel->first->GetClientsNickname() + " ";
-			std::cout << "msg_sent === " <<  msg_sent << std::endl; 
 			it_ClientsNoyInAnyChannel++;
 		}
-		std::cout << "final msg === " << WHITE <<  msg_sent << NORMAL << std::endl; 
 		SendMsgBackWithPrefix(msg, msg_sent);
 		msg_sent = RPL_ENDOFNAMES(*this, "*");
 		SendMsgBackWithPrefix(msg, msg_sent);
-	
-
 	}
 	else
 	{

@@ -397,7 +397,7 @@ std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
 {
     std::string reply;
 
-    reply = "353 " + msg.GetClients()->GetClientsNickname() + " =" + channames + " :";
+    reply = "353 " + msg.GetClients()->GetClientsNickname() + " = " + channames + " :";
     return (reply);
 }
 
