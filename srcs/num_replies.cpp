@@ -325,11 +325,11 @@ std::string RPL_NOTOPIC( void )
     return (reply);
 }
 
-std::string RPL_TOPIC(std::map<Channels *, std::string>::iterator it)
+std::string RPL_TOPIC(MyMsg msg, std::map<Channels *, std::string>::iterator it)
 {
     std::string reply;
 
-    reply = "332 " + it->first->GetChannelName() + " :" + it->first->GetChannelstopic();
+    reply = "332 " + msg.GetClients()->GetClientsNickname() + " " + it->first->GetChannelName() + " :" + it->first->GetChannelstopic();
     std::cout << "reply === " << reply << std::endl;
     return (reply);
 }

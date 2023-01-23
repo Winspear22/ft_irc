@@ -1060,7 +1060,7 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 					}
 					else
 					{
-						ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->GetPrefix().size() + this->GetCmd().size() + this->Params.at(0).size() + this->Params.at(1).size());
+						ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->GetCmd().size() + this->Params.at(0).size() + this->Params.at(1).size());
 						std::string tmp;
 						tmp = "";
 						if (ping_pos != std::string::npos)
@@ -1068,14 +1068,14 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 							tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos);
 							std::cout << "TMP === " << tmp << std::endl;
 						}
-						std::cout << CYAN << "msg_sent == " << PURPLE << msg_sent << NORMAL << std::endl;
-						std::cout << CYAN << "msg_sent == " << PURPLE << this->_SentFrom->GetClientsMessage() << NORMAL << std::endl;
+						std::cout << CYAN << "msg_sent1 == " << PURPLE << this->_SentFrom->GetClientsMessage() << NORMAL << std::endl;
+						std::cout << CYAN << "msg_sent2 == " << PURPLE << msg_sent << NORMAL << std::endl;
 						msg_sent = "KICK " + *it + " " + *it2 + " " + tmp;
 						IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
-						std::cout << CYAN << "msg_sent == " << PURPLE << msg_sent << NORMAL << std::endl;
+						std::cout << CYAN << "msg_sent3 == " << PURPLE << msg_sent << NORMAL << std::endl;
 						SendMsgBackWithPrefix(*this, msg_sent);
 						IRC_Server->GetChannelsByName(*it)->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(*it2));
-					}		
+					}
 					it2++;
 				}
 			}
@@ -1247,7 +1247,7 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 					}
 					else
 					{
-						msg_sent = RPL_TOPIC(it1);
+						msg_sent = RPL_TOPIC(*this, it1);
 						SendMsgBackWithPrefix(*this, msg_sent);
 					}
 				}
@@ -1272,8 +1272,10 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 					ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 					if (ping_pos != std::string::npos)
 						tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos + 1);
+					std::cout << RED << "ping_pos " << ping_pos << "\n";
+					std::cout << RED << "TMP = " << GREEN << tmp << "\n";
 					it1->first->SetChannelstopic(tmp);
-					msg_sent = RPL_TOPIC(it1);
+					msg_sent = RPL_TOPIC(*this, it1);
 					std::string ret = "TOPIC " + it1->second + " :" + it1->first->GetChannelstopic();
 					it1->first->SendMsgToAllInChannelsForTopic(this, ret, this->_SentFrom);
 				}
