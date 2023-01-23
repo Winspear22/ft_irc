@@ -48,10 +48,7 @@ std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
 
-    if (msg.GetClients()->GetClientsNickname().size() == 0)
-        reply = "461 *" + msg.GetCmd() + ":Not enough parameters";
-    else
-        reply = "461 " + msg.GetClients()->GetClientsNickname() + msg.GetCmd() + ":Not enough parameters";
+    reply = "461 " + msg.GetCmd() + " " + ":Not enough parameters";
     return (reply);
 }
 
@@ -332,8 +329,8 @@ std::string RPL_TOPIC(std::map<Channels *, std::string>::iterator it)
 {
     std::string reply;
 
-    reply = "332 " + it->second + " :" + it->first->GetChannelstopic();
-    
+    reply = "332 " + it->first->GetChannelName() + " :" + it->first->GetChannelstopic();
+    std::cout << "reply === " << reply << std::endl;
     return (reply);
 }
 
@@ -391,5 +388,21 @@ std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
     std::string reply;
 
     reply = "441 " + client + " " + chan + " :" + "They aren't on that channel";
+    return (reply);
+}
+
+std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "353 " + msg.GetClients()->GetClientsNickname() + " = " + channames + " :";
+    return (reply);
+}
+
+std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
     return (reply);
 }

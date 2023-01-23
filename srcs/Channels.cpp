@@ -83,6 +83,19 @@ std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
 	return (this->_MemberOfTheChannelList);
 }
 
+
+/*std::map<Clients*, int> Channels::GetAllClientsNotInAnyChannels( void )
+{
+	std::map<Clients*, int>::iterator members;
+	
+	members = this->_MemberOfTheChannelList.begin();
+	while ()
+
+
+	return (NULL);
+}*/
+
+
 void		Channels::AddClientsToChannelMemberList( Clients *client )
 {
 	if (client == NULL)
@@ -120,6 +133,7 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
+	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
@@ -128,6 +142,26 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 			if (ret_send == ERROR_SERVER)
 				return(loop_errors_handlers_msg(ERROR_SEND));
 		}
+		it++;
+	}
+}
+
+void		Channels::SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom )
+{
+	std::map<Clients*, int>::iterator	it;
+	int									ret_send;
+(void)SentFrom;
+	it = this->_MemberOfTheChannelList.begin();
+	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
+	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
+	while (it != this->_MemberOfTheChannelList.end())
+	{
+		//if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
+		//{	
+			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
+			if (ret_send == ERROR_SERVER)
+				return(loop_errors_handlers_msg(ERROR_SEND));
+		//}
 		it++;
 	}
 }

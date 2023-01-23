@@ -13,8 +13,6 @@ class Channels
 {
 public:
     Channels( Clients *CreatedBy, std::string ChannelName );
-	Channels( const Channels & copy );
-	Channels & operator=( const Channels & popo );
 	~Channels( void );
 
 	std::string				GetChannelName( void );
@@ -28,6 +26,8 @@ public:
 	void					AddClientsToChannelMemberList( Clients *client );
 	void					DeleteClientsToChannelMemberList( Clients *client );
 	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	void					SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+
 	int						GetHasAChannelCreator( void );
 	void					SetHasAChannelCreator( int status );
 
@@ -38,6 +38,8 @@ public:
 
 private:
     Channels(/*ARG*/);
+	Channels( const Channels & copy );
+	Channels & operator=( const Channels & popo );
 
 	int						_HasAChannelCreator;
 	std::string				_Topic;

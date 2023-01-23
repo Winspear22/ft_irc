@@ -8,8 +8,6 @@ class Clients
 {
 public:
 	Clients( int ClientFd, struct sockaddr_in _New_Address, std::string ServerName );
-	Clients( const Clients & copy );
-	Clients & operator=( const Clients & client );
 	~Clients( void );
 
 	int			GetClientsFd( void );
@@ -43,6 +41,8 @@ public:
 	void		SetClientsConnectionStatus( int status );
 	time_t		GetClientsLastPing( void );
 	void		SetClientsLastPing( time_t ping);
+	int			GetFirstMOTD( void );
+	void		SetFirstMOTD( int motd );
 
 
 
@@ -65,6 +65,8 @@ std::string _ServerName;
 
 private:
     Clients(/* ARG*/);
+	Clients( const Clients & copy );
+	Clients & operator=( const Clients & client );
 	int 		_ClientFd;
 	sockaddr_in _New_Address;
 //	std::string _ServerName;
@@ -89,6 +91,7 @@ private:
 	int			_ConnectionStatus;
 	/*Clients Message*/
 	std::string	_ClientMessage;
+	int			_FirstMOTD;
 	
 	/*A supprimer à la fin du test*/
 	time_t	_last_com;

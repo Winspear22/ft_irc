@@ -158,12 +158,13 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 	std::string msg_sent;
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
-	if (this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == NO) // Pas sûr de la deuxième condition
+	if (this->Params.empty()) // Pas sûr de la deuxième condition
 	{
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
 		SendMsgBackToClients(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+		this->_SentFrom->SetClientsConnectionStatus(NO);
 	}
 	else if (*it != IRC_Server->GetPassword())
 	{
@@ -171,6 +172,8 @@ int		MyMsg::PassCmd( MyServer *IRC_Server )
 		this->_SentFrom->SetClientsConnectionAuthorisation(YES);
 		SendMsgBackToClients(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionAuthorisation(NO);
+		this->_SentFrom->SetClientsConnectionStatus(NO);
+
 	}	
 	else if (!this->Params.empty() && this->_SentFrom->GetClientsConnectionAuthorisation() == YES)
 	{
@@ -318,7 +321,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 	it = this->Params.begin();
 	if (this->Params.size() < 4)
 	{
-
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -341,8 +343,11 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
 		it++;
-		//this->_SentFrom->SetClientsMode(*it); // A CE MOMENT LA IL FAUDRA LANCER LA COMMANDE MODE
-		//it++;
+		/*Pas sûr pour mode*/
+		if (*it == "2")
+			this->_SentFrom->SetClientsMode("w");
+		else if (*it == "3")
+			this->_SentFrom->SetClientsMode("i");
 		this->_SentFrom->SetClientsUnused(*it);
 		it++;
 		while (it != this->Params.end())
@@ -518,12 +523,7 @@ int			MyMsg::MotdCmd( void )
 	std::vector<std::string> file_content;
 	std::vector<std::string>::iterator it;
 
-	if (this->Params.size() > 1) // S'il y'a trop de paramètres (verifier le nb de parametre sur les ordis de 42, moi j'en ai 4 bizarrement)
-	{
-		msg_sent = ERR_NOMOTD(*this, 1);
-		SendMsgBackWithPrefix(*this, msg_sent);
-	}
-	else
+	if (this->GetClients()->GetFirstMOTD() == 0) // premiere connexion
 	{
 		std::ifstream motd_file("./srcs/motd.txt");
 		if (!motd_file.good()) // Si le fichier n'existe pas
@@ -535,8 +535,76 @@ int			MyMsg::MotdCmd( void )
 		{
 			msg_sent = RPL_MOTDSTART(*this); // Code pour commencer le msg
 			SendMsgBackWithPrefix(*this, msg_sent);
-			while (getline(motd_file, file_tmp)) // j'écris dans la variable le contenu de motd.txt
-				file_content.push_back(file_tmp);
+			while (getline(motd_file, file_tmp))
+			{ 
+				if (file_tmp.length() > 80) // si j'ai plus de 80 caracteres j'append
+					file_content.push_back(file_tmp.substr(0, 80).append("."));
+				else							// j'écris dans la variable le contenu de motd.txt
+					file_content.push_back(file_tmp);
+			}
+			it = file_content.begin();
+			while (it != file_content.end())
+			{
+				msg_sent = RPL_MOTD(*this, it);
+				SendMsgBackWithPrefix(*this, msg_sent); //je le renvoi ligne par ligne au client
+				it++;
+			}
+		}
+		motd_file.close();
+		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
+		this->GetClients()->SetFirstMOTD(1);
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	if (this->Params.size() == 1 && this->Params[0] == this->GetClients()->GetServerName() && this->GetClients()->GetFirstMOTD() == 1)
+	{
+		std::ifstream motd_file("./srcs/motd.txt");
+		if (!motd_file.good()) // Si le fichier n'existe pas
+		{
+			msg_sent = ERR_NOMOTD(*this, 2);
+			SendMsgBackWithPrefix(*this, msg_sent);
+		}
+		else // Si le fichier existe
+		{
+			msg_sent = RPL_MOTDSTART(*this); // Code pour commencer le msg
+			SendMsgBackWithPrefix(*this, msg_sent);
+			while (getline(motd_file, file_tmp))
+			{ 
+				if (file_tmp.length() > 80) // si j'ai plus de 80 caracteres j'append
+					file_content.push_back(file_tmp.substr(0, 80).append("."));
+				else							// j'écris dans la variable le contenu de motd.txt
+					file_content.push_back(file_tmp);
+			}
+			it = file_content.begin();
+			while (it != file_content.end())
+			{
+				msg_sent = RPL_MOTD(*this, it);
+				SendMsgBackWithPrefix(*this, msg_sent); //je le renvoi ligne par ligne au client
+				it++;
+			}
+		}
+		motd_file.close();
+		msg_sent = RPL_ENDOFMOTD(*this); // je ferme le stream et je renvoi le code signifiant la fin du msg
+		SendMsgBackWithPrefix(*this, msg_sent);
+	}
+	else if (this->Params.empty() && this->GetClients()->GetFirstMOTD() == 1)
+	{
+		std::ifstream motd_file("./srcs/motd.txt");
+		if (!motd_file.good()) // Si le fichier n'existe pas
+		{
+			msg_sent = ERR_NOMOTD(*this, 2);
+			SendMsgBackWithPrefix(*this, msg_sent);
+		}
+		else // Si le fichier existe
+		{
+			msg_sent = RPL_MOTDSTART(*this); // Code pour commencer le msg
+			SendMsgBackWithPrefix(*this, msg_sent);
+			while (getline(motd_file, file_tmp))
+			{ 
+				if (file_tmp.length() > 80) // si j'ai plus de 80 caracteres j'append
+					file_content.push_back(file_tmp.substr(0, 80).append("."));
+				else							// j'écris dans la variable le contenu de motd.txt
+					file_content.push_back(file_tmp);
+			}
 			it = file_content.begin();
 			while (it != file_content.end())
 			{
@@ -661,7 +729,7 @@ int			MyMsg::IsTheUserVisible( Channels *channel, Clients *sender )
 
 int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 {
-	std::string str;
+	std::string msg_sent;
 
 	if (msg.Params.size() == 0)
 	{
@@ -669,22 +737,61 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 		std::map<Channels *, std::string>::iterator it = chans.begin();
 		while (it != chans.end())
 		{
-			std::map<Clients *, int> members = IRC_Server->GetChannelsByName(it->second)->_MemberOfTheChannelList;
+			std::map<Clients *, int> members = IRC_Server->GetChannelsByName(it->second)->GetAllClientsInChannelMemberList();
 			std::map<Clients *, int>::iterator it2 = members.begin();
-			str = "353";
-			str += " " + msg._SentFrom->_Nickname + " =" + it->second + " :";
+			msg_sent = RPL_NAMREPLY(*this, it->second);
 			while (it2 != members.end())
 			{
-				str += it2->first->_Nickname + " ";
+				if (it2->first->GetClientsMode().find('i') == std::string::npos)
+					msg_sent += it2->first->GetClientsNickname() + " ";
 				it2++;
 			}
-			SendMsgBackWithPrefix(msg, str);
-			str = "366";
-			str += " " + msg._SentFrom->_Nickname + " ";
-			str += it->second + ":End of /NAMES list";
-			SendMsgBackWithPrefix(msg, str);
+			SendMsgBackWithPrefix(msg, msg_sent);
+			msg_sent = RPL_ENDOFNAMES(*this, it->second);
+			SendMsgBackWithPrefix(msg, msg_sent);
 			it++;
 		}
+		std::map<Clients *, int>::iterator EntireClientsList;
+		std::map<Clients*, int> ClientsNotInAnyChannel;
+		std::map<Clients*, int>::iterator it_ClientsNoyInAnyChannel;
+		EntireClientsList = IRC_Server->_clients_list.begin();
+		it = chans.begin();
+		if (it == chans.end())
+		{
+			while (EntireClientsList != IRC_Server->_clients_list.end())
+			{
+				if (EntireClientsList->first->GetClientsMode().find('i') == std::string::npos)
+					ClientsNotInAnyChannel.insert(std::make_pair(EntireClientsList->first, EntireClientsList->second));
+			EntireClientsList++;
+			}
+		}
+		else
+		{
+			while (EntireClientsList != IRC_Server->_clients_list.end())
+			{
+				it = chans.begin();
+				while (it != chans.end())
+				{
+					if (it->first->GetClientsInChannelMemberList(EntireClientsList->first->GetClientsNickname()) == NULL)
+					{
+						if (EntireClientsList->first->GetClientsMode().find('i') == std::string::npos)
+							ClientsNotInAnyChannel.insert(std::make_pair(EntireClientsList->first, EntireClientsList->second));
+					}
+					it++;
+				}
+				EntireClientsList++;
+			}
+		}
+		it_ClientsNoyInAnyChannel = ClientsNotInAnyChannel.begin();
+		msg_sent = RPL_NAMREPLY(*this, "*");
+		while (it_ClientsNoyInAnyChannel != ClientsNotInAnyChannel.end())
+		{
+			msg_sent += it_ClientsNoyInAnyChannel->first->GetClientsNickname() + " ";
+			it_ClientsNoyInAnyChannel++;
+		}
+		SendMsgBackWithPrefix(msg, msg_sent);
+		msg_sent = RPL_ENDOFNAMES(*this, "*");
+		SendMsgBackWithPrefix(msg, msg_sent);
 	}
 	else
 	{
@@ -702,17 +809,16 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 				{
 					std::map<Clients *, int> members = IRC_Server->GetChannelsByName(*it)->_MemberOfTheChannelList;
 					std::map<Clients *, int>::iterator it2 = members.begin();
-					str = "353";
-					str += " " + msg._SentFrom->_Nickname + " = " + *it + " :";
+					msg_sent = RPL_NAMREPLY(*this, *it);
 					while (it2 != members.end())
 					{
-						if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == msg._SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(msg._SentFrom->_Nickname))
+						if (it2->first->GetClientsMode().find('i') == std::string::npos || it2->first == msg._SentFrom || IRC_Server->GetChannelsByName(*it)->GetClientsInChannelMemberList(msg._SentFrom->GetClientsNickname()))
 						{
 							if (IRC_Server->GetChannelsByName(*it)->GetChannelCreator() != NULL)
 							{
 								if (it2->first == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()) //changer ici + fd
-									str += "@";
-								str += it2->first->_Nickname + " ";
+									msg_sent += "@";
+								msg_sent += it2->first->GetClientsNickname() + " ";
 							}
 						}
 						it2++;
@@ -720,11 +826,9 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 				}
 				if (IRC_Server->GetChannelsByName(*it) != NULL)
 				{
-					SendMsgBackWithPrefix(msg, str);
-					str = "366";
-					str += " " + msg._SentFrom->_Nickname + " ";
-					str += *it + " :End of /NAMES list";
-					SendMsgBackWithPrefix(msg, str);
+					SendMsgBackWithPrefix(msg, msg_sent);
+					msg_sent = RPL_ENDOFNAMES(*this, *it);
+					SendMsgBackWithPrefix(msg, msg_sent);
 				}
 				it++;
 			}
@@ -908,6 +1012,7 @@ int		MyMsg::InfoCmd( void )
 int		MyMsg::KickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
+	size_t		ping_pos;
 
 	if (this->Params.size() == 0)
 	{
@@ -955,12 +1060,19 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 					}
 					else
 					{
-						size_t ping_pos = this->_Message.find(':', this->GetPrefix().size() + this->GetCmd().size() + this->Params[0].size() + this->Params[1].size());
-						std::string tmp = "";
+						ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->GetPrefix().size() + this->GetCmd().size() + this->Params.at(0).size() + this->Params.at(1).size());
+						std::string tmp;
+						tmp = "";
 						if (ping_pos != std::string::npos)
-							tmp = this->_Message.substr(ping_pos);
+						{
+							tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos);
+							std::cout << "TMP === " << tmp << std::endl;
+						}
+						std::cout << CYAN << "msg_sent == " << PURPLE << msg_sent << NORMAL << std::endl;
+						std::cout << CYAN << "msg_sent == " << PURPLE << this->_SentFrom->GetClientsMessage() << NORMAL << std::endl;
 						msg_sent = "KICK " + *it + " " + *it2 + " " + tmp;
 						IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+						std::cout << CYAN << "msg_sent == " << PURPLE << msg_sent << NORMAL << std::endl;
 						SendMsgBackWithPrefix(*this, msg_sent);
 						IRC_Server->GetChannelsByName(*it)->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(*it2));
 					}		
@@ -1082,6 +1194,7 @@ int		MyMsg::OperCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 	(void)IRC_Server;
+	
 
 	if (this->Params.size() < 2)
 	{
@@ -1106,6 +1219,7 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 {
 	std::string 								msg_sent;
 	std::map<Channels*, std::string>::iterator	it1;
+	std::map<Clients*, int>::iterator it;
 
 	if (this->Params.empty())
 	{
@@ -1145,25 +1259,23 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 	{
 		while (it1 != IRC_Server->channels_list.end())
 		{
+			it = it1->first->GetAllClientsInChannelMemberList().begin();
+
 			if (it1->second == this->Params[0])
 			{
-				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos)
+				if (this->_SentFrom->GetClientsMode().find('o') != std::string::npos || this->_SentFrom->GetClientsMode().find('O') != std::string::npos)
 				{
-					std::vector<std::string>::iterator topic;
-					std::string tmp;
+					std::string 	tmp;
+					size_t			ping_pos;
 
-					topic = this->Params.begin();
-					topic++;
-					while (topic != this->Params.end())
-					{
-						tmp = *topic;
-						tmp += " ";
-					//	it1->first->SetChannelstopic(tmp);
-						topic++;
-					}
+					tmp = "";
+					ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
+					if (ping_pos != std::string::npos)
+						tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos + 1);
 					it1->first->SetChannelstopic(tmp);
 					msg_sent = RPL_TOPIC(it1);
-					SendMsgBackWithPrefix(*this, msg_sent);
+					std::string ret = "TOPIC " + it1->second + " :" + it1->first->GetChannelstopic();
+					it1->first->SendMsgToAllInChannelsForTopic(this, ret, this->_SentFrom);
 				}
 				else
 				{
@@ -1174,6 +1286,7 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 			it1++;
 		}
 	}
+
 	return (SUCCESS);
 }
 
@@ -1189,7 +1302,7 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	SendMsgBackWithPrefix(*this, ::RPL_CREATED(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_MYINFO(*this));
 
-	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";// + "\r\n";
+	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
 	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
@@ -1290,7 +1403,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	else
 	{
 		// KILL PART
-		msg_sent = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
+		msg_sent = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
 		msg_sent += "KILL " + this->Params.at(0);
 		if (this->Params.size() > 1)
 		{
@@ -1299,20 +1412,15 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 				msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
 		}
 		msg_sent += "\r\n";
-		std::cout << GREEN << "To client: " << WHITE << msg_sent << NORMAL;
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
 		IRC_Server->SetUnavailableNickname(this->Params.at(0));
-
+		
 		// QUIT PART
-		msg_sent2 = ":" + this->_SentFrom->GetClientsNickname() + "!" + this->_SentFrom->GetClientsUsername() + "@" + this->_SentFrom->GetClientsHostname() + " ";
-		msg_sent2 += "QUIT killed by " + this->_SentFrom->GetClientsNickname();
-		msg_sent2 += "\r\n";
-		std::cout << GREEN << "To client2: " << WHITE << msg_sent2 << NORMAL;
-		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent2.c_str(), strlen(msg_sent2.c_str()), MSG_DONTWAIT);
-		if (ret_send == ERROR_SERVER)
-			return (loop_errors_handlers_msg(ERROR_SEND));
+		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT killed by " + this->_SentFrom->GetClientsNickname());
+		msg.parse_msg();
+		msg.QuitCmd(IRC_Server);
 		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;
@@ -1333,9 +1441,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 			}
 			it_client++;
 		}
-		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT :Client disconnected. Killed by " + this->_SentFrom->GetClientsNickname());
-		msg.parse_msg();
-		msg.QuitCmd(IRC_Server);
 	}
 }
 
