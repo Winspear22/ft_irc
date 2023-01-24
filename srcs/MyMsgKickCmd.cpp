@@ -61,6 +61,9 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 						}
 						std::cout << CYAN << "msg_sent1 == " << PURPLE << this->_SentFrom->GetClientsMessage() << NORMAL << std::endl;
 						std::cout << CYAN << "msg_sent2 == " << PURPLE << msg_sent << NORMAL << std::endl;
+						msg_sent = ":" + IRC_Server->GetClientsThroughName(*it2)->GetClientsNickname() + "!" + IRC_Server->GetClientsThroughName(*it2)->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(*it2)->_Hostname;
+						msg_sent += " PART " + *it + " " + *it2 + "\r\n";
+						send(IRC_Server->GetClientsThroughName(*it2)->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 						msg_sent = "KICK " + *it + " " + *it2 + " " + tmp;
 						IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 						std::cout << CYAN << "msg_sent3 == " << PURPLE << msg_sent << NORMAL << std::endl;
