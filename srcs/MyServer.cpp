@@ -1,4 +1,8 @@
 # include "MyServer.hpp"
+# include "Channels.hpp"
+# include "Clients.hpp"
+# include "MyMsg.hpp"
+
 
 MyServer::MyServer( void )
 {
@@ -311,7 +315,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	this->DeleteAFKClients();
+	//this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 		this->deleteUnavailableNickname();
 	return (SUCCESS);

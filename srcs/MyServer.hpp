@@ -2,12 +2,10 @@
 # define MYSERVER_HPP
 
 # include "irc.hpp"
-# include "Clients.hpp"
-# include "MyMsg.hpp"
-# include "Channels.hpp"
 
 class Clients;
 class MyMsg;
+class Channels;
 
 class MyServer
 {

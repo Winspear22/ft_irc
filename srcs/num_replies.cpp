@@ -1,5 +1,5 @@
-# include "MyMsg.hpp"
 
+# include "num_replies.hpp"
 // CONNECTION REGISTRATION
 
 std::string RPL_WELCOME(MyMsg msg)
