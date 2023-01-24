@@ -45,6 +45,8 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 				MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
 				UseOfNamesCmd.parse_msg();
 				NamesCmd(IRC_Server, UseOfNamesCmd);
+				msg_sent = RPL_TOPIC(*this, *it, IRC_Server->GetChannelsByName(*it)->GetChannelstopic());
+				SendMsgBackWithPrefix(*this, msg_sent);
 			}
 			it++;
 		}

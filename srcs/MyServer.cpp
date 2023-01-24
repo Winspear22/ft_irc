@@ -317,7 +317,7 @@ int			MyServer::SelectClients( void )
 	}
 	//this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
-		this->deleteUnavailableNickname();
+	this->deleteUnavailableNickname();
 	return (SUCCESS);
 }
 

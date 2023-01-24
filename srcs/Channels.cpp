@@ -159,12 +159,12 @@ void		Channels::SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent
 	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
-		//if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
-		//{	
+		// if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
+		// {	
 			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 			if (ret_send == ERROR_SERVER)
 				return(loop_errors_handlers_msg(ERROR_SEND));
-		//}
+		// }
 		it++;
 	}
 }

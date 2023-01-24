@@ -48,7 +48,7 @@ std::string ERR_NEEDMOREPARAMS2(MyMsg msg);
 std::string RPL_YOUREOPER(MyMsg msg);
 std::string ERR_NOTONCHANNEL(MyMsg msg, std::string chan_name);
 std::string RPL_NOTOPIC( void );
-std::string RPL_TOPIC(MyMsg msg, std::map<Channels *, std::string>::iterator it);
+std::string RPL_TOPIC(MyMsg msg, std::string chan, std::string topic);
 std::string ERR_CHANOPRIVSNEEDED(MyMsg msg, std::map<Channels *, std::string>::iterator it);
 std::string ERR_CHANOPRIVSNEEDED2(MyMsg msg, std::string it);
 std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it);
