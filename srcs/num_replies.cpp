@@ -1,7 +1,8 @@
-# include "MyMsg.hpp"
+# include "num_replies.hpp"
 
-// CONNECTION REGISTRATION
-
+/*=====================================*/
+/*-----------REPLIES OF RFC------------*/
+/*=====================================*/
 std::string RPL_WELCOME(MyMsg msg)
 {
     std::string reply;
@@ -44,6 +45,165 @@ std::string RPL_MYINFO(MyMsg msg)
     reply += " Modes accessible : \033[1;35mi, w, o, O\033[0m";
     return (reply);
 }
+
+std::string RPL_UMODEIS(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "221 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetClientsMode(); // + "<user mode string>"
+
+    return (reply);
+}
+
+std::string RPL_MOTDSTART(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "375 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " +  ":- \033[1;35m" + msg.GetClients()->GetServerName() + " \033[1;36mMessage of the day - \033[0m";
+	return (reply);
+}
+
+std::string RPL_MOTD(MyMsg msg, std::vector<std::string>::iterator it)
+{
+	std::string reply;
+    std::string iterator_content = *it;
+	reply = "372 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " :- \033[1;34m" + iterator_content + "\033[0m";
+	return (reply);
+}
+
+std::string RPL_ENDOFMOTD(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "376 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of MOTD command\033[0m";
+	return (reply);
+}
+
+std::string RPL_VERSION(MyMsg msg)
+{
+	std::string reply;
+	/*S'assurer de la bonne version dans le RPL*/
+	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m";
+	return (reply);
+}
+
+
+std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
+{
+	std::string reply;
+    std::string iterator_content = *it;
+	/*S'assurer de la bonne version dans le RPL*/
+	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content;
+	return (reply);
+}
+
+std::string RPL_ENDOFINFO(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m";
+	return (reply);
+}
+
+std::string RPL_LIST(MyMsg msg, std::string name, std::string nb)
+{
+	std::string reply;
+
+	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " " + nb;
+
+    return (reply);
+}
+
+std::string RPL_LISTEND(MyMsg msg)
+{
+	std::string reply;
+
+	reply = "323 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of list\033[0m";
+	return (reply);
+}
+
+std::string RPL_YOUREOPER(MyMsg msg)
+{
+    std::string reply;
+
+    reply = "381 " + msg.GetClients()->GetClientsNickname() + " " + ":You are now an IRC operator";
+    return (reply);
+}
+
+std::string RPL_NOTOPIC( void )
+{
+    std::string reply;
+
+	reply = "331 : No topic is set";
+    return (reply);
+}
+
+std::string RPL_TOPIC(MyMsg msg, std::string chan, std::string topic)
+{
+    std::string reply;
+
+    reply = "332 " + msg.GetClients()->GetClientsNickname() + " " + chan + " :" + topic;
+    std::cout << "reply === " << reply << std::endl;
+    return (reply);
+}
+
+std::string RPL_INVITING(MyMsg msg, std::string user_invited, std::string channel)
+{
+    std::string reply;
+
+    reply = "341 " + msg.GetClients()->GetClientsNickname() + " " + channel + + " " + user_invited;
+    return (reply);
+}
+
+std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "353 " + msg.GetClients()->GetClientsNickname() + " = " + channames + " :";
+    return (reply);
+}
+
+std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
+{
+    std::string reply;
+
+    reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
+    return (reply);
+}
+
+std::string RPL_TIME( MyMsg msg )
+{
+    std::string reply;
+    time_t 		tmp;
+    std::string timestamp;
+    std::string timestamp_2;
+    size_t      pos;
+	
+	tmp = time(NULL);
+    timestamp = std::string(ctime(&tmp));
+    pos = timestamp.find("\n");
+    timestamp_2 = timestamp.erase(pos);
+
+    reply = "391 " + msg.GetClients()->GetServerName() + " :\033[1;34m" + timestamp_2 + "\033[0m";
+    return (reply);
+}
+
+/*=====================================*/
+/*------------END OF REPLIES-----------*/
+/*=====================================*/
+
+
+
+
+
+
+
+
+/*=====================================*/
+/*-------------ERRORS OF RFC-----------*/
+/*=====================================*/
+
+
 std::string ERR_NEEDMOREPARAMS(MyMsg msg)
 {
     std::string reply;
@@ -100,14 +260,12 @@ std::string ERR_NICKNAMEINUSE(MyMsg msg, std::vector<std::string>::iterator it)
     return (reply);
 }
 
-std::string ERR_UNAVAILRESOURCE(MyMsg msg)
+std::string ERR_UNAVAILRESOURCE(std::string nick)
 {
     std::string reply;
     
-    if (msg.GetCmd() == "NICK")
-        reply = "437 " + msg.GetClients()->GetClientsNickname() + " : " + msg.GetClients()->GetClientsNickname() + "is temporarily unavailable";
-    // if (msg.GetCmd() == "JOIN")
-    //     reply = "437 " + msg.GetClients()->GetClientsNickname() + " :" + msg.getChannelName() + " is temporarily unavailable\n";
+    reply = "437 " + nick + " " + nick;
+
     return (reply);
 }
 
@@ -116,15 +274,6 @@ std::string ERR_RESTRICTED(MyMsg msg)
     std::string reply;
 
     reply = "484 " + msg.GetClients()->GetClientsNickname() + ": Your connection is restricted!";
-
-    return (reply);
-}
-
-std::string RPL_UMODEIS(MyMsg msg)
-{
-    std::string reply;
-
-    reply = "221 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetClientsMode(); // + "<user mode string>"
 
     return (reply);
 }
@@ -160,8 +309,9 @@ std::string ERR_NOSUCHSERVER(MyMsg msg, std::vector<std::string>::iterator it)
 {
     std::string reply;
     std::string iterator_content = *it;
+    (void)msg;
 
-    reply = "402 " + msg.GetClients()->GetClientsNickname() + ": " + iterator_content + ": No such server";
+    reply = "402 :" + iterator_content + ": No such server";
 
     return (reply);
 }
@@ -182,30 +332,6 @@ std::string ERR_NOMOTD(MyMsg msg, int msg_type)
         reply = "422 " + msg.GetClients()->GetClientsNickname() + " :Too much parameters";
 	else if (msg_type == 2)
 		reply = "422 " + msg.GetClients()->GetClientsNickname() + " :MOTD File is missing";
-	return (reply);
-}
-
-std::string RPL_MOTDSTART(MyMsg msg)
-{
-	std::string reply;
-
-	reply = "375 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " +  ":- \033[1;35m" + msg.GetClients()->GetServerName() + " \033[1;36mMessage of the day - \033[0m";
-	return (reply);
-}
-
-std::string RPL_MOTD(MyMsg msg, std::vector<std::string>::iterator it)
-{
-	std::string reply;
-    std::string iterator_content = *it;
-	reply = "372 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " :- \033[1;34m" + iterator_content + "\033[0m";
-	return (reply);
-}
-
-std::string RPL_ENDOFMOTD(MyMsg msg)
-{
-	std::string reply;
-
-	reply = "376 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of MOTD command\033[0m";
 	return (reply);
 }
 
@@ -231,49 +357,6 @@ std::string ERR_NOSUCHNICK(MyMsg msg)
 
     reply = "401 " + msg.GetClients()->GetClientsNickname() + " :No such nick/channel";
     return (reply);
-}
-
-std::string RPL_VERSION(MyMsg msg)
-{
-	std::string reply;
-	/*S'assurer de la bonne version dans le RPL*/
-	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m";
-	return (reply);
-}
-
-
-std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
-{
-	std::string reply;
-    std::string iterator_content = *it;
-	/*S'assurer de la bonne version dans le RPL*/
-	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content;
-	return (reply);
-}
-
-std::string RPL_ENDOFINFO(MyMsg msg)
-{
-	std::string reply;
-
-	reply = "374 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of INFO list\033[0m";
-	return (reply);
-}
-
-std::string RPL_LIST(MyMsg msg, std::string name, std::string nb)
-{
-	std::string reply;
-
-	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " " + nb;
-
-    return (reply);
-}
-
-std::string RPL_LISTEND(MyMsg msg)
-{
-	std::string reply;
-
-	reply = "323 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31m:End of list\033[0m";
-	return (reply);
 }
 
 std::string ERR_NOSUCHCHANNEL(MyMsg msg, std::string it)
@@ -302,37 +385,11 @@ std::string ERR_NEEDMOREPARAMS2(MyMsg msg)
     return (reply);
 }
 
-std::string RPL_YOUREOPER(MyMsg msg)
-{
-    std::string reply;
-
-    reply = "381 " + msg.GetClients()->GetClientsNickname() + " " + ":You are now an IRC operator";
-    return (reply);
-}
-
 std::string ERR_NOTONCHANNEL(MyMsg msg, std::string chan_name)
 {
     std::string reply;
 
     reply = "442 " + msg.GetClients()->GetClientsNickname() + " " + chan_name + " :" + "You're not on that channel"; 
-    return (reply);
-}
-
-/*AJOUT AVEC MAEVA*/
-std::string RPL_NOTOPIC( void )
-{
-    std::string reply;
-
-	reply = "331 : No topic is set";
-    return (reply);
-}
-
-std::string RPL_TOPIC(std::map<Channels *, std::string>::iterator it)
-{
-    std::string reply;
-
-    reply = "332 " + it->first->GetChannelName() + " :" + it->first->GetChannelstopic();
-    std::cout << "reply === " << reply << std::endl;
     return (reply);
 }
 
@@ -359,7 +416,7 @@ std::string ERR_NOTONCHANNEL(std::map<Channels *, std::string>::iterator it)
     reply = "442 " + it->second + " :" + "You're not on that channel";
     return (reply);
 }
-/*------------------------------------------------------*/
+
 std::string ERR_USERONCHANNEL(MyMsg msg, std::string user_invited, std::string channel)
 {
     std::string reply;
@@ -377,14 +434,6 @@ std::string ERR_CHANOPRIVSNEEDED(MyMsg msg, std::string channel)
     return (reply);
 }
 
-std::string RPL_INVITING(MyMsg msg, std::string user_invited, std::string channel)
-{
-    std::string reply;
-
-    reply = "341 " + msg.GetClients()->GetClientsNickname() + " " + channel + + " " + user_invited;
-    return (reply);
-}
-
 std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
 {
     std::string reply;
@@ -393,18 +442,6 @@ std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
     return (reply);
 }
 
-std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
-{
-    std::string reply;
-
-    reply = "353 " + msg.GetClients()->GetClientsNickname() + " = " + channames + " :";
-    return (reply);
-}
-
-std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
-{
-    std::string reply;
-
-    reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
-    return (reply);
-}
+/*=====================================*/
+/*------------END OF ERRORS------------*/
+/*=====================================*/

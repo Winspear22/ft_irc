@@ -1,4 +1,8 @@
 # include "MyServer.hpp"
+# include "Channels.hpp"
+# include "Clients.hpp"
+# include "MyMsg.hpp"
+
 
 MyServer::MyServer( void )
 {
@@ -11,15 +15,15 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
-	std::string cmd_list_string[84] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
+	std::string cmd_list_string[85] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
 	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "kill", "KNOCKS", "LINKS", "LIST", \
 	"LUSERS", "MODE", "motd", "MOTD", "NAMES", "NICK", "NOTICE", "OPER", "PART", "PASS", "PING", \
 	"PONG", "PRIVMSG", "QUIT", "REHASH", "RULES", "SERVER", "SERVICE", "SERVLIST", "SQUERY", \
-	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
+	"SQUIT", "SETNAME", "SILENCE", "STATS", "SUMMON", "time", "TYPE", "TOPIC", "TRACE", "USER", "USERHOST", \
 	"USERIP", "USERS", "version", "wallops", "VERSION", "userhost", "WALLOPS", "WATCH", "WHO", "WHOIS", "WHOWAS", "CAP", "info" };
 
 	i = -1;
-	while (++i < 84)
+	while (++i < 85)
 		this->_cmd_list.push_back(cmd_list_string[i]);
 	this->_fds_list = 0;
 	return ;
@@ -53,7 +57,6 @@ MyServer::~MyServer( void )
 	itt = this->channels_list.begin();
 	while (itt != this->channels_list.end())
 	{
-
 		std::cout << YELLOW << "Deleting Channel named : " << WHITE << itt->second << NORMAL << std::endl;
 		delete itt->first;
 		itt++;
@@ -76,31 +79,6 @@ MyServer & MyServer::operator=( MyServer const & rhs )
     }
 	return (*this);
 }
-
-
-/*-----------------------------CONFIGURATION FUNCTION--------------------*/
-
-/*int		MyServer::ConfigurateMyServer( void )
-{
-	std::ifstream 	ifs("srcs/config.txt", std::ifstream::in);
-	std::string		tmp;
-
-	if (!ifs.good())
-		return (errors_handlers_msg(ERROR_CONFIG));
-	else
-	{
-		while (getline(ifs, tmp))
-		{
-			if (!tmp.empty())
-			{
-				std::string::iterator it
-			}
-		}
-		}
-	}
-
-	return(SUCCESS);
-}*/
 
 /*----------------------------ALL THE SETTERS --------------------------*/
 
@@ -311,8 +289,9 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	this->DeleteAFKClients();
+	//this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
+	this->deleteUnavailableNickname();
 	return (SUCCESS);
 }
 
@@ -553,6 +532,8 @@ void		MyServer::ExecuteCommand( std::string cmd, MyMsg *msg)
 		msg->KillCmd(this);
 	else if (cmd == "INVITE")
 		msg->InviteCmd(this);
+	else if (cmd == "time")
+		msg->TimeCmd(this);
 }
 
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg )
@@ -659,5 +640,52 @@ void	MyServer::MyServerDestructorMsg( void )
 		MyMsg msg_sent(it->first, msg);
 		SendMsgBackWithPrefix(msg_sent, msg);
 		it++;
+	}
+}
+
+int		MyServer::isUnavailableNickname(std::string nickname)
+{
+	std::map<std::string, clock_t>::iterator	it;
+
+
+	it = this->_unavailable_nicknames.begin();
+	while (it != this->_unavailable_nicknames.end())
+	{
+		if (it->first == nickname)
+		{
+			return 1;
+		}
+		it++;
+	}
+	return SUCCESS;
+}
+
+int		MyServer::SetUnavailableNickname(std::string nickname)
+{
+	clock_t	time;
+
+	time = clock();
+	this->_unavailable_nicknames.insert(std::make_pair(nickname, time));
+
+	return SUCCESS;
+}
+
+void		MyServer::deleteUnavailableNickname( void )
+{
+	std::map<std::string, clock_t>::iterator	it;
+
+	if (!this->_unavailable_nicknames.empty())
+	{
+		it = this->_unavailable_nicknames.begin();
+		while (it != this->_unavailable_nicknames.end())
+		{
+			if (clock() - it->second >= DELAY)
+			{
+				std::cout << "Nickname " << GREEN << it->first << " is now available.\n";
+				this->_unavailable_nicknames.erase(it);
+				break;
+			}
+			it++;
+		}
 	}
 }

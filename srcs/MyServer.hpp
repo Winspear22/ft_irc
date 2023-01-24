@@ -2,12 +2,10 @@
 # define MYSERVER_HPP
 
 # include "irc.hpp"
-# include "Clients.hpp"
-# include "MyMsg.hpp"
-# include "Channels.hpp"
 
 class Clients;
 class MyMsg;
+class Channels;
 
 class MyServer
 {
@@ -42,6 +40,9 @@ public:
 	void		SetMaxPing( size_t MaxPing );
 	void		SetMaxUser( size_t MaxUsers );
 	void		SetCurrentClientsNb( int CurrentNb );
+	int			isUnavailableNickname(std::string nickame);
+	int			SetUnavailableNickname(std::string nickname);
+	void		deleteUnavailableNickname( void );
 	/*------------------------------------------*/
 
 
@@ -81,8 +82,8 @@ public:
 	std::map<Clients*, int> 			_clients_list;
 	std::map<Channels*, std::string>	channels_list;
 	MyMsg								*new_msg;
-	fd_set			ready_fds; //mes fds etant prets a transmettre des donnes
-	fd_set			readfds; // mes sets de fds pouvant lire
+	fd_set			ready_fds;
+	fd_set			readfds;
 
 private:
     MyServer(/* ARG */);
@@ -94,18 +95,18 @@ private:
     int         	_port;
     std::string 	_password;
 	bool			_server_status;
-	int				_socketfd; // sert de socket qui va listen
+	int				_socketfd;
 	sockaddr_in		_sockadress;
 	bool			_right_password_used;
 	/*TEST*/
-	int				_new_fd_nb; // nouvel utilisateur se connecte et cree une nouvelle socket IL FAUT CREER UNE FONCTION SPECIALE POUR
+	int				_new_fd_nb;
 	int				_nb_of_clients;
 
 	int				_fds_list;
 	int				_maximum_fds;
-	/*pour avoir la liste des commandes complete*/
 	std::vector<std::string> _cmd_list;
 	std::vector<std::string>::iterator _it_cmd;
+	std::map<std::string, clock_t> _unavailable_nicknames;
 
 	/*Server identity*/
 	std::string		_Servername;

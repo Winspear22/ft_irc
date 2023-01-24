@@ -1,9 +1,7 @@
 #ifndef CHANNELS_HPP
 # define CHANNELS_HPP
 
-//# include "irc.hpp"
-# include "Clients.hpp"
-# include "MyMsg.hpp"
+# include "irc.hpp"
 
 class MyMsg;
 class MyServer;
@@ -26,7 +24,7 @@ public:
 	void					AddClientsToChannelMemberList( Clients *client );
 	void					DeleteClientsToChannelMemberList( Clients *client );
 	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
-	void					SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	void					SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom);
 
 	int						GetHasAChannelCreator( void );
 	void					SetHasAChannelCreator( int status );
