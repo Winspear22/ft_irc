@@ -15,69 +15,66 @@ public:
 
 	void		InitVariables( void );
 
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
     void        SetPort( char *str );
     void        SetPassword( char *str );
 	void		SetServerStatus( int ServerStatus );
-
+	void		SetCurrentClientsNb( int CurrentNb );
+	int			SetUnavailableNickname(std::string nickname);
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
     int         GetPort( void );
 	int			GetServerStatus( void );
     std::string GetPassword( void );
 	int			GetSocketFd( void );
-
-	/*Setters and getters for Server identity -- need config.txt file to function*/
-	int			ConfigurateMyServer( void );
-	std::string GetServerName( void );
-	std::string	GetServerversion( void );
-	std::string GetOperlogname( void );
-	std::string GetOpermdp( void );
-	size_t		GetMaxPing( void );
-	size_t		GetMaxUser( void );
 	int			GetCurrentClientsNb( void );
-	void 		SetServerName( std::string ServerName );
-	void		SetServerversion( std::string ServerVersion );
-	void 		SetOperlogname( std::string Operlogname );
-	void 		SetOpermdp( std::string Opermdp );
-	void		SetMaxPing( size_t MaxPing );
-	void		SetMaxUser( size_t MaxUsers );
-	void		SetCurrentClientsNb( int CurrentNb );
 	int			isUnavailableNickname(std::string nickame);
-	int			SetUnavailableNickname(std::string nickname);
-	void		deleteUnavailableNickname( void );
-	/*------------------------------------------*/
+	Clients		*GetClientsThroughName( std::string name );
+	Clients		*GetClientsThroughSocketFd( int fd );
+	Channels	*GetChannelsByName( std::string ChannelName );
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-
+	/*===========================================*/
+	/*            SERVER CREATION PHASE          */   
+	/*-----------Socket Creation Process---------*/
 	int			CreateSocketFd( void );
 	int			SetSocketOptions( void );
 	int			BindSocketFd( void );
+	/*-----------Listening and NB Phase----------*/
 	int			ListenToSockedFd( void );
 	int			SetSocketFdToNonBlocking( int SocketFd );
+	/*-------------------------------------------*/
+	/*===========================================*/
 
+	/*===========================================*/
+	/*       CLIENTS CONNECTION MANAGEMENT       */
+	/*-----------Clients Connection Phase--------*/
 	int			SelectClients( void );
 	void		CreateClients( void );
-	int			DeleteAFKClients( void );
-	int			DeleteChannelsWithoutClients( void );
-
+	/*-------Clients Authentification Phase------*/
 	void		CheckClientsAuthentification( std::string cmd, MyMsg *msg );
-	void		ExecuteCommand(std::string cmd, MyMsg *msg);
-
-	Clients		*GetClientsThroughName( std::string name );
-	Clients		*GetClientsThroughSocketFd( int fd );
-
-	std::vector<std::string> SplitByEndline(char *str, const char *delim);
-
-	Channels	*GetChannelsByName( std::string ChannelName );
-	Channels	*CreateChannels( std::string Channelname, Clients *client );
+	/*---------Recv and Send Clients Msgs--------*/
+	void		RecvClientsMsg( int ClientFd );
+	//SendMsgBackToClients  --- Function outside of class
+	//SendMsgBackWithPrefix --- Function outside of class
 	void		SendMsgToAllInChannels( std::string msg_sent );
+	/*-------------Command Execution-------------*/
+	void		ExecuteCommand(std::string cmd, MyMsg *msg);
+	/*-------AFK Clients and Channels Mngmt------*/
+	int			DeleteAFKClients( void );
+	Channels	*CreateChannels( std::string Channelname, Clients *client );
+	int			DeleteChannelsWithoutClients( void );
+	/*--------------------------------------------*/
+	/*============================================*/
+
+	/*----------Server Shutdown Message----------*/
 	void		MyServerDestructorMsg( void );
-
-
-
-	/*A EFFACER A LA FIN DU TEST*/
-	void	buf_to_cmd( int ClientFd );
-	void	RecvClientsMsg( int ClientFd );
-
-	/*==========================*/
-
+	/*---------------Miscellaneous---------------*/
+	void						deleteUnavailableNickname( void );
+	std::vector<std::string> 	SplitByEndline(char *str, const char *delim);
 
 	std::map<Clients*, int> 			_clients_list;
 	std::map<Channels*, std::string>	channels_list;
@@ -92,33 +89,24 @@ private:
 
 
 
-    int         	_port;
-    std::string 	_password;
-	bool			_server_status;
-	int				_socketfd;
-	sockaddr_in		_sockadress;
-	bool			_right_password_used;
+    int         						_port;
+    std::string 						_password;
+	bool								_server_status;
+	int									_socketfd;
+	sockaddr_in							_sockadress;
+	bool								_right_password_used;
 	/*TEST*/
-	int				_new_fd_nb;
-	int				_nb_of_clients;
+	int									_new_fd_nb;
+	int									_nb_of_clients;
 
-	int				_fds_list;
-	int				_maximum_fds;
-	std::vector<std::string> _cmd_list;
-	std::vector<std::string>::iterator _it_cmd;
-	std::map<std::string, clock_t> _unavailable_nicknames;
-
-	/*Server identity*/
-	std::string		_Servername;
-	std::string		_Serverversion;
-	std::string		_Operlogname;
-	std::string		_Opermdp;
-	size_t			_MaxPing;
-	size_t			_MaxUsers;
+	int									_fds_list;
+	int									_maximum_fds;
+	std::vector<std::string> 			_cmd_list;
+	std::vector<std::string>::iterator	_it_cmd;
+	std::map<std::string, clock_t> 		_unavailable_nicknames;
 };
 
 void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg );
 void		SendMsgBackWithPrefix( MyMsg ClientMsg, std::string Msg );
 
-/*En dehors du scope de la classe car je l'utilise dans une autre classe et dans laquelle il n'y a pas l'instance IRC_Server*/
 # endif

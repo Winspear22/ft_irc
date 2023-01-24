@@ -97,43 +97,13 @@ void        MyServer::SetServerStatus( int ServerStatus )
 	this->_server_status = ServerStatus;
 }
 
-void 		MyServer::SetServerName( std::string ServerName )
-{
-	this->_Servername = ServerName;
-}
-
-void		MyServer::SetServerversion( std::string ServerVersion )
-{
-	this->_Serverversion = ServerVersion;
-}
-
-void 		MyServer::SetOperlogname( std::string Operlogname )
-{
-	this->_Operlogname = Operlogname;
-}
-
-void 		MyServer::SetOpermdp( std::string Opermdp )
-{
-	this->_Opermdp = Opermdp;
-}
-
-void		MyServer::SetMaxPing( size_t MaxPing )
-{
-	this->_MaxPing = MaxPing;
-}
-
-void		MyServer::SetMaxUser( size_t MaxUsers )
-{
-	this->_MaxUsers = MaxUsers;
-}
-
 void		MyServer::SetCurrentClientsNb( int CurrentNb )
 {
 	this->_nb_of_clients = CurrentNb;
 }
 /*------------------------------ END OF SETTERS -----------------------------*/
 
-/*								ALL THE GETTERS								*/
+/*------------------------------ ALL THE GETTERS ------------------------------*/
 
 int     MyServer::GetPort( void )
 {
@@ -160,36 +130,6 @@ void		MyServer::InitVariables( void )
 	this->_new_fd_nb = 0;
 	this->_nb_of_clients = 0;
 	this->_right_password_used = FAILURE;
-}
-
-std::string MyServer::GetServerName( void )
-{
-	return (this->_Servername);
-}
-
-std::string	MyServer::GetServerversion( void )
-{
-	return (this->_Serverversion);
-}
-	
-std::string MyServer::GetOperlogname( void )
-{
-	return (this->_Operlogname);
-}
-	
-std::string MyServer::GetOpermdp( void )
-{
-	return (this->_Opermdp);
-}
-
-size_t		MyServer::GetMaxPing( void )
-{
-	return (this->_MaxPing);
-}
-
-size_t		MyServer::GetMaxUser( void )
-{
-	return (this->_MaxUsers);
 }
 
 int			MyServer::GetCurrentClientsNb( void )
