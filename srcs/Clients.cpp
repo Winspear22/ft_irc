@@ -250,13 +250,10 @@ int			Clients::DeleteClientsMode( char DeleteMode )
 int			Clients::AddClientsMode( char AddMode )
 {
 	if (this->_Mode.find(AddMode) != std::string::npos)
-	{
 		return (FAILURE);
-	}
 	else
-	{
 		this->_Mode.push_back(AddMode);
-	}
+
 	return (SUCCESS);
 }
 

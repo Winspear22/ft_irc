@@ -188,6 +188,23 @@ std::string RPL_TIME( MyMsg msg )
     return (reply);
 }
 
+
+std::string RPL_CHANNELMODEIS(Channels *chan)
+{
+    std::string reply;
+    std::map<Clients *, int>::iterator it;
+
+    it = chan->GetAllowedToInviteList().begin();
+
+    reply = "324 " + chan->GetChannelName() + " " + chan->GetChannelMode() + " ";
+    while (it != chan->GetAllowedToInviteList().end())
+    {
+        reply += it->first->GetClientsNickname() + " ";
+        it++;
+    }
+    return (reply);
+}
+
 /*=====================================*/
 /*------------END OF REPLIES-----------*/
 /*=====================================*/
@@ -265,6 +282,16 @@ std::string ERR_UNAVAILRESOURCE(std::string nick)
     std::string reply;
     
     reply = "437 " + nick + " " + nick;
+
+    return (reply);
+}
+
+std::string ERR_UNKNOWNMODE(MyMsg msg, std::string mode, std::string channame)
+{
+    (void)msg;
+    std::string reply;
+
+    reply = "472 " + mode + " :is unknown mode char to me for " + channame;
 
     return (reply);
 }
