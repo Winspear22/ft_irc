@@ -43,8 +43,8 @@ MyServer::~MyServer( void )
 	std::map<Channels*, std::string>::iterator itt;
 	
 	this->MyServerDestructorMsg();
-	it = this->_clients_list.begin();	
-	while (it != this->_clients_list.end())
+	it = this->clients_list.begin();	
+	while (it != this->clients_list.end())
 	{
 		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
 		FD_CLR(it->second, &this->ready_fds);
@@ -52,7 +52,7 @@ MyServer::~MyServer( void )
 		delete it->first;
 		it++;
 	}
-	this->_clients_list.clear();
+	this->clients_list.clear();
 	std::cout << CYAN << "All Clients were freed. No Leaks. :)" << NORMAL << std::endl;
 	itt = this->channels_list.begin();
 	while (itt != this->channels_list.end())
@@ -73,9 +73,24 @@ MyServer & MyServer::operator=( MyServer const & rhs )
 	std::cout << "\033[0;34mMyServer Copy assignment operator called." << NORMAL << std::endl;
 	if ( this != &rhs )
     {
+		this->new_msg = rhs.new_msg;
+		this->clients_list = rhs.clients_list;
+		this->channels_list = rhs.channels_list;
+		this->ready_fds = rhs.ready_fds;
+		this->readfds = rhs.readfds;
         this->_password = rhs._password;
 		this->_port = rhs._port;
 		this->_server_status = rhs._server_status;
+		this->_socketfd = rhs._socketfd;
+		this->_sockadress = rhs._sockadress;
+		this->_right_password_used = rhs._right_password_used;
+		this->_new_fd_nb = rhs._new_fd_nb;
+		this->_nb_of_clients = rhs._nb_of_clients;
+		this->_fds_list = rhs._fds_list;
+		this->_maximum_fds = rhs._maximum_fds;
+		this->_cmd_list = rhs._cmd_list;
+		this->_it_cmd = rhs._it_cmd;
+		this->_unavailable_nicknames = rhs._unavailable_nicknames;
     }
 	return (*this);
 }
@@ -229,7 +244,7 @@ int			MyServer::SelectClients( void )
 			RecvClientsMsg(this->_fds_list);
 		this->_fds_list++;
 	}
-	//this->DeleteAFKClients();
+	this->DeleteAFKClients();
 	this->DeleteChannelsWithoutClients();
 	this->deleteUnavailableNickname();
 	return (SUCCESS);
@@ -239,10 +254,10 @@ int			MyServer::DeleteAFKClients( void )
 {
 	std::map<Clients*, int>::iterator	it;
 
-	it = this->_clients_list.begin();
-	if (it == this->_clients_list.end())
+	it = this->clients_list.begin();
+	if (it == this->clients_list.end())
 		return (SUCCESS);
-	while (it != this->_clients_list.end())
+	while (it != this->clients_list.end())
 	{
 		if ((it->first->GetClientsConnectionStatus() == NO) || 
 		(it->first->GetClientsLastPing() >= 120))
@@ -252,8 +267,8 @@ int			MyServer::DeleteAFKClients( void )
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
 			msg.QuitCmd(this);
-			it = this->_clients_list.begin();
-			if (it == this->_clients_list.end())
+			it = this->clients_list.begin();
+			if (it == this->clients_list.end())
 				return (SUCCESS);
 		}
 		it++;
@@ -303,7 +318,7 @@ void			MyServer::CreateClients( void )
 	else
 	{
 		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
-		this->_clients_list.insert(std::make_pair(client_created, client_created_fd));
+		this->clients_list.insert(std::make_pair(client_created, client_created_fd));
 		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
 		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
 		if (this->GetCurrentClientsNb() > 8)
@@ -331,8 +346,6 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 	}
 	return (splitted_str);
 }
-
-
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
@@ -500,8 +513,8 @@ Clients		*MyServer::GetClientsThroughName( std::string NickName )
 {
 	std::map<Clients*, int>::iterator it;
 
-	it = this->_clients_list.begin();
-	while (it != this->_clients_list.end())
+	it = this->clients_list.begin();
+	while (it != this->clients_list.end())
 	{
 		if (it->first->GetClientsNickname() == NickName)
 			return (it->first);
@@ -514,8 +527,8 @@ Clients		*MyServer::GetClientsThroughSocketFd( int fd )
 {
 	std::map<Clients*, int>::iterator it;
 
-	it = this->_clients_list.begin();
-	while (it != this->_clients_list.end())
+	it = this->clients_list.begin();
+	while (it != this->clients_list.end())
 	{
 		if (it->second == fd)
 			return (it->first);
@@ -571,11 +584,11 @@ void	MyServer::MyServerDestructorMsg( void )
 	std::map<Clients*, int>::iterator	it;
 	std::string							msg;
 
-	it = this->_clients_list.begin();
+	it = this->clients_list.begin();
 	msg = "QUIT :Server shutdown";
-	if (it != this->_clients_list.end())
+	if (it != this->clients_list.end())
 		return ;
-	while (it != this->_clients_list.end())
+	while (it != this->clients_list.end())
 	{
 		MyMsg msg_sent(it->first, msg);
 		SendMsgBackWithPrefix(msg_sent, msg);

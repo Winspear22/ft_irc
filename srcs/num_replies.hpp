@@ -59,5 +59,7 @@ std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan);
 std::string RPL_NAMREPLY( MyMsg msg, std::string channames );
 std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames );
 std::string RPL_TIME( MyMsg msg );
+std::string ERR_TOOMANYCHANNELS( std::string channame );
+
 
 #endif

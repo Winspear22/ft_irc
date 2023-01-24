@@ -116,6 +116,6 @@
 /*                                              errors_handler.cpp                                                */
 int     errors_handlers_msg( int error_code );
 void    loop_errors_handlers_msg( int error_code );
-//void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> _clients_list );
+//void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> clients_list );
 
 #endif

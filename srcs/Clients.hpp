@@ -43,6 +43,9 @@ public:
 	void		SetClientsLastPing( time_t ping);
 	int			GetFirstMOTD( void );
 	void		SetFirstMOTD( int motd );
+	int			GetChanLim( void );
+	void		SetChanLim( int ChanLim );
+
 
 
 
@@ -92,6 +95,7 @@ private:
 	/*Clients Message*/
 	std::string	_ClientMessage;
 	int			_FirstMOTD;
+	int			_ChanLim;
 	
 	/*A supprimer à la fin du test*/
 	time_t	_last_com;

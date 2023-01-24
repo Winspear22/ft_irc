@@ -31,7 +31,7 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	SendMsgBackWithPrefix(*this, msg_sent);
 	if (IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()) != NULL && this->_SentFrom != NULL)
 	{
-		IRC_Server->_clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
+		IRC_Server->clients_list.erase(IRC_Server->GetClientsThroughSocketFd(this->_SentFrom->GetClientsFd()));
 		delete this->_SentFrom;
 	}
 	close(fd);

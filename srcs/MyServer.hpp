@@ -76,18 +76,17 @@ public:
 	void						deleteUnavailableNickname( void );
 	std::vector<std::string> 	SplitByEndline(char *str, const char *delim);
 
-	std::map<Clients*, int> 			_clients_list;
-	std::map<Channels*, std::string>	channels_list;
+
 	MyMsg								*new_msg;
-	fd_set			ready_fds;
-	fd_set			readfds;
+	std::map<Clients*, int> 			clients_list;
+	std::map<Channels*, std::string>	channels_list;
+	fd_set								ready_fds;
+	fd_set								readfds;
 
 private:
     MyServer(/* ARG */);
 	MyServer( const MyServer & copy);
     MyServer & operator=( const MyServer & server );
-
-
 
     int         						_port;
     std::string 						_password;
@@ -95,10 +94,9 @@ private:
 	int									_socketfd;
 	sockaddr_in							_sockadress;
 	bool								_right_password_used;
-	/*TEST*/
+
 	int									_new_fd_nb;
 	int									_nb_of_clients;
-
 	int									_fds_list;
 	int									_maximum_fds;
 	std::vector<std::string> 			_cmd_list;

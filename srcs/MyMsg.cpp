@@ -8,7 +8,6 @@
 
 MyMsg::MyMsg( void )
 {
-	//std::cout << RED << "Wrong constructor used." << NORMAL << std::endl;
 	return ;
 }
 
@@ -16,20 +15,17 @@ MyMsg::MyMsg( Clients *client, std::string MyMsg )
 {
 	this->_Message = MyMsg;
 	this->_SentFrom = client;
-	//std::cout << GREEN << "MyMsg Constructor called." << NORMAL << std::endl;
 	return ;
 }
 
 MyMsg::MyMsg( const MyMsg & copy )
 {
-	//std::cout << "\033[0;33mMyMsg Copy Constructor called." << NORMAL << std::endl;
 	*this = copy;
     return ;
 }
 
 MyMsg & MyMsg::operator=( MyMsg const & rhs )
 {
-	//std::cout << "\033[0;34mMyMsg Copy assignment operator called." << NORMAL << std::endl;
 	this->_Message = rhs._Message;
 	this->_SentFrom = rhs._SentFrom;
 	return (*this);
@@ -38,7 +34,6 @@ MyMsg & MyMsg::operator=( MyMsg const & rhs )
 
 MyMsg::~MyMsg( void )
 {
-	//std::cout << RED << "MyMsg Destructor called." << NORMAL << std::endl;
 	return ;
 }
 

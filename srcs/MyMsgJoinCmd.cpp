@@ -21,32 +21,43 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 		free(tmp);
 		while (it != channels.end())
 		{
-			if ((*it)[0] != '#' && (*it)[0] != '&' && (*it)[0] != '+' && (*it)[0] != '!')
-				it->insert(it->begin(), '#');
-			if (it->size() > 50) //CHANLIMIT
-				it->resize(50);
-			if (IRC_Server->GetChannelsByName(*it) == NULL)
+			if (this->GetClients()->GetChanLim() < 5)
 			{
-				chan = IRC_Server->CreateChannels(*it, this->_SentFrom);//new Channels(this->_SentFrom, *it);
-				chan->AddClientsToChannelMemberList(this->_SentFrom);
-				msg_sent = "JOIN " + *it;
-				SendMsgBackWithPrefix(*this, msg_sent);
-				chan->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
-				MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
-				UseOfNamesCmd.parse_msg();
-				NamesCmd(IRC_Server, UseOfNamesCmd);
+				if ((*it)[0] != '#' && (*it)[0] != '&' && (*it)[0] != '+' && (*it)[0] != '!')
+					it->insert(it->begin(), '#');
+				if (it->size() > 50) //CHANLIMIT
+					it->resize(50);
+				if (IRC_Server->GetChannelsByName(*it) == NULL)
+				{
+					chan = IRC_Server->CreateChannels(*it, this->_SentFrom);//new Channels(this->_SentFrom, *it);
+					chan->AddClientsToChannelMemberList(this->_SentFrom);
+					msg_sent = "JOIN " + *it;
+					SendMsgBackWithPrefix(*this, msg_sent);
+					chan->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+					MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
+					UseOfNamesCmd.parse_msg();
+					this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() + 1);
+					NamesCmd(IRC_Server, UseOfNamesCmd);
+				}
+				else
+				{
+					IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
+					msg_sent = "JOIN " + *it;
+					SendMsgBackWithPrefix(*this, msg_sent);
+					IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
+					MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
+					UseOfNamesCmd.parse_msg();
+					this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() + 1);
+					NamesCmd(IRC_Server, UseOfNamesCmd);
+					msg_sent = RPL_TOPIC(*this, *it, IRC_Server->GetChannelsByName(*it)->GetChannelstopic());
+					SendMsgBackWithPrefix(*this, msg_sent);
+				}
 			}
 			else
 			{
-				IRC_Server->GetChannelsByName(*it)->AddClientsToChannelMemberList(this->_SentFrom);
-				msg_sent = "JOIN " + *it;
+				msg_sent = ERR_TOOMANYCHANNELS(*it);
 				SendMsgBackWithPrefix(*this, msg_sent);
-				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
-				MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
-				UseOfNamesCmd.parse_msg();
-				NamesCmd(IRC_Server, UseOfNamesCmd);
-				msg_sent = RPL_TOPIC(*this, *it, IRC_Server->GetChannelsByName(*it)->GetChannelstopic());
-				SendMsgBackWithPrefix(*this, msg_sent);
+				break ;
 			}
 			it++;
 		}
