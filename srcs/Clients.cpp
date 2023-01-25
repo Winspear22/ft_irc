@@ -3,7 +3,6 @@
 
 Clients::Clients( void )
 {
-	//std::cout << RED << "Wrong constructor used." << NORMAL << std::endl;
 	return ;
 }
 
@@ -14,9 +13,6 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	int ret;
 
 	this->_ClientFd = ClientFd;
-	//a supprimer à la fin du test :
-	//this->_last_com = time(0);
-	//----------
 	this->_New_Address = New_Address;
 	this->_ServerName = ServerName;
 	this->_HasTheClientsBeenAccepted = NO;
@@ -33,20 +29,17 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 		this->_Hostname = hostname;
 	else
 		loop_errors_handlers_msg(ERROR_USER_DISCONNECTED);
-	//std::cout << GREEN << "Clients Constructor called." << NORMAL << std::endl;
 	return ;
 }
 
 Clients::Clients( const Clients & copy )
 {
-	//std::cout << "\033[0;33mClients Copy Constructor called." << NORMAL << std::endl;
 	*this = copy;
     return ;
 }
 
 Clients & Clients::operator=( Clients const & rhs )
 {
-	//std::cout << "\033[0;34mClients Copy assignment operator called." << NORMAL << std::endl;
 	if ( this != &rhs )
     {
 	    this->_ClientFd = rhs._ClientFd;
@@ -56,31 +49,30 @@ Clients & Clients::operator=( Clients const & rhs )
 	return (*this);
 }
 
-
 Clients::~Clients( void )
 {
-	//std::cout << RED << "Clients Destructor called." << NORMAL << std::endl;
 	return ;
 }
 
-int		Clients::GetClientsFd( void )
+	/*--------------All the Setters--------------*/
+void		Clients::SetFirstMOTD( int motd )
 {
-	return (this->_ClientFd);
+	this->_FirstMOTD = motd;
 }
 
-std::string Clients::GetClientsUsername( void )
+void		Clients::SetChanLim( int ChanLim )
 {
-	return (this->_Username);
+	this->_ChanLim = ChanLim;
 }
 
-void		Clients::SetClientsUsername( std::string username )
+void		Clients::SetClientsBuffer( std::string msg )
 {
-	this->_Username = username;
+	this->_Buffer = msg;
 }
 
-std::string	Clients::GetClientsMode( void )
+void		Clients::SetClientsLastPing( time_t ping )
 {
-	return (this->_Mode);
+	this->_LastPing = ping;
 }
 
 void		Clients::SetClientsMode( std::string mode )
@@ -88,128 +80,9 @@ void		Clients::SetClientsMode( std::string mode )
 	this->_Mode = mode;
 }
 
-std::string	Clients::GetClientsUnused( void )
-{
-	return (this->_Unused);
-}
-
 void		Clients::SetClientsUnused( std::string Unused )
 {
 	this->_Unused = Unused;
-}
-
-std::string Clients::GetClientsRealname( void )
-{
-	return (this->_Realname);
-}
-
-void		Clients::SetClientsRealname( std::string Realname )
-{
-	this->_Realname = Realname;
-}
-
-
-std::string Clients::GetClientsNickname( void )
-{
-	return (this->_Nickname);
-}
-
-void		Clients::SetClientsNickname( std::string Nickname )
-{
-	this->_Nickname = Nickname;
-}
-
-std::string Clients::GetClientsHostname( void )
-{
-	return (this->_Hostname);
-}
-
-void		Clients::SetClientsHostname( std::string Hostname )
-{
-	this->_Hostname = Hostname;
-}
-
-std::string Clients::GetClientsHostAdress( void )
-{
-	return (this->_HostAdress);
-}
-
-void		Clients::SetClientsHostAdress( std::string hostAdress )
-{
-	this->_HostAdress = hostAdress;
-}
-
-std::string Clients::GetClientsMessage( void )
-{
-	return (this->_ClientMessage);
-}
-
-void		Clients::SetClientsMessage( std::string msg_recv )
-{
-	this->_ClientMessage = msg_recv;
-}
-
-int			Clients::GetClientsConnectionPermission( void )
-{
-	return (this->_HasTheClientsBeenAccepted);
-}
-
-void		Clients::SetClientsConnectionPermission( int PermissionStatus )
-{
-	this->_HasTheClientsBeenAccepted = PermissionStatus;
-}
-
-int			Clients::GetClientsConnectionAuthorisation( void )
-{
-	return (this->_HasTheClientsBeenAuthorized);
-}
-
-void		Clients::SetClientsConnectionAuthorisation( int PermissionStatus )
-{
-	this->_HasTheClientsBeenAuthorized = PermissionStatus;
-}
-
-int			Clients::GetClientsConnectionNickCmd( void )
-{
-	return (this->_HasTheClientsNickBeenChosen);
-}
-
-void		Clients::SetClientsConnectionNickCmd( int PermissionStatus )
-{
-	this->_HasTheClientsNickBeenChosen = PermissionStatus;
-}
-
-int			Clients::GetClientsConnectionUserCmd( void )
-{
-	return (this->_HasTheClientsUserBeenChosen);
-}
-
-void		Clients::SetClientsConnectionUserCmd( int PermissionStatus )
-{
-	this->_HasTheClientsUserBeenChosen = PermissionStatus;
-}
-/*Ces deux fonctions servent au cas où le messge reçu serait incomplet avec recv*/
-std::string	Clients::GetClientsBuffer( void )
-{
-	return (this->_Buffer);
-}
-void		Clients::SetClientsBuffer( std::string msg )
-{
-	this->_Buffer = msg;
-}
-
-int			Clients::GetClientsConnectionStatus( void )
-{
-	return (this->_ConnectionStatus);
-}
-void		Clients::SetClientsConnectionStatus( int status )
-{
-	this->_ConnectionStatus = status;
-}
-
-std::string	Clients::GetServerName( void )
-{
-	return (this->_ServerName);
 }
 
 void		Clients::SetServerName( std::string ServerName )
@@ -217,24 +90,163 @@ void		Clients::SetServerName( std::string ServerName )
 	this->_ServerName = ServerName;
 }
 
-time_t		Clients::GetClientsLastPing( void )
+void		Clients::SetClientsConnectionStatus( int status )
 {
-	return (time(0) - this->_LastPing);
+	this->_ConnectionStatus = status;
 }
-void		Clients::SetClientsLastPing( time_t ping )
+
+void		Clients::SetClientsMessage( std::string msg_recv )
 {
-	this->_LastPing = ping;
+	this->_ClientMessage = msg_recv;
 }
+
+void		Clients::SetClientsUsername( std::string username )
+{
+	this->_Username = username;
+}
+
+void		Clients::SetClientsRealname( std::string Realname )
+{
+	this->_Realname = Realname;
+}
+
+void		Clients::SetClientsNickname( std::string Nickname )
+{
+	this->_Nickname = Nickname;
+}
+
+void		Clients::SetClientsHostname( std::string Hostname )
+{
+	this->_Hostname = Hostname;
+}
+
+void		Clients::SetClientsHostAdress( std::string hostAdress )
+{
+	this->_HostAdress = hostAdress;
+}
+
+void		Clients::SetClientsConnectionUserCmd( int PermissionStatus )
+{
+	this->_HasTheClientsUserBeenChosen = PermissionStatus;
+}
+
+void		Clients::SetClientsConnectionNickCmd( int PermissionStatus )
+{
+	this->_HasTheClientsNickBeenChosen = PermissionStatus;
+}
+
+void		Clients::SetClientsConnectionPermission( int PermissionStatus )
+{
+	this->_HasTheClientsBeenAccepted = PermissionStatus;
+}
+
+void		Clients::SetClientsConnectionAuthorisation( int PermissionStatus )
+{
+	this->_HasTheClientsBeenAuthorized = PermissionStatus;
+}
+
+
+	/*--------------All the Getters--------------*/
+
 
 int			Clients::GetChanLim( void )
 {
 	return (this->_ChanLim);
 }
 
-void		Clients::SetChanLim( int ChanLim )
+int		Clients::GetClientsFd( void )
 {
-	this->_ChanLim = ChanLim;
+	return (this->_ClientFd);
 }
+
+int			Clients::GetFirstMOTD( void )
+{
+	return (this->_FirstMOTD);
+}
+
+int			Clients::GetClientsConnectionStatus( void )
+{
+	return (this->_ConnectionStatus);
+}
+
+int			Clients::GetClientsConnectionNickCmd( void )
+{
+	return (this->_HasTheClientsNickBeenChosen);
+}
+
+int			Clients::GetClientsConnectionUserCmd( void )
+{
+	return (this->_HasTheClientsUserBeenChosen);
+}
+
+int			Clients::GetClientsConnectionPermission( void )
+{
+	return (this->_HasTheClientsBeenAccepted);
+}
+
+int			Clients::GetClientsConnectionAuthorisation( void )
+{
+	return (this->_HasTheClientsBeenAuthorized);
+}
+
+time_t		Clients::GetClientsLastPing( void )
+{
+	return (time(0) - this->_LastPing);
+}
+
+std::string	Clients::GetServerName( void )
+{
+	return (this->_ServerName);
+}
+
+std::string Clients::GetClientsUsername( void )
+{
+	return (this->_Username);
+}
+
+std::string	Clients::GetClientsMode( void )
+{
+	return (this->_Mode);
+}
+
+std::string	Clients::GetClientsUnused( void )
+{
+	return (this->_Unused);
+}
+
+std::string	Clients::GetClientsBuffer( void )
+{
+	return (this->_Buffer);
+}
+
+std::string Clients::GetClientsRealname( void )
+{
+	return (this->_Realname);
+}
+
+std::string Clients::GetClientsNickname( void )
+{
+	return (this->_Nickname);
+}
+
+std::string Clients::GetClientsHostname( void )
+{
+	return (this->_Hostname);
+}
+
+std::string Clients::GetClientsHostAdress( void )
+{
+	return (this->_HostAdress);
+}
+
+std::string Clients::GetClientsMessage( void )
+{
+	return (this->_ClientMessage);
+}
+
+
+	/*-------------------------------------------*/
+
 
 int			Clients::DeleteClientsMode( char DeleteMode )
 {
@@ -257,19 +269,7 @@ int			Clients::AddClientsMode( char AddMode )
 	return (SUCCESS);
 }
 
-/*a supprimer a la fin du test*/
-
 void	Clients::resetTime(void)
 {
 	this->_last_com = time(0);
-}
-
-int			Clients::GetFirstMOTD( void )
-{
-	return (this->_FirstMOTD);
-}
-
-void		Clients::SetFirstMOTD( int motd )
-{
-	this->_FirstMOTD = motd;
 }

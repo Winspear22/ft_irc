@@ -38,6 +38,5 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 			it++;
 		}
 	}
-	/*PAS DE ERR_NOPRIVS - CAR TOUS LES OPER ONT LES MEMES DROITS*/
 	return (SUCCESS);
 }

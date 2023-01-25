@@ -5,15 +5,12 @@
 
 Channels::Channels( void )
 {
-	std::cout << RED << "Wrong constructor used." << NORMAL << std::endl;
 	return ;
 }
 
 Channels::Channels( Clients *CreatedBy, std::string ChannelName )
 {
-	std::cout << PURPLE << "Channels constructor used." << NORMAL << std::endl;
 	this->_ChannelName = ChannelName;
-//	std::cout << GREEN << "This is the Channel's name == " << WHITE << this->GetChannelName() << std::endl;
 	this->_CreatedBy = CreatedBy;
 	this->_HasAChannelCreator = YES;
 	return ;
@@ -21,29 +18,29 @@ Channels::Channels( Clients *CreatedBy, std::string ChannelName )
 
 Channels::Channels( const Channels & copy )
 {
-	std::cout << "\033[0;33mChannels Copy Constructor called." << NORMAL << std::endl;
 	*this = copy;
     return ;
 }
 
 Channels & Channels::operator=( Channels const & rhs )
 {
-	std::cout << "\033[0;34mChannels Copy assignment operator called." << NORMAL << std::endl;
 	this->_ChannelName = rhs._ChannelName;
 	this->_CreatedBy = rhs._CreatedBy;
 	return (*this);
 }
 
-
 Channels::~Channels( void )
 {
-	std::cout << RED << "Channels Destructor called." << NORMAL << std::endl;
 	return ;
 }
 
-std::string			Channels::GetChannelName( void )
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
+
+void					Channels::SetChannelMode( std::string mode )
 {
-	return (this->_ChannelName);
+	this->_ChanMode = mode;
 }
 
 void				Channels::SetChannelName( std::string name )
@@ -51,14 +48,9 @@ void				Channels::SetChannelName( std::string name )
 	this->_ChannelName = name;
 }
 
-Clients				*Channels::GetChannelCreator( void )
+void	Channels::SetHasAChannelCreator( int status )
 {
-	return (this->_CreatedBy);
-}
-
-std::string				Channels::GetChannelstopic( void )
-{
-	return (this->_Topic);
+	this->_HasAChannelCreator = status;
 }
 
 void					Channels::SetChannelstopic( std::string topic )
@@ -66,34 +58,27 @@ void					Channels::SetChannelstopic( std::string topic )
 	this->_Topic = topic;
 }
 
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
+
+int		Channels::GetHasAChannelCreator( void )
+{
+	return (this->_HasAChannelCreator);
+}
+
+std::string			Channels::GetChannelName( void )
+{
+	return (this->_ChannelName);
+}
+
 std::string				Channels::GetChannelMode( void )
 {
 	return (this->_ChanMode);
 }
 
-void					Channels::SetChannelMode( std::string mode )
+std::string				Channels::GetChannelstopic( void )
 {
-	this->_ChanMode = mode;
-}
-
-int			Channels::DeleteChannelsMode( char DeleteMode )
-{
-	if (this->_ChanMode.find(DeleteMode) == std::string::npos)
-		return (FAILURE);
-	else
-		this->_ChanMode.erase(this->_ChanMode.find(DeleteMode), 1);
-	return (SUCCESS);
-
-}
-
-int			Channels::AddChannelsMode( char AddMode )
-{
-	if (this->_ChanMode.find(AddMode) != std::string::npos)
-		return (FAILURE);
-	else
-		this->_ChanMode.push_back(AddMode);
-
-	return (SUCCESS);
+	return (this->_Topic);
 }
 
 std::map<Clients *, int> Channels::GetAllowedToInviteList( void )
@@ -101,51 +86,15 @@ std::map<Clients *, int> Channels::GetAllowedToInviteList( void )
 	return (this->_IsAllowedToInvite);
 }
 
-Clients					*Channels::GetClientsAllowedToInvite( std::string NickName )
+std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
 {
-	std::map<Clients*, int>::iterator it;
-
-	it = this->_IsAllowedToInvite.begin();
-	while (it != this->_IsAllowedToInvite.end())
-	{
-		if (it->first->GetClientsNickname() == NickName)
-			return (it->first);
-		it++;
-	}
-	return (NULL);
-}
-void					Channels::AddClientsToAllowedToInviteList( Clients *client )
-{
-	if (client == NULL)
-		return ;
-	else
-		this->_IsAllowedToInvite.insert(std::make_pair(client, client->GetClientsFd()));
-
+	return (this->_MemberOfTheChannelList);
 }
 
-void	Channels::DeleteClientsFromAllowedToInviteList( Clients *client )
+Clients				*Channels::GetChannelCreator( void )
 {
-	std::map<Clients*, int>::iterator it;
-
-	it = this->_IsAllowedToInvite.begin();
-	if (client == NULL)
-		return ;
-	else
-	{
-		while (it != this->_IsAllowedToInvite.end())
-		{
-			if (client == it->first)
-			{
-				std::cout << CYAN << "Client deleted" << std::endl;
-				this->_IsAllowedToInvite.erase(client);
-				break ;
-			}
-			it++;
-		}	
-	}
+	return (this->_CreatedBy);
 }
-
-
 
 Clients		*Channels::GetClientsInChannelMemberList( std::string NickName )
 {
@@ -161,10 +110,23 @@ Clients		*Channels::GetClientsInChannelMemberList( std::string NickName )
 	return (NULL);
 }
 
-std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
+Clients					*Channels::GetClientsAllowedToInvite( std::string NickName )
 {
-	return (this->_MemberOfTheChannelList);
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_IsAllowedToInvite.begin();
+	while (it != this->_IsAllowedToInvite.end())
+	{
+		if (it->first->GetClientsNickname() == NickName)
+			return (it->first);
+		it++;
+	}
+	return (NULL);
 }
+	/*-------------------------------------------*/
+	/*===========================================*/
+
+
 
 void		Channels::AddClientsToChannelMemberList( Clients *client )
 {
@@ -187,7 +149,6 @@ void		Channels::DeleteClientsToChannelMemberList( Clients *client )
 		{
 			if (client == it->first)
 			{
-				std::cout << YELLOW << "Client deleted" << std::endl;
 				this->_MemberOfTheChannelList.erase(client);
 				break ;
 			}
@@ -203,7 +164,6 @@ void		Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Client
 
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
-	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
@@ -223,25 +183,63 @@ void		Channels::SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent
 (void)SentFrom;
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
-	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
-		// if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
-		// {	
 			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);
 			if (ret_send == ERROR_SERVER)
 				return(loop_errors_handlers_msg(ERROR_SEND));
-		// }
 		it++;
 	}
 }
 
-int		Channels::GetHasAChannelCreator( void )
+
+
+int			Channels::AddChannelsMode( char AddMode )
 {
-	return (this->_HasAChannelCreator);
+	if (this->_ChanMode.find(AddMode) != std::string::npos)
+		return (FAILURE);
+	else
+		this->_ChanMode.push_back(AddMode);
+
+	return (SUCCESS);
 }
 
-void	Channels::SetHasAChannelCreator( int status )
+int			Channels::DeleteChannelsMode( char DeleteMode )
 {
-	this->_HasAChannelCreator = status;
+	if (this->_ChanMode.find(DeleteMode) == std::string::npos)
+		return (FAILURE);
+	else
+		this->_ChanMode.erase(this->_ChanMode.find(DeleteMode), 1);
+	return (SUCCESS);
+
+}
+
+void					Channels::AddClientsToAllowedToInviteList( Clients *client )
+{
+	if (client == NULL)
+		return ;
+	else
+		this->_IsAllowedToInvite.insert(std::make_pair(client, client->GetClientsFd()));
+
+}
+
+void	Channels::DeleteClientsFromAllowedToInviteList( Clients *client )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_IsAllowedToInvite.begin();
+	if (client == NULL)
+		return ;
+	else
+	{
+		while (it != this->_IsAllowedToInvite.end())
+		{
+			if (client == it->first)
+			{
+				this->_IsAllowedToInvite.erase(client);
+				break ;
+			}
+			it++;
+		}	
+	}
 }

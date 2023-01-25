@@ -31,11 +31,37 @@ MyMsg & MyMsg::operator=( MyMsg const & rhs )
 	return (*this);
 }
 
-
 MyMsg::~MyMsg( void )
 {
 	return ;
 }
+
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
+
+void MyMsg::SetPrefix( std::string Prefix)
+{
+	this->Prefix = Prefix;
+}
+
+void MyMsg::SetCmd( std::string Cmd )
+{
+	this->Command = toupper_striing( Cmd );
+}
+
+void MyMsg::SetParams( std::string Params )
+{
+	this->Params.push_back(Params);
+}
+
+void	MyMsg::SetCmdExistence( int CmdStatus )
+{
+	this->_DoesCmdExist = CmdStatus;
+}
+
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
 
 std::string MyMsg::GetMsg( void )
 {
@@ -67,20 +93,17 @@ std::string MyMsg::GetCmd( void )
 	return (this->Command);
 }
 
-/*std::string MyMsg::GetParams( void )
-{
-	return (this->_Params);
-}*/
 
 Clients	*MyMsg::GetClients( void )
 {
 	return (this->_SentFrom);
 }
 
-void MyMsg::SetPrefix( std::string Prefix)
+int	MyMsg::GetCmdExistence( void )
 {
-	this->Prefix = Prefix;
+	return (this->_DoesCmdExist);
 }
+
 
 std::string toupper_striing( std::string cmd )
 {
@@ -92,29 +115,9 @@ std::string toupper_striing( std::string cmd )
 		capitalized_str[i] = toupper(cmd[i]);
 	return (capitalized_str);
 }
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-void MyMsg::SetCmd( std::string Cmd )
-{
-	this->Command = toupper_striing( Cmd );
-}
-
-int	MyMsg::GetCmdExistence( void )
-{
-	return (this->_DoesCmdExist);
-}
-
-void	MyMsg::SetCmdExistence( int CmdStatus )
-{
-	this->_DoesCmdExist = CmdStatus;
-}
-
-void MyMsg::SetParams( std::string Params )
-{
-	this->Params.push_back(Params);
-}
-
-
-/*verifier la pertinence de cette fct par rapport au RFC car il y'a un bail avec la grammaire des commandes : 1 chifres et 3 lettres*/
 int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
 	std::vector<std::string>::iterator 	it;
@@ -151,7 +154,6 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	std::string intro_new_nick;
 
 	this->_SentFrom->SetClientsConnectionPermission(YES);
-	std::cout << GREEN << "Client validé" << NORMAL << std::endl;
 
 	SendMsgBackWithPrefix(*this, ::RPL_WELCOME(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_YOURHOST(*this));
@@ -161,36 +163,8 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
-	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
-	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
+	(void)IRC_Server;
 	return (SUCCESS);
-}
-
-bool MyMsg::Check_command(std::string str)
-{
-	if (str.size() == 0)
-		return false;
-	if (str.size() == 3 && isdigit(str[0]) == true)
-	{
-		for(int i = 0; i < 3; i++)
-		{
-			if (isdigit(str[i]) == false)
-				return false;
-		}
-		return true;
-	}
-	for (size_t i = 0; i < str.size(); i++)
-	{
-		if (isalpha(str[i]) == 0)
-			return false;
-	}
-	return true;
-}
-
-
-void MyMsg::SetParams2(std::vector<std::string> params)
-{
-	this->Params = params;
 }
 
 bool	MyMsg::parse_msg(void)
@@ -232,4 +206,31 @@ bool	MyMsg::parse_msg(void)
 		this->SetParams2(tab_parse);
 	}
 	return true;
+}
+
+bool MyMsg::Check_command(std::string str)
+{
+	if (str.size() == 0)
+		return false;
+	if (str.size() == 3 && isdigit(str[0]) == true)
+	{
+		for(int i = 0; i < 3; i++)
+		{
+			if (isdigit(str[i]) == false)
+				return false;
+		}
+		return true;
+	}
+	for (size_t i = 0; i < str.size(); i++)
+	{
+		if (isalpha(str[i]) == 0)
+			return false;
+	}
+	return true;
+}
+
+
+void MyMsg::SetParams2(std::vector<std::string> params)
+{
+	this->Params = params;
 }

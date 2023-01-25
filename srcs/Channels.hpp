@@ -13,45 +13,50 @@ public:
     Channels( Clients *CreatedBy, std::string ChannelName );
 	~Channels( void );
 
-	std::string				GetChannelName( void );
-	void					SetChannelName( std::string name );
-	Clients					*GetChannelCreator( void );
-	Clients					*GetClientsInChannelMemberList( std::string NickName );
-	std::map<Clients*, int> GetAllClientsInChannelMemberList( void );
-	std::string				GetChannelstopic( void );
-	void					SetChannelstopic( std::string topic );
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
+	void						SetChannelMode(std::string mode);
+	void						SetChannelName(std::string name);
+	void						SetHasAChannelCreator(int status);
+	void						SetChannelstopic(std::string topic);
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
+	int							GetHasAChannelCreator( void );
+	std::string					GetChannelName( void );
+	std::string					GetChannelMode( void );
+	std::string					GetChannelstopic( void );
+	std::map<Clients *, int> 	GetAllowedToInviteList( void );
+	std::map<Clients*, int> 	GetAllClientsInChannelMemberList( void );
+	Clients						*GetChannelCreator( void );
+	Clients						*GetClientsInChannelMemberList( std::string NickName );
+	Clients						*GetClientsAllowedToInvite( std::string name );
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-	void					AddClientsToChannelMemberList( Clients *client );
-	void					DeleteClientsToChannelMemberList( Clients *client );
-	void					SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
-	void					SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom);
+	void						AddClientsToChannelMemberList( Clients *client );
+	void						DeleteClientsToChannelMemberList( Clients *client );
+	void						SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Clients *SentFrom );
+	void						SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent, Clients *SentFrom);
 
-	int						GetHasAChannelCreator( void );
-	void					SetHasAChannelCreator( int status );
-	std::string				GetChannelMode( void );
-	void					SetChannelMode( std::string mode );
-	int						DeleteChannelsMode( char DeleteMode );
-	int						AddChannelsMode( char AddMode );
-	std::map<Clients *, int> GetAllowedToInviteList( void );
-	Clients					*GetClientsAllowedToInvite( std::string name );
-	void					AddClientsToAllowedToInviteList( Clients *client );
-	void					DeleteClientsFromAllowedToInviteList( Clients *client );
+	int							AddChannelsMode( char AddMode );
+	int							DeleteChannelsMode( char DeleteMode );
+	void						AddClientsToAllowedToInviteList( Clients *client );
+	void						DeleteClientsFromAllowedToInviteList( Clients *client );
 
-
-
-	std::map<Clients*, int> _MemberOfTheChannelList;
-	std::string				_ChannelName;
-	Clients					*_CreatedBy;
+	std::map<Clients*, int> 	_MemberOfTheChannelList;
+	std::string					_ChannelName;
+	Clients						*_CreatedBy;
 
 private:
     Channels(/*ARG*/);
 	Channels( const Channels & copy );
 	Channels & operator=( const Channels & popo );
 
-	std::map<Clients*, int> _IsAllowedToInvite;
-	int						_HasAChannelCreator;
-	std::string				_Topic;
-	std::string				_ChanMode;
+	std::map<Clients*, int> 	_IsAllowedToInvite;
+	int							_HasAChannelCreator;
+	std::string					_Topic;
+	std::string					_ChanMode;
 
 };
 

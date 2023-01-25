@@ -25,11 +25,11 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 			{
 				if ((*it)[0] != '#' && (*it)[0] != '&' && (*it)[0] != '+' && (*it)[0] != '!')
 					it->insert(it->begin(), '#');
-				if (it->size() > 50) //CHANLIMIT
+				if (it->size() > 50)
 					it->resize(50);
 				if (IRC_Server->GetChannelsByName(*it) == NULL)
 				{
-					chan = IRC_Server->CreateChannels(*it, this->_SentFrom);//new Channels(this->_SentFrom, *it);
+					chan = IRC_Server->CreateChannels(*it, this->_SentFrom);
 					chan->AddClientsToChannelMemberList(this->_SentFrom);
 					msg_sent = "JOIN " + *it;
 					SendMsgBackWithPrefix(*this, msg_sent);

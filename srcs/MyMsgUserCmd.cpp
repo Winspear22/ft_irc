@@ -1,6 +1,5 @@
 
 # include "num_replies.hpp"
-/*LA COMMANDE USER QUI SET LE USERNAME, LE mode ET LE REALNAME */
 int	MyMsg::UserCmd( MyServer *IRC_Server )
 {
 	(void)IRC_Server;
@@ -19,7 +18,7 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		msg_sent = ERR_ALREADYREGISTRED(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (this->Params.size() >= 4) // > 4 car le realname peut contenir des  espaces
+	else if (this->Params.size() >= 4)
 	{
 		while (it != this->Params.end())
 		{
@@ -33,7 +32,6 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it = this->Params.begin();
 		this->_SentFrom->SetClientsUsername(*it);
 		it++;
-		/*Pas sûr pour mode*/
 		if (*it == "2")
 			this->_SentFrom->SetClientsMode("w");
 		else if (*it == "3")
@@ -42,11 +40,11 @@ int	MyMsg::UserCmd( MyServer *IRC_Server )
 		it++;
 		while (it != this->Params.end())
 		{
-			if (it->empty()) // Si aucun realname n'est renseigné, il doit etre remplacé par le NICK
+			if (it->empty())
 				realname = this->_SentFrom->_Nickname;
-			else // Sinon, tout ce qui suit après le 3e arguments = realname
+			else
 			{	
-				if (it->at(0) == ':') // S'il y'a plusieurs ':' les uns à la suite des autres, seul le premier ':' doit être évité
+				if (it->at(0) == ':')
 				{
 					realname = it->substr(1);
 					it++;

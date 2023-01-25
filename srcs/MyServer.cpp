@@ -6,14 +6,12 @@
 
 MyServer::MyServer( void )
 {
-	std::cout << RED << "Wrong constructor used." << NORMAL << std::endl;
 	return ;
 }
 
 
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
-	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
 	std::string cmd_list_string[85] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
 	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "kill", "KNOCKS", "LINKS", "LIST", \
@@ -31,14 +29,12 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 
 MyServer::MyServer( const MyServer & copy )
 {
-	std::cout << "\033[0;33mMyServer Copy Constructor called." << NORMAL << std::endl;
 	*this = copy;
     return ;
 }
 
 MyServer::~MyServer( void )
 {
-	std::cout << RED << "MyServer Destructor called." << NORMAL << std::endl;
 	std::map<Clients*, int>::iterator it;
 	std::map<Channels*, std::string>::iterator itt;
 	
@@ -46,31 +42,26 @@ MyServer::~MyServer( void )
 	it = this->clients_list.begin();	
 	while (it != this->clients_list.end())
 	{
-		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
 		FD_CLR(it->second, &this->ready_fds);
 		close(it->second);
 		delete it->first;
 		it++;
 	}
 	this->clients_list.clear();
-	std::cout << CYAN << "All Clients were freed. No Leaks. :)" << NORMAL << std::endl;
 	itt = this->channels_list.begin();
 	while (itt != this->channels_list.end())
 	{
-		std::cout << YELLOW << "Deleting Channel named : " << WHITE << itt->second << NORMAL << std::endl;
 		delete itt->first;
 		itt++;
 	}
 	this->channels_list.clear();
 	close(this->GetSocketFd());
-	std::cout << CYAN << "All Channels were freed. No Leaks. :)" << NORMAL << std::endl;
 
 	return ;
 }
 
 MyServer & MyServer::operator=( MyServer const & rhs )
 {
-	std::cout << "\033[0;34mMyServer Copy assignment operator called." << NORMAL << std::endl;
 	if ( this != &rhs )
     {
 		this->new_msg = rhs.new_msg;
@@ -165,7 +156,7 @@ int			MyServer::CreateSocketFd( void )
 int			MyServer::SetSocketOptions( void )
 {
 	int			ret;
-	const int 	optname = 1; //l'option SO_REUSEADDR REQUIERT UN BOOLEEAN POUR FONCTIONNER, ON SET ALORS CET ARGUMENT A 1, DONC A VRAI, POUR QUE LA FCT MARCHE.
+	const int 	optname = 1;
 
 	ret = setsockopt(this->_socketfd, SOL_SOCKET, SO_REUSEADDR, &optname,  sizeof(int));
 	if (ret == ERROR_SERVER)
@@ -180,15 +171,9 @@ int			MyServer::BindSocketFd( void )
 	this->_sockadress.sin_port = htons(this->_port);
 	this->_sockadress.sin_family = AF_INET; 
 	this->_sockadress.sin_addr.s_addr = INADDR_ANY;
-	/*IL FAUT PROTEGER CETTE VARIABLE CAR INET_ADDR RENVOIT -1 EN CAS D'ECHEC ET -1 = 255.255.255.255 IP, IP UNIVERSELLE*/
-	//if (this->_sockadress.sin_addr.s_addr < 0)
-	//	return (ERROR_SOCKET_BINDING);
-	/*if ((this->_sockadress.sin_addr.s_addr = INADDR_ANY) < 0)
-		return (ERROR_SOCKET_BINDING);*/
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
 		return (ERROR_SOCKET_BINDING);
-	std::cout << GREEN << "BIND(); WORKED." << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
@@ -199,7 +184,6 @@ int			MyServer::ListenToSockedFd( void )
 	ret = listen(this->_socketfd, 10);
 	if (ret == ERROR_SERVER)
 		return (ERROR_LISTENING);
-	std::cout << GREEN << "listen(); works !" << std::endl;
 	this->_maximum_fds = this->_socketfd;
 	return (SUCCESS);
 }
@@ -210,13 +194,12 @@ int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 	ret = fcntl(SocketFd, F_SETFL, O_NONBLOCK);
 	if (ret == ERROR_SERVER)
 		return (ERROR_NONBLOCKING);
-	std::cout << GREEN << "fcntl(); works !" << std::endl;
 	return (SUCCESS);
 }
 
 int			MyServer::SelectClients( void )
 {
-	int					ret_select; //return de select pour les erreurs
+	int					ret_select;
 	struct timeval		timeout;
 
 	memset(&timeout, 0, sizeof(struct timeval));
@@ -224,15 +207,15 @@ int			MyServer::SelectClients( void )
 	this->_fds_list = 0;
 	FD_ZERO(&this->ready_fds);
 	FD_SET(this->_socketfd, &this->ready_fds);
-	this->readfds = this->ready_fds; // je sais plus pk on fait ca 
+	this->readfds = this->ready_fds;
 	ret_select = select(this->_maximum_fds + 1, &this->readfds, NULL, NULL, &timeout);
 	if (ret_select == ERROR_SERVER)
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
-	while (this->_fds_list <= this->_maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
+	while (this->_fds_list <= this->_maximum_fds)
 	{
-		if (FD_ISSET(this->_fds_list, &this->readfds)) // C'est un client qui a ete trouve
+		if (FD_ISSET(this->_fds_list, &this->readfds))
 		{
 			this->CreateClients();
 			FD_SET(this->_new_fd_nb, &this->ready_fds);
@@ -262,7 +245,6 @@ int			MyServer::DeleteAFKClients( void )
 		if ((it->first->GetClientsConnectionStatus() == NO) || 
 		(it->first->GetClientsLastPing() >= 120))
 		{
-			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
@@ -320,14 +302,12 @@ void			MyServer::CreateClients( void )
 		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
 		this->clients_list.insert(std::make_pair(client_created, client_created_fd));
 		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
-		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
 		if (this->GetCurrentClientsNb() > 8)
 		{
 			client_created->SetClientsConnectionStatus(NO);
 			return ;
 		}
 		this->_new_fd_nb = client_created_fd;
-		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
 	}
 }
 
@@ -349,7 +329,7 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
-	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
+	char								recv_buffer[512 + 1];
 	char								*msg_buffer;
 	int									ret_rcv;
 	std::vector<std::string>			splitted_msg;
@@ -366,14 +346,9 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	else if (ret_rcv == ERROR_USER_DISCONNECTED)
-		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);
 	else if (ret_rcv > 0 && (buf_str.rfind("\r") != buf_str.size() - 1) && (buf_str.rfind("\n") != buf_str.size() - 1))
-	{
-		std::cout << WHITE << "Incomplete new message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
-		<< CYAN << " Adding it to the buffer." << NORMAL << std::endl;
 		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
-		std::cout << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() << std::endl; 
-	}
 	else if (this->GetClientsThroughSocketFd(ClientsFd) != NULL)
 	{
 		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsMessage(this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer());
@@ -386,27 +361,23 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		while (it != splitted_msg.end())
 		{	
 			this->new_msg = new MyMsg(this->GetClientsThroughSocketFd(ClientsFd), *it);
-			std::cout << WHITE << "You have a message : " << BLUE <<  *it << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd()  << NORMAL << std::endl;
 			tmp = strdup(it->c_str());
 			tab_parse = this->SplitByEndline(tmp, " ");
 			free(tmp);
 			str = tab_parse.begin();
 			if (str->at(0) == ':')
 			{
-				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
+				this->new_msg->Prefix = *str;
 				str++;
 			}
 			if (this->new_msg->CheckFormatCmd(str, this->_cmd_list) == SUCCESS)
 			{
-				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
+				this->new_msg->Command = *str;
 				str++;
 				this->new_msg->SetCmdExistence(CMD_EXISTS);
 			}
 			else
-			{
-				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
 				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
-			}
 			while (str != tab_parse.end())
 			{
 				this->new_msg->SetParams(*str);
@@ -502,7 +473,6 @@ void		SendMsgBackToClients( MyMsg ClientMsg, std::string Msg )
 	if (ClientMsg.GetClients()->GetClientsConnectionAuthorisation() == YES)
 	{
 		Msg += "\r\n";
-		std::cout << GREEN << "To client: " << WHITE << Msg << NORMAL;
 		ret_send = send(ClientMsg.GetClients()->GetClientsFd(), Msg.c_str(), strlen(Msg.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
@@ -634,7 +604,6 @@ void		MyServer::deleteUnavailableNickname( void )
 		{
 			if (clock() - it->second >= DELAY)
 			{
-				std::cout << "Nickname " << GREEN << it->first << " is now available.\n";
 				this->_unavailable_nicknames.erase(it);
 				break;
 			}

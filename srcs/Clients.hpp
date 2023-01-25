@@ -9,97 +9,90 @@ class Clients
 public:
 	Clients( int ClientFd, struct sockaddr_in _New_Address, std::string ServerName );
 	~Clients( void );
-
-	int			GetClientsFd( void );
-	std::string	GetServerName( void );
-	void		SetServerName( std::string ServerName);
-	std::string	GetClientsUsername( void );
-	void		SetClientsUsername( std::string username );
-	std::string	GetClientsMode( void );
-	void		SetClientsMode( std::string Mode );
-	std::string	GetClientsUnused( void );
-	void		SetClientsUnused( std::string Unused );
-	std::string	GetClientsRealname( void );
-	void		SetClientsRealname( std::string realname );
-	std::string	GetClientsNickname( void );
-	void		SetClientsNickname( std::string nickname );
-	std::string GetClientsHostname( void );
-	void		SetClientsHostname( std::string hostname );
-	std::string GetClientsHostAdress( void );
-	void		SetClientsHostAdress( std::string hostAdress );
-	int			GetClientsConnectionPermission( void );
-	void		SetClientsConnectionPermission( int PermissionStatus );
-	int			GetClientsConnectionAuthorisation( void );
-	void		SetClientsConnectionAuthorisation( int PermissionStatus );
-	int			GetClientsConnectionNickCmd( void );
-	void		SetClientsConnectionNickCmd( int PermissionStatus );
-	int			GetClientsConnectionUserCmd( void );
-	void		SetClientsConnectionUserCmd( int PermissionStatus );
-	std::string	GetClientsBuffer( void );
-	void		SetClientsBuffer( std::string );
-	int			GetClientsConnectionStatus( void );
-	void		SetClientsConnectionStatus( int status );
-	time_t		GetClientsLastPing( void );
-	void		SetClientsLastPing( time_t ping);
-	int			GetFirstMOTD( void );
-	void		SetFirstMOTD( int motd );
-	int			GetChanLim( void );
-	void		SetChanLim( int ChanLim );
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
+	void			SetFirstMOTD(int motd);
+	void			SetChanLim(int ChanLim);
+	void			SetClientsBuffer(std::string);
+	void			SetClientsLastPing(time_t ping);
+	void			SetClientsMode(std::string Mode);
+    void			SetClientsUnused(std::string Unused);
+	void			SetServerName(std::string ServerName);
+	void			SetClientsConnectionStatus(int status);
+	void			SetClientsMessage(std::string msg_recv);
+	void			SetClientsUsername(std::string username);
+	void			SetClientsRealname(std::string realname);
+	void			SetClientsNickname(std::string nickname);
+	void			SetClientsHostname(std::string hostname);
+	void			SetClientsHostAdress(std::string hostAdress);
+	void			SetClientsConnectionUserCmd(int PermissionStatus);
+	void			SetClientsConnectionNickCmd(int PermissionStatus);
+	void			SetClientsConnectionPermission(int PermissionStatus);
+	void			SetClientsConnectionAuthorisation(int PermissionStatus);
 
 
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
+	int				GetChanLim(void);
+	int				GetClientsFd(void);
+	int				GetFirstMOTD(void);
+	int				GetClientsConnectionStatus(void);
+	int				GetClientsConnectionNickCmd(void);
+	int				GetClientsConnectionUserCmd(void);
+	int				GetClientsConnectionPermission(void);
+	int				GetClientsConnectionAuthorisation(void);
 
+	time_t			GetClientsLastPing(void);
 
-	std::string GetClientsMessage( void );
-	void		SetClientsMessage( std::string msg_recv );
-	int			DeleteClientsMode( char DeleteMode );
-	int			AddClientsMode( char AddMode );
+	std::string		GetServerName(void);
+	std::string		GetClientsUsername(void);
+	std::string		GetClientsMode(void);
+	std::string		GetClientsUnused(void);
+	std::string		GetClientsBuffer(void);
+	std::string		GetClientsRealname(void);
+	std::string 	GetClientsNickname(void);
+	std::string 	GetClientsHostname(void);
+	std::string 	GetClientsHostAdress(void);
+	std::string 	GetClientsMessage( void );
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-/*A SUPPRIMER A LA FIN DU TEST*/
+	int				DeleteClientsMode(char DeleteMode);
+	int				AddClientsMode(char AddMode);
 
-void	resetTime(void);
-std::string	_Nickname;
-std::string _Hostname;
-	std::string	_HostAdress;
-std::string _ServerName;
-
-/*========================*/
-
-
+	void			resetTime(void);
+	
+	std::string		_Nickname;
+	std::string 	_Hostname;
+	std::string		_HostAdress;
+	std::string 	_ServerName;
 
 private:
-    Clients(/* ARG*/);
+    Clients();
 	Clients( const Clients & copy );
 	Clients & operator=( const Clients & client );
-	int 		_ClientFd;
-	sockaddr_in _New_Address;
-//	std::string _ServerName;
-	std::string _Buffer;
 
-	/*Clients Identity*/
-	std::string	_Username;
-	std::string _Mode; // Sert à la commande MODE, il y'a 2 modes --> à voir plus tard lors de la prgmtion de MODE
-	std::string	_Unused; // ce paramètre n'est pas utilisé par les clients selon RFC
-	std::string _Realname;
-	//std::string	_Nickname;
-	//std::string _Hostname;
-	//std::string	_HostAdress;
-	time_t		_LastPing;
+	sockaddr_in 	_New_Address;
 
-	/*On utilise les deux derniers booléens car Nick et User peuvent être faits dans des ordres différents*/
-	/*Autrement : Authorisation + NICK + USER = Permission */
-	bool		_HasTheClientsBeenAccepted;   // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
-	bool		_HasTheClientsBeenAuthorized; // Authorisation pour le PWD
-	bool		_HasTheClientsNickBeenChosen; // Authorisation pour le Nick - NICK a bien fonctionné
-	bool		_HasTheClientsUserBeenChosen; // Authorisation pour le User - USER a bien fonctionné
-	int			_ConnectionStatus;
-	/*Clients Message*/
-	std::string	_ClientMessage;
-	int			_FirstMOTD;
-	int			_ChanLim;
-	
-	/*A supprimer à la fin du test*/
-	time_t	_last_com;
+	int				_ChanLim;
+	int 			_ClientFd;
+	int				_FirstMOTD;
+	int				_ConnectionStatus;
 
+	bool			_HasTheClientsBeenAccepted;
+	bool			_HasTheClientsBeenAuthorized;
+	bool			_HasTheClientsNickBeenChosen; 
+	bool			_HasTheClientsUserBeenChosen; 
 
+	time_t			_last_com;
+	time_t			_LastPing;
+
+	std::string 	_Mode;
+	std::string		_Username;
+	std::string		_Unused;
+	std::string 	_Buffer;
+	std::string 	_Realname;
+	std::string		_ClientMessage;
 };
 # endif

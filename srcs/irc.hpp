@@ -3,58 +3,32 @@
 /*===============================================================================================================*/
                                                 /*INCLUDES*/
 /*===============================================================================================================*/
-/*Classic libraries to implement c++ features*/
 # include <iomanip>
 # include <iostream>
-/*socket - setsockopt - getsockname - getprotobyname - gethostbyname - getaddrinfo - freeaddrinfo - bind
 - connect - listen - accept - recv - */
 # include <sys/socket.h>
 # include <netdb.h>
-/*htons - htonl - ntohs - ntohl - inet_addr - inet_ntoa*/
 # include <arpa/inet.h>
-/*signal library*/
 # include <csignal>
-/*lseek*/
 # include <sys/types.h>
-/*fstat*/
 # include <sys/stat.h>
-/*fnctl*/
 # include <fcntl.h>
-/*poll*/
 # include <poll.h>
-
-/*atoi*/
 # include <stdlib.h>
 # include <unistd.h>
-
-/*strlen*/
 # include <string.h>
-
-/*vector*/
 # include <vector>
-
-/*map*/
 # include <map>
-
-/*list*/
 # include <list>
-
-/*time ctime*/
 # include <ctime>
-
-/*find*/
 # include <algorithm>
-
-/*ifstream*/
 # include <fstream>
-
 # include "MyServer.hpp"
 # include "Clients.hpp"
 
 /*===============================================================================================================*/
 /*                                                DEFINES                                                        */
 /*===============================================================================================================*/
-
 
 /*                                              OPERATOR ID                                                      */
 # define PASSWORD_OF_OPERATORS "1234"
@@ -116,6 +90,5 @@
 /*                                              errors_handler.cpp                                                */
 int     errors_handlers_msg( int error_code );
 void    loop_errors_handlers_msg( int error_code );
-//void	loop_safe_exit( Clients *sole_client, std::map<Clients*, int> clients_list );
 
 #endif
