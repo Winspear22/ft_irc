@@ -7,7 +7,6 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 	int j;
 	std::string mode;
 	std::string msg_sent;
-	mode = this->Params.at(1);
 	i = 0;
 
 	if (this->Params.size() == 1)
@@ -30,6 +29,7 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 	}
 	else
 	{
+		mode = this->Params.at(1);
 		if (IRC_Server->GetChannelsByName(this->Params.at(0))->GetChannelMode().empty())
 			IRC_Server->GetChannelsByName(this->Params.at(0))->SetChannelMode(mode);
 		while (i < mode.size())
