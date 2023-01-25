@@ -114,7 +114,7 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (ret_find_first_of == 0)
-		;//this->ChanModeCmd(IRC_Server);
+		this->ChanModeCmd(IRC_Server);
 	else if (this->Params.at(0) != this->_SentFrom->GetClientsNickname())
 	{
 		msg_sent = ERR_USERSDONTMATCH(*this);
