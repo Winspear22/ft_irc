@@ -67,11 +67,6 @@ std::string MyMsg::GetCmd( void )
 	return (this->Command);
 }
 
-/*std::string MyMsg::GetParams( void )
-{
-	return (this->_Params);
-}*/
-
 Clients	*MyMsg::GetClients( void )
 {
 	return (this->_SentFrom);
@@ -130,7 +125,7 @@ int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector
 	{
 		while (i < 3)
 		{
-			if (isdigit(cmd->at(i)) != SUCCESS)
+			if (isdigit(cmd->at(i)) == SUCCESS)
 				return (FAILURE);
 			i++;
 		}
@@ -138,7 +133,7 @@ int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector
 	}
 	while (j < cmd->size())
 	{
-		if (isalpha(cmd->at(i)) == SUCCESS)
+		if (isalpha(cmd->at(j)) == SUCCESS)
 			return (FAILURE);
 		j++;
 	}
@@ -166,34 +161,12 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	return (SUCCESS);
 }
 
-bool MyMsg::Check_command(std::string str)
-{
-	if (str.size() == 0)
-		return false;
-	if (str.size() == 3 && isdigit(str[0]) == true)
-	{
-		for(int i = 0; i < 3; i++)
-		{
-			if (isdigit(str[i]) == false)
-				return false;
-		}
-		return true;
-	}
-	for (size_t i = 0; i < str.size(); i++)
-	{
-		if (isalpha(str[i]) == 0)
-			return false;
-	}
-	return true;
-}
-
-
 void MyMsg::SetParams2(std::vector<std::string> params)
 {
 	this->Params = params;
 }
 
-bool	MyMsg::parse_msg(void)
+bool	MyMsg::ParseCmdInMyMsg( MyServer *IRC_Server )
 {
 	const char *delim = " ";
 	char*	tmp = strdup(this->_Message.c_str());
@@ -218,7 +191,7 @@ bool	MyMsg::parse_msg(void)
 		this->Prefix = *str;
 		++str;
 	}
-	if (Check_command(*str))
+	if (CheckFormatCmd(str, IRC_Server->GetCmdList()))
 		this->Command = *str;
 	else
 	{

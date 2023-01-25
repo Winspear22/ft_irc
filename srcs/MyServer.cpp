@@ -152,6 +152,12 @@ int			MyServer::GetCurrentClientsNb( void )
 	return (this->_nb_of_clients);
 }
 
+std::vector<std::string> MyServer::GetCmdList( void )
+{
+	return (this->_cmd_list);
+}
+
+
 /*-----------------------------------------------------------END OF GETTERS ---------------------------------------------*/
 
 int			MyServer::CreateSocketFd( void )
@@ -180,11 +186,6 @@ int			MyServer::BindSocketFd( void )
 	this->_sockadress.sin_port = htons(this->_port);
 	this->_sockadress.sin_family = AF_INET; 
 	this->_sockadress.sin_addr.s_addr = INADDR_ANY;
-	/*IL FAUT PROTEGER CETTE VARIABLE CAR INET_ADDR RENVOIT -1 EN CAS D'ECHEC ET -1 = 255.255.255.255 IP, IP UNIVERSELLE*/
-	//if (this->_sockadress.sin_addr.s_addr < 0)
-	//	return (ERROR_SOCKET_BINDING);
-	/*if ((this->_sockadress.sin_addr.s_addr = INADDR_ANY) < 0)
-		return (ERROR_SOCKET_BINDING);*/
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
 		return (ERROR_SOCKET_BINDING);
@@ -265,7 +266,7 @@ int			MyServer::DeleteAFKClients( void )
 			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
-			msg.parse_msg();
+			msg.ParseCmdInMyMsg(this);
 			msg.QuitCmd(this);
 			it = this->clients_list.begin();
 			if (it == this->clients_list.end())
@@ -404,7 +405,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			}
 			else
 			{
-				std::cout << RED << "Error. The command format you wrote is wrong. You need one letter followed by three numbers." << std::endl;
+				std::cout << RED << "Error. The command format you wrote is wrong. You only letters commands or three numbers." << std::endl;
 				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
 			}
 			while (str != tab_parse.end())

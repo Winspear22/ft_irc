@@ -41,7 +41,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		
 		// QUIT PART
 		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT killed by " + this->_SentFrom->GetClientsNickname());
-		msg.parse_msg();
+		msg.ParseCmdInMyMsg(IRC_Server);
 		msg.QuitCmd(IRC_Server);
 		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
 		std::map<Channels*, std::string>::iterator it_chan;

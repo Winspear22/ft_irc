@@ -13,8 +13,8 @@ class MyMsg
 {
 public:
     MyMsg( Clients  *popo, std::string lolo );
-	MyMsg( const MyMsg & copy );
-	MyMsg & operator=( const MyMsg & popo );
+	MyMsg( const MyMsg & copy );//prive
+	MyMsg & operator=( const MyMsg & popo );//prive
 	~MyMsg( void );
 
 	std::string GetMsg( void );
@@ -59,11 +59,8 @@ public:
 
 	int			ValidateClientsConnections( MyServer *IRC_Server );
 
-
-	/*TEST A EFFACER ENSUITE -- TESTER LE PARSING DE SMAUGDELA*/
-	bool	parse_msg(void);
-	bool 	Check_command(std::string str);
-	void 	SetParams2(std::vector<std::string> params);
+	bool		ParseCmdInMyMsg( MyServer *IRC_Server );
+	void 		SetParams2(std::vector<std::string> params);
 
 
 	/*======================*/

@@ -14,7 +14,6 @@ public:
     ~MyServer( void );
 
 	void		InitVariables( void );
-
 	/*===========================================*/
 	/*             GETTERS AND SETTERS           */
 	/*--------------All the Setters--------------*/
@@ -31,6 +30,7 @@ public:
 	int			GetSocketFd( void );
 	int			GetCurrentClientsNb( void );
 	int			isUnavailableNickname(std::string nickame);
+	std::vector<std::string> GetCmdList( void );
 	Clients		*GetClientsThroughName( std::string name );
 	Clients		*GetClientsThroughSocketFd( int fd );
 	Channels	*GetChannelsByName( std::string ChannelName );
