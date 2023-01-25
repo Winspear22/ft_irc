@@ -158,17 +158,15 @@ int						MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	std::string intro_new_nick;
 
 	this->_SentFrom->SetClientsConnectionPermission(YES);
-	std::cout << GREEN << "Client validé" << NORMAL << std::endl;
 
 	SendMsgBackWithPrefix(*this, ::RPL_WELCOME(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_YOURHOST(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_CREATED(*this));
 	SendMsgBackWithPrefix(*this, ::RPL_MYINFO(*this));
-
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
-	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
+	(void)IRC_Server;
 	return (SUCCESS);
 }
 

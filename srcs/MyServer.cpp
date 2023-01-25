@@ -6,13 +6,11 @@
 
 MyServer::MyServer( void )
 {
-	std::cout << RED << "Wrong constructor used." << NORMAL << std::endl;
 	return ;
 }
 
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
-	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
 	int i;
 	std::string cmd_list_string[85] = {"ADMIN", "AWAY", "CNOTICE", "CPRIVMSG", "CONNECT", "DIE", "ENCAP", \
 	"ERROR", "HELP", "INFO", "INVITE", "ISON", "JOIN", "KICK", "kill", "KNOCKS", "LINKS", "LIST", \
@@ -30,14 +28,12 @@ MyServer::MyServer( int port, std::string password ): _port(port), _password(pas
 
 MyServer::MyServer( const MyServer & copy )
 {
-	std::cout << "\033[0;33mMyServer Copy Constructor called." << NORMAL << std::endl;
 	*this = copy;
     return ;
 }
 
 MyServer::~MyServer( void )
 {
-	std::cout << RED << "MyServer Destructor called." << NORMAL << std::endl;
 	std::map<Clients*, int>::iterator it;
 	std::map<Channels*, std::string>::iterator itt;
 	
@@ -45,31 +41,25 @@ MyServer::~MyServer( void )
 	it = this->clients_list.begin();	
 	while (it != this->clients_list.end())
 	{
-		std::cout << YELLOW << "Deleting client n° : " << WHITE << it->second << NORMAL << std::endl;
 		FD_CLR(it->second, &this->ready_fds);
 		close(it->second);
 		delete it->first;
 		it++;
 	}
 	this->clients_list.clear();
-	std::cout << CYAN << "All Clients were freed. No Leaks. :)" << NORMAL << std::endl;
 	itt = this->channels_list.begin();
 	while (itt != this->channels_list.end())
 	{
-		std::cout << YELLOW << "Deleting Channel named : " << WHITE << itt->second << NORMAL << std::endl;
 		delete itt->first;
 		itt++;
 	}
 	this->channels_list.clear();
 	close(this->GetSocketFd());
-	std::cout << CYAN << "All Channels were freed. No Leaks. :)" << NORMAL << std::endl;
-
 	return ;
 }
 
 MyServer & MyServer::operator=( MyServer const & rhs )
 {
-	std::cout << "\033[0;34mMyServer Copy assignment operator called." << NORMAL << std::endl;
 	if ( this != &rhs )
     {
 		this->new_msg = rhs.new_msg;
@@ -183,7 +173,6 @@ int			MyServer::BindSocketFd( void )
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
 		return (ERROR_SOCKET_BINDING);
-	std::cout << GREEN << "BIND(); WORKED." << NORMAL << std::endl;
 	return (SUCCESS);
 }
 
@@ -194,7 +183,6 @@ int			MyServer::ListenToSockedFd( void )
 	ret = listen(this->_socketfd, 10);
 	if (ret == ERROR_SERVER)
 		return (ERROR_LISTENING);
-	std::cout << GREEN << "listen(); works !" << std::endl;
 	this->_maximum_fds = this->_socketfd;
 	return (SUCCESS);
 }
@@ -205,7 +193,6 @@ int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 	ret = fcntl(SocketFd, F_SETFL, O_NONBLOCK);
 	if (ret == ERROR_SERVER)
 		return (ERROR_NONBLOCKING);
-	std::cout << GREEN << "fcntl(); works !" << std::endl;
 	return (SUCCESS);
 }
 
@@ -265,14 +252,12 @@ void			MyServer::CreateClients( void )
 		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
 		this->clients_list.insert(std::make_pair(client_created, client_created_fd));
 		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
-		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
 		if (this->GetCurrentClientsNb() > 8)
 		{
 			client_created->SetClientsConnectionStatus(NO);
 			return ;
 		}
 		this->_new_fd_nb = client_created_fd;
-		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
 	}
 }
 
@@ -288,7 +273,6 @@ int			MyServer::DeleteAFKClients( void )
 		if ((it->first->GetClientsConnectionStatus() == NO) || 
 		(it->first->GetClientsLastPing() >= 120))
 		{
-			std::cout << "Client with fd " << it->first->GetClientsNickname() << " disconnected" << std::endl;
 			it->first->SetClientsConnectionStatus(NO);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
 			msg.parse_msg();
@@ -367,7 +351,6 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 		std::cout << WHITE << "Incomplete new message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
 		<< CYAN << " Adding it to the buffer." << NORMAL << std::endl;
 		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsBuffer(GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() + recv_buffer);
-		std::cout << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsBuffer() << std::endl; 
 	}
 	else if (this->GetClientsThroughSocketFd(ClientsFd) != NULL)
 	{

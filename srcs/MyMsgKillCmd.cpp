@@ -30,7 +30,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		{
 			i = 0;
 			while (++i < this->Params.size())
-				msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
+				msg_sent = msg_sent + " " + this->Params[i];
 		}
 		msg_sent += "\r\n";
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);

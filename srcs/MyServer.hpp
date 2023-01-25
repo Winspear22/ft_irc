@@ -84,7 +84,7 @@ public:
 	fd_set								readfds;
 
 private:
-    MyServer(/* ARG */);
+    MyServer(void);
 	MyServer( const MyServer & copy);
     MyServer & operator=( const MyServer & server );
 

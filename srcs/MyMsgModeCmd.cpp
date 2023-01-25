@@ -47,7 +47,6 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 					{
 						std::string mode2;
 						mode2 += mode[j];
-						std::cout << "mode2 === " << mode2 << std::endl;
 						msg_sent = ERR_UNKNOWNMODE(*this, mode2, IRC_Server->GetChannelsByName(this->Params.at(0))->GetChannelName());
 						SendMsgBackWithPrefix(*this, msg_sent);
 
@@ -81,7 +80,6 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 					{
 						std::string mode2;
 						mode2 += mode[j];
-						std::cout << "mode2 === " << mode2 << std::endl;
 						msg_sent = ERR_UNKNOWNMODE(*this, mode2, IRC_Server->GetChannelsByName(this->Params.at(0))->GetChannelName());
 						SendMsgBackWithPrefix(*this, msg_sent);
 												IRC_Server->GetChannelsByName(this->Params.at(0))->DeleteClientsFromAllowedToInviteList(IRC_Server->GetClientsThroughName(this->Params.at(0)));

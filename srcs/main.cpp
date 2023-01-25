@@ -38,8 +38,6 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 		return (errors_handlers_msg(ERROR_SOCKET_BINDING));
 	if (Irc_Serveur.ListenToSockedFd() == ERROR_LISTENING)
 		return (errors_handlers_msg(ERROR_LISTENING));
-	//if (Irc_Serveur.SetSocketFdToNonBlocking(Irc_Serveur.GetSocketFd()) == ERROR_NONBLOCKING)
-	//	return (errors_handlers_msg(ERROR_NONBLOCKING));
 	return (SUCCESS);
 }
 

@@ -57,8 +57,6 @@ int		MyMsg::TopicCmd( MyServer *IRC_Server )
 					ping_pos = this->_SentFrom->GetClientsMessage().find(':', this->Prefix.size() + this->Command.size() + this->Params.at(0).size());
 					if (ping_pos != std::string::npos)
 						tmp = this->_SentFrom->GetClientsMessage().substr(ping_pos + 1);
-					std::cout << RED << "ping_pos " << ping_pos << "\n";
-					std::cout << RED << "TMP = " << GREEN << tmp << "\n";
 					it1->first->SetChannelstopic(tmp);
 					msg_sent = RPL_TOPIC(*this, it1->second, it1->first->GetChannelstopic());
 					std::string ret = "TOPIC " + it1->second + " :" + it1->first->GetChannelstopic();

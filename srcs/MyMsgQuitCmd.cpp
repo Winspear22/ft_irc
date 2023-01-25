@@ -22,7 +22,6 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	{
 		if (it->first->GetClientsInChannelMemberList(this->_SentFrom->GetClientsNickname()) != NULL)
 		{
-			std::cout << "User supprimé du channel" << std::endl;
 			it->first->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 			it->first->DeleteClientsToChannelMemberList(this->_SentFrom);
 		}
@@ -37,6 +36,5 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	close(fd);
 	FD_CLR(fd, &IRC_Server->ready_fds);
 	IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() - 1);
-	std::cout << CYAN << "Current nb of Clients after QUIT : " << WHITE << IRC_Server->GetCurrentClientsNb() << NORMAL << std::endl;
 	return (SUCCESS);
 }

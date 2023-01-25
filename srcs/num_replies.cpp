@@ -50,7 +50,7 @@ std::string RPL_UMODEIS(MyMsg msg)
 {
     std::string reply;
 
-    reply = "221 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetClientsMode(); // + "<user mode string>"
+    reply = "221 " + msg.GetClients()->GetClientsNickname() + " " + msg.GetClients()->GetClientsMode();
 
     return (reply);
 }
@@ -82,7 +82,6 @@ std::string RPL_ENDOFMOTD(MyMsg msg)
 std::string RPL_VERSION(MyMsg msg)
 {
 	std::string reply;
-	/*S'assurer de la bonne version dans le RPL*/
 	reply = "351 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " \033[1;31mVersion 1.0 ft_irc\033[0m";
 	return (reply);
 }
@@ -92,7 +91,6 @@ std::string RPL_INFO(MyMsg msg, std::vector<std::string>::iterator it)
 {
 	std::string reply;
     std::string iterator_content = *it;
-	/*S'assurer de la bonne version dans le RPL*/
 	reply = "371 \033[1;37m" + msg.GetClients()->GetClientsNickname() + iterator_content;
 	return (reply);
 }
@@ -110,7 +108,6 @@ std::string RPL_LIST(MyMsg msg, std::string name, std::string topic)
 	std::string reply;
 
 	reply = "322 \033[1;37m" + msg.GetClients()->GetClientsNickname() + " " + name + " :" + topic;
-
     return (reply);
 }
 
@@ -143,7 +140,6 @@ std::string RPL_TOPIC(MyMsg msg, std::string chan, std::string topic)
     std::string reply;
 
     reply = "332 " + msg.GetClients()->GetClientsNickname() + " " + chan + " :" + topic;
-    std::cout << "reply === " << reply << std::endl;
     return (reply);
 }
 
@@ -163,15 +159,15 @@ std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
     return (reply);
 }
 
-
-
 std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
 {
     std::string reply;
 
     reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
     return (reply);
-}std::string RPL_TIME( MyMsg msg )
+}
+
+std::string RPL_TIME( MyMsg msg )
 {
     std::string reply;
     time_t 		tmp;
@@ -208,12 +204,6 @@ std::string RPL_CHANNELMODEIS(Channels *chan)
 /*=====================================*/
 /*------------END OF REPLIES-----------*/
 /*=====================================*/
-
-
-
-
-
-
 
 
 /*=====================================*/

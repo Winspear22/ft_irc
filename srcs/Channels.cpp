@@ -157,7 +157,6 @@ void						Channels::DeleteClientsFromAllowedToInviteList( Clients *client )
 		{
 			if (client == it->first)
 			{
-				std::cout << CYAN << "Client deleted" << std::endl;
 				this->_IsAllowedToInvite.erase(client);
 				break ;
 			}
@@ -202,7 +201,6 @@ void						Channels::DeleteClientsToChannelMemberList( Clients *client )
 		{
 			if (client == it->first)
 			{
-				std::cout << YELLOW << "Client deleted" << std::endl;
 				this->_MemberOfTheChannelList.erase(client);
 				break ;
 			}
@@ -218,7 +216,6 @@ void						Channels::SendMsgToAllInChannels( MyMsg *msg, std::string msg_sent, Cl
 
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
-	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 		if (it->first->GetClientsNickname() != SentFrom->GetClientsNickname())
@@ -238,7 +235,6 @@ void						Channels::SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_
 (void)SentFrom;
 	it = this->_MemberOfTheChannelList.begin();
 	msg_sent = msg->GetPrefix() + " " + msg_sent + "\r\n";
-	std::cout << "\033[1;37m msg_sent dans broadcast === " <<  msg_sent << std::endl;
 	while (it != this->_MemberOfTheChannelList.end())
 	{
 			ret_send = send(it->first->GetClientsFd(), msg_sent.c_str(), strlen(msg_sent.c_str()), MSG_DONTWAIT);

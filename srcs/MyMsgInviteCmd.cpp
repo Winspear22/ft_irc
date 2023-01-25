@@ -39,7 +39,6 @@ void		MyMsg::InviteCmd( MyServer *IRC_Server )
 		SendMsgBackWithPrefix(*this, msg_sent);
 		prefix += " " + msg_sent;
 		prefix += "\r\n";
-		std::cout << GREEN << "To client: " << WHITE << prefix << NORMAL;
 		ret_send = send(IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsFd(), prefix.c_str(), strlen(prefix.c_str()), MSG_DONTWAIT);
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));

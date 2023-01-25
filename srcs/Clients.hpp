@@ -71,7 +71,7 @@ public:
 	int				AddClientsMode( char AddMode );
 
 private:
-    Clients(/* ARG*/);
+    Clients(void);
 	Clients( const Clients & copy );
 	Clients & operator=( const Clients & client );
 
