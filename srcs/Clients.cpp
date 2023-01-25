@@ -265,7 +265,6 @@ int			Clients::AddClientsMode( char AddMode )
 		return (FAILURE);
 	else
 		this->_Mode.push_back(AddMode);
-
 	return (SUCCESS);
 }
 

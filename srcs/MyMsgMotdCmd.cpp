@@ -6,23 +6,23 @@ int			MyMsg::MotdCmd( void )
 	std::vector<std::string> file_content;
 	std::vector<std::string>::iterator it;
 
-	if (this->GetClients()->GetFirstMOTD() == 0)
+	if (this->GetClients()->GetFirstMOTD() == 0) 
 	{
 		std::ifstream motd_file("./srcs/motd.txt");
-		if (!motd_file.good())
+		if (!motd_file.good()) 
 		{
 			msg_sent = ERR_NOMOTD(*this, 2);
 			SendMsgBackWithPrefix(*this, msg_sent);
 		}
-		else
+		else 
 		{
-			msg_sent = RPL_MOTDSTART(*this); 
+			msg_sent = RPL_MOTDSTART(*this);
 			SendMsgBackWithPrefix(*this, msg_sent);
 			while (getline(motd_file, file_tmp))
 			{ 
 				if (file_tmp.length() > 80) 
 					file_content.push_back(file_tmp.substr(0, 80).append("."));
-				else						
+				else							
 					file_content.push_back(file_tmp);
 			}
 			it = file_content.begin();
@@ -34,7 +34,7 @@ int			MyMsg::MotdCmd( void )
 			}
 		}
 		motd_file.close();
-		msg_sent = RPL_ENDOFMOTD(*this);
+		msg_sent = RPL_ENDOFMOTD(*this); 
 		this->GetClients()->SetFirstMOTD(1);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
@@ -52,9 +52,9 @@ int			MyMsg::MotdCmd( void )
 			SendMsgBackWithPrefix(*this, msg_sent);
 			while (getline(motd_file, file_tmp))
 			{ 
-				if (file_tmp.length() > 80) 
+				if (file_tmp.length() > 80)
 					file_content.push_back(file_tmp.substr(0, 80).append("."));
-				else
+				else							
 					file_content.push_back(file_tmp);
 			}
 			it = file_content.begin();
@@ -77,15 +77,15 @@ int			MyMsg::MotdCmd( void )
 			msg_sent = ERR_NOMOTD(*this, 2);
 			SendMsgBackWithPrefix(*this, msg_sent);
 		}
-		else
+		else 
 		{
-			msg_sent = RPL_MOTDSTART(*this);
+			msg_sent = RPL_MOTDSTART(*this); 
 			SendMsgBackWithPrefix(*this, msg_sent);
 			while (getline(motd_file, file_tmp))
 			{ 
-				if (file_tmp.length() > 80) 
+				if (file_tmp.length() > 80)
 					file_content.push_back(file_tmp.substr(0, 80).append("."));
-				else
+				else							
 					file_content.push_back(file_tmp);
 			}
 			it = file_content.begin();

@@ -5,7 +5,6 @@
 /*===============================================================================================================*/
 # include <iomanip>
 # include <iostream>
-- connect - listen - accept - recv - */
 # include <sys/socket.h>
 # include <netdb.h>
 # include <arpa/inet.h>

@@ -43,12 +43,12 @@ void					Channels::SetChannelMode( std::string mode )
 	this->_ChanMode = mode;
 }
 
-void				Channels::SetChannelName( std::string name )
+void					Channels::SetChannelName( std::string name )
 {
 	this->_ChannelName = name;
 }
 
-void	Channels::SetHasAChannelCreator( int status )
+void					Channels::SetHasAChannelCreator( int status )
 {
 	this->_HasAChannelCreator = status;
 }
@@ -61,12 +61,12 @@ void					Channels::SetChannelstopic( std::string topic )
 	/*-------------------------------------------*/
 	/*--------------All the Getters--------------*/
 
-int		Channels::GetHasAChannelCreator( void )
+int						Channels::GetHasAChannelCreator( void )
 {
 	return (this->_HasAChannelCreator);
 }
 
-std::string			Channels::GetChannelName( void )
+std::string				Channels::GetChannelName( void )
 {
 	return (this->_ChannelName);
 }
@@ -91,7 +91,7 @@ std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
 	return (this->_MemberOfTheChannelList);
 }
 
-Clients				*Channels::GetChannelCreator( void )
+Clients					*Channels::GetChannelCreator( void )
 {
 	return (this->_CreatedBy);
 }
@@ -192,8 +192,6 @@ void		Channels::SendMsgToAllInChannelsForTopic( MyMsg *msg, std::string msg_sent
 	}
 }
 
-
-
 int			Channels::AddChannelsMode( char AddMode )
 {
 	if (this->_ChanMode.find(AddMode) != std::string::npos)
@@ -214,29 +212,28 @@ int			Channels::DeleteChannelsMode( char DeleteMode )
 
 }
 
-void					Channels::AddClientsToAllowedToInviteList( Clients *client )
+void		Channels::AddClientsToChannelMemberList( Clients *client )
 {
 	if (client == NULL)
 		return ;
 	else
-		this->_IsAllowedToInvite.insert(std::make_pair(client, client->GetClientsFd()));
-
+		this->_MemberOfTheChannelList.insert(std::make_pair(client, client->GetClientsFd()));
 }
 
 void	Channels::DeleteClientsFromAllowedToInviteList( Clients *client )
 {
 	std::map<Clients*, int>::iterator it;
 
-	it = this->_IsAllowedToInvite.begin();
+	it = this->_MemberOfTheChannelList.begin();
 	if (client == NULL)
 		return ;
 	else
 	{
-		while (it != this->_IsAllowedToInvite.end())
+		while (it != this->_MemberOfTheChannelList.end())
 		{
 			if (client == it->first)
 			{
-				this->_IsAllowedToInvite.erase(client);
+				this->_MemberOfTheChannelList.erase(client);
 				break ;
 			}
 			it++;

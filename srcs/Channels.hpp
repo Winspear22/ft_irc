@@ -41,6 +41,7 @@ public:
 
 	int							AddChannelsMode( char AddMode );
 	int							DeleteChannelsMode( char DeleteMode );
+	void						SetHasAChannelCreator( int status );
 	void						AddClientsToAllowedToInviteList( Clients *client );
 	void						DeleteClientsFromAllowedToInviteList( Clients *client );
 
@@ -49,8 +50,8 @@ public:
 	Clients						*_CreatedBy;
 
 private:
-    Channels(/*ARG*/);
-	Channels( const Channels & copy );
+    Channels(void);
+	Channels(const Channels & copy);
 	Channels & operator=( const Channels & popo );
 
 	std::map<Clients*, int> 	_IsAllowedToInvite;
