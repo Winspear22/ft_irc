@@ -68,6 +68,7 @@ int		MyMsg::KickCmd( MyServer *IRC_Server )
 						IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 						std::cout << CYAN << "msg_sent3 == " << PURPLE << msg_sent << NORMAL << std::endl;
 						SendMsgBackWithPrefix(*this, msg_sent);
+						this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() - 1);
 						IRC_Server->GetChannelsByName(*it)->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(*it2));
 					}
 					it2++;

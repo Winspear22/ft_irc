@@ -6,7 +6,7 @@ srcs/MyMsgKickCmd.cpp srcs/MyMsgKillCmd.cpp srcs/MyMsgListCmd.cpp srcs/MyMsgMode
 srcs/MyMsgMotdCmd.cpp srcs/MyMsgNamesCmd.cpp srcs/MyMsgNickCmd.cpp srcs/MyMsgNoticeCmd.cpp \
 srcs/MyMsgOperCmd.cpp srcs/MyMsgPartCmd.cpp srcs/MyMsgPassCmd.cpp srcs/MyMsgPingCmd.cpp \
 srcs/MyMsgPrivMsgCmd.cpp srcs/MyMsgQuitCmd.cpp srcs/MyMsgTopicCmd.cpp srcs/MyMsgUserCmd.cpp \
-srcs/MyMsgVersionCmd.cpp srcs/MyMsgWallopsCmd.cpp
+srcs/MyMsgVersionCmd.cpp srcs/MyMsgWallopsCmd.cpp srcs/MyMsgTimeCmd.cpp
 
 INCLUDE= irc.hpp
 

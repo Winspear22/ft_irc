@@ -35,6 +35,7 @@ public:
 	int			UserCmd( MyServer *IRC_Server );
 	int			MotdCmd( void );
 	int			ModeCmd( MyServer *IRC_Server );
+	int			ChanModeCmd( MyServer *IRC_Server );
 	int			PingCmd( MyServer *IRC_Server );
 	int			VersionCmd( void );
 	int			QuitCmd( MyServer *IRC_Server );
@@ -53,6 +54,7 @@ public:
 	int			TopicCmd( MyServer *IRC_Server );
 	void		KillCmd( MyServer *IRC_Server );
 	void		InviteCmd( MyServer *IRC_Server );
+	int			TimeCmd( MyServer *IRC_Server );
 
 
 	int			ValidateClientsConnections( MyServer *IRC_Server );

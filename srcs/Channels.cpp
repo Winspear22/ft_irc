@@ -19,7 +19,6 @@ Channels::Channels( Clients *CreatedBy, std::string ChannelName )
 	return ;
 }
 
-
 Channels::Channels( const Channels & copy )
 {
 	std::cout << "\033[0;33mChannels Copy Constructor called." << NORMAL << std::endl;
@@ -67,6 +66,87 @@ void					Channels::SetChannelstopic( std::string topic )
 	this->_Topic = topic;
 }
 
+std::string				Channels::GetChannelMode( void )
+{
+	return (this->_ChanMode);
+}
+
+void					Channels::SetChannelMode( std::string mode )
+{
+	this->_ChanMode = mode;
+}
+
+int			Channels::DeleteChannelsMode( char DeleteMode )
+{
+	if (this->_ChanMode.find(DeleteMode) == std::string::npos)
+		return (FAILURE);
+	else
+		this->_ChanMode.erase(this->_ChanMode.find(DeleteMode), 1);
+	return (SUCCESS);
+
+}
+
+int			Channels::AddChannelsMode( char AddMode )
+{
+	if (this->_ChanMode.find(AddMode) != std::string::npos)
+		return (FAILURE);
+	else
+		this->_ChanMode.push_back(AddMode);
+
+	return (SUCCESS);
+}
+
+std::map<Clients *, int> Channels::GetAllowedToInviteList( void )
+{
+	return (this->_IsAllowedToInvite);
+}
+
+Clients					*Channels::GetClientsAllowedToInvite( std::string NickName )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_IsAllowedToInvite.begin();
+	while (it != this->_IsAllowedToInvite.end())
+	{
+		if (it->first->GetClientsNickname() == NickName)
+			return (it->first);
+		it++;
+	}
+	return (NULL);
+}
+void					Channels::AddClientsToAllowedToInviteList( Clients *client )
+{
+	if (client == NULL)
+		return ;
+	else
+		this->_IsAllowedToInvite.insert(std::make_pair(client, client->GetClientsFd()));
+
+}
+
+void	Channels::DeleteClientsFromAllowedToInviteList( Clients *client )
+{
+	std::map<Clients*, int>::iterator it;
+
+	it = this->_IsAllowedToInvite.begin();
+	if (client == NULL)
+		return ;
+	else
+	{
+		while (it != this->_IsAllowedToInvite.end())
+		{
+			if (client == it->first)
+			{
+				std::cout << CYAN << "Client deleted" << std::endl;
+				this->_IsAllowedToInvite.erase(client);
+				break ;
+			}
+			it++;
+		}	
+	}
+}
+
+
+
 Clients		*Channels::GetClientsInChannelMemberList( std::string NickName )
 {
 	std::map<Clients*, int>::iterator it;
@@ -85,19 +165,6 @@ std::map<Clients*, int> Channels::GetAllClientsInChannelMemberList( void )
 {
 	return (this->_MemberOfTheChannelList);
 }
-
-
-/*std::map<Clients*, int> Channels::GetAllClientsNotInAnyChannels( void )
-{
-	std::map<Clients*, int>::iterator members;
-	
-	members = this->_MemberOfTheChannelList.begin();
-	while ()
-
-
-	return (NULL);
-}*/
-
 
 void		Channels::AddClientsToChannelMemberList( Clients *client )
 {

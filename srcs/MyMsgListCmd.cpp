@@ -11,8 +11,6 @@ int		MyMsg::ListCmd( MyServer *IRC_Server )
 	std::vector<std::string>::iterator 			it2;
 	Channels									*chan;
 	std::string									name_chan;
-	std::string									nb_members;
-	size_t										nb_memberss;
 
 	if (this->Params.empty())
 	{
@@ -21,11 +19,7 @@ int		MyMsg::ListCmd( MyServer *IRC_Server )
 		{
 			chan = it1->first;
 			name_chan = chan->GetChannelName();
-			nb_memberss = chan->GetAllClientsInChannelMemberList().size();
-			std::ostringstream convert;
-			convert << nb_memberss;
-			nb_members = convert.str();
-			msg_sent = RPL_LIST(*this, name_chan, nb_members);
+			msg_sent = RPL_LIST(*this, name_chan, it1->first->GetChannelstopic());
 			SendMsgBackToClients(*this, msg_sent);
 			it1++;
 		}
@@ -41,11 +35,7 @@ int		MyMsg::ListCmd( MyServer *IRC_Server )
 			if (IRC_Server->GetChannelsByName(*it2) != NULL)
 			{
 				name_chan = *it2;
-				nb_memberss = IRC_Server->GetChannelsByName(*it2)->GetAllClientsInChannelMemberList().size();
-				std::ostringstream convert;
-				convert << nb_memberss;
-				nb_members = convert.str();
-				msg_sent = RPL_LIST(*this, name_chan, nb_members);
+				msg_sent = RPL_LIST(*this, name_chan, IRC_Server->GetChannelsByName(*it2)->GetChannelstopic());
 				SendMsgBackToClients(*this, msg_sent);
 			}
 			it2++;

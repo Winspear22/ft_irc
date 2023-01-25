@@ -47,13 +47,13 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;
 		it_chan = IRC_Server->channels_list.begin();
-		it_client = IRC_Server->_clients_list.begin();
+		it_client = IRC_Server->clients_list.begin();
 		while (it_chan != IRC_Server->channels_list.end())
 		{
 			it_chan->first->DeleteClientsToChannelMemberList(IRC_Server->GetClientsThroughName(this->Params.at(0)));
 			it_chan++;
 		}
-		while (it_client != IRC_Server->_clients_list.end())
+		while (it_client != IRC_Server->clients_list.end())
 		{
 			if (it_client->first->GetClientsNickname() != this->Params.at(0))
 			{

@@ -24,10 +24,10 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 			tmp = this->_Message.substr(ping_pos);
 		msg_sent = this->Prefix + " WALLOPS " + tmp;
 		std::map<Clients*, int>::iterator it;
-		it = IRC_Server->_clients_list.begin();
+		it = IRC_Server->clients_list.begin();
 		int ret_send;
 		msg_sent += "\r\n";
-		while (it != IRC_Server->_clients_list.end())
+		while (it != IRC_Server->clients_list.end())
 		{
 			if (it->first->GetClientsMode().find('w') != std::string::npos)
 			{

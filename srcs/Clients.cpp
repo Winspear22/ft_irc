@@ -27,6 +27,7 @@ Clients::Clients( int ClientFd, struct sockaddr_in New_Address, std::string Serv
 	this->_HostAdress = inet_ntoa(New_Address.sin_addr);
 	this->_LastPing = time(0);
 	this->_FirstMOTD = 0;
+	this->_ChanLim = 0;
 	ret = getnameinfo(((struct sockaddr *)&New_Address), sizeof(New_Address), hostname, NI_MAXHOST, NULL, 0, 0);
 	if (ret == SUCCESS)
 		this->_Hostname = hostname;
@@ -225,6 +226,16 @@ void		Clients::SetClientsLastPing( time_t ping )
 	this->_LastPing = ping;
 }
 
+int			Clients::GetChanLim( void )
+{
+	return (this->_ChanLim);
+}
+
+void		Clients::SetChanLim( int ChanLim )
+{
+	this->_ChanLim = ChanLim;
+}
+
 int			Clients::DeleteClientsMode( char DeleteMode )
 {
 
@@ -239,13 +250,10 @@ int			Clients::DeleteClientsMode( char DeleteMode )
 int			Clients::AddClientsMode( char AddMode )
 {
 	if (this->_Mode.find(AddMode) != std::string::npos)
-	{
 		return (FAILURE);
-	}
 	else
-	{
 		this->_Mode.push_back(AddMode);
-	}
+
 	return (SUCCESS);
 }
 

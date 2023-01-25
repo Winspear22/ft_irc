@@ -51,6 +51,7 @@ int		MyMsg::PartCmd( MyServer *IRC_Server )
 				else
 					msg_sent = "PART " + *it + " " + this->GetClients()->GetClientsNickname() + "\r\n";
 				IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this,msg_sent,this->_SentFrom);
+				this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() - 1);
 				SendMsgBackWithPrefix(*this, msg_sent);
 			}
 			it++;

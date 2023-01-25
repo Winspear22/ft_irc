@@ -28,6 +28,15 @@ public:
 
 	int						GetHasAChannelCreator( void );
 	void					SetHasAChannelCreator( int status );
+	std::string				GetChannelMode( void );
+	void					SetChannelMode( std::string mode );
+	int						DeleteChannelsMode( char DeleteMode );
+	int						AddChannelsMode( char AddMode );
+	std::map<Clients *, int> GetAllowedToInviteList( void );
+	Clients					*GetClientsAllowedToInvite( std::string name );
+	void					AddClientsToAllowedToInviteList( Clients *client );
+	void					DeleteClientsFromAllowedToInviteList( Clients *client );
+
 
 
 	std::map<Clients*, int> _MemberOfTheChannelList;
@@ -39,8 +48,10 @@ private:
 	Channels( const Channels & copy );
 	Channels & operator=( const Channels & popo );
 
+	std::map<Clients*, int> _IsAllowedToInvite;
 	int						_HasAChannelCreator;
 	std::string				_Topic;
+	std::string				_ChanMode;
 
 };
 

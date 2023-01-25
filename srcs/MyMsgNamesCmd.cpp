@@ -43,11 +43,11 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 		std::map<Clients *, int>::iterator EntireClientsList;
 		std::map<Clients*, int> ClientsNotInAnyChannel;
 		std::map<Clients*, int>::iterator it_ClientsNoyInAnyChannel;
-		EntireClientsList = IRC_Server->_clients_list.begin();
+		EntireClientsList = IRC_Server->clients_list.begin();
 		it = chans.begin();
 		if (it == chans.end())
 		{
-			while (EntireClientsList != IRC_Server->_clients_list.end())
+			while (EntireClientsList != IRC_Server->clients_list.end())
 			{
 				if (EntireClientsList->first->GetClientsMode().find('i') == std::string::npos)
 					ClientsNotInAnyChannel.insert(std::make_pair(EntireClientsList->first, EntireClientsList->second));
@@ -56,7 +56,7 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 		}
 		else
 		{
-			while (EntireClientsList != IRC_Server->_clients_list.end())
+			while (EntireClientsList != IRC_Server->clients_list.end())
 			{
 				it = chans.begin();
 				while (it != chans.end())
