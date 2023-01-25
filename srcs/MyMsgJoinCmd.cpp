@@ -57,7 +57,6 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 			{
 				msg_sent = ERR_TOOMANYCHANNELS(*this, *it);
 				SendMsgBackWithPrefix(*this, msg_sent);
-				break ;
 			}
 			it++;
 		}

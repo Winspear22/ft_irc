@@ -172,7 +172,10 @@ int			MyServer::BindSocketFd( void )
 
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
+	{
+		close(this->_socketfd);
 		return (ERROR_SOCKET_BINDING);
+	}
 	return (SUCCESS);
 }
 
