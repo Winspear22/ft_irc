@@ -14,7 +14,6 @@ class MyMsg
 public:
     MyMsg( Clients  *popo, std::string lolo );
 	MyMsg( const MyMsg & copy );
-	MyMsg & operator=( const MyMsg & popo );
 	~MyMsg( void );
 
 	/*===========================================*/
@@ -72,8 +71,7 @@ public:
 
 	int			ValidateClientsConnections( MyServer *IRC_Server );
 
-	bool		parse_msg(void);
-	bool 		Check_command(std::string str);
+	bool		ParseCmdInMyMsg( MyServer *IRC_Server );
 	void 		SetParams2(std::vector<std::string> params);
 
 	std::string					Prefix;
@@ -81,6 +79,8 @@ public:
 	std::vector<std::string>	Params;
 private:
     MyMsg();
+
+	MyMsg & operator=( const MyMsg & popo );
 
 	std::string 				_Message;
 	Clients						*_SentFrom;

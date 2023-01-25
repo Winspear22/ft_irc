@@ -143,6 +143,11 @@ int			MyServer::GetCurrentClientsNb( void )
 	return (this->_nb_of_clients);
 }
 
+std::vector<std::string> MyServer::GetCmdList( void )
+{
+	return (this->_cmd_list);
+}
+
 /*-----------------------------------------------------------END OF GETTERS ---------------------------------------------*/
 
 int			MyServer::CreateSocketFd( void )
@@ -247,7 +252,7 @@ int			MyServer::DeleteAFKClients( void )
 		{
 			it->first->SetClientsConnectionStatus(NO);
 			MyMsg msg(it->first, "QUIT :Client disconnected.");
-			msg.parse_msg();
+			msg.ParseCmdInMyMsg(this);
 			msg.QuitCmd(this);
 			it = this->clients_list.begin();
 			if (it == this->clients_list.end())
@@ -377,7 +382,10 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 				this->new_msg->SetCmdExistence(CMD_EXISTS);
 			}
 			else
+			{
+				std::cout << RED << "Error. The command format you wrote is wrong. You only letters commands or three numbers." << std::endl;
 				this->new_msg->SetCmdExistence(CMD_DOESNT_EXIST);
+			}
 			while (str != tab_parse.end())
 			{
 				this->new_msg->SetParams(*str);

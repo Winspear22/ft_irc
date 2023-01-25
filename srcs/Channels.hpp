@@ -41,7 +41,6 @@ public:
 
 	int							AddChannelsMode( char AddMode );
 	int							DeleteChannelsMode( char DeleteMode );
-	void						SetHasAChannelCreator( int status );
 	void						AddClientsToAllowedToInviteList( Clients *client );
 	void						DeleteClientsFromAllowedToInviteList( Clients *client );
 

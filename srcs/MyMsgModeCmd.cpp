@@ -9,7 +9,7 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 	std::string msg_sent;
 	i = 0;
 
-	if (this->Params.size() == 1)
+	if (this->Params.size() == 1 && IRC_Server->GetChannelsByName(this->Params.at(0)) != NULL)
 	{
 		if (this->Params.at(0) == IRC_Server->GetChannelsByName(this->Params.at(0))->GetChannelName())
 		{
@@ -17,11 +17,13 @@ int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 			SendMsgBackWithPrefix(*this, msg_sent);
 		}
 	}
-	else if (this->Params.size() < 3)
+	else if (this->Params.size() < 2)
 	{
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
+	else if (IRC_Server->GetChannelsByName(this->Params.at(0)) == NULL || IRC_Server->GetClientsThroughName(this->Params.at(2)) == NULL)
+		return (FAILURE);
 	else if (this->Params.at(2) != IRC_Server->GetClientsThroughName(this->Params.at(2))->GetClientsNickname())
 	{
 		msg_sent = ERR_USERNOTINCHANNEL(IRC_Server->GetClientsThroughName(this->Params.at(2))->GetClientsNickname(), IRC_Server->GetChannelsByName(this->Params.at(0))->GetChannelName());
@@ -114,7 +116,7 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
 	else if (ret_find_first_of == 0)
-		this->ChanModeCmd(IRC_Server);
+		return (FAILURE);
 	else if (this->Params.at(0) != this->_SentFrom->GetClientsNickname())
 	{
 		msg_sent = ERR_USERSDONTMATCH(*this);
@@ -167,7 +169,6 @@ int			MyMsg::ModeCmd( MyServer *IRC_Server )
 		msg_sent = RPL_UMODEIS(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-
 	(void)IRC_Server;
 	return (SUCCESS);
 }

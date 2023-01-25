@@ -39,7 +39,7 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		IRC_Server->SetUnavailableNickname(this->Params.at(0));
 		
 		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT killed by " + this->_SentFrom->GetClientsNickname());
-		msg.parse_msg();
+		msg.ParseCmdInMyMsg(IRC_Server);
 		msg.QuitCmd(IRC_Server);
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;

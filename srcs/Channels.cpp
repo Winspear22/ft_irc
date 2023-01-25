@@ -212,12 +212,12 @@ int			Channels::DeleteChannelsMode( char DeleteMode )
 
 }
 
-void		Channels::AddClientsToChannelMemberList( Clients *client )
+void					Channels::AddClientsToAllowedToInviteList( Clients *client )
 {
 	if (client == NULL)
 		return ;
 	else
-		this->_MemberOfTheChannelList.insert(std::make_pair(client, client->GetClientsFd()));
+		this->_IsAllowedToInvite.insert(std::make_pair(client, client->GetClientsFd()));
 }
 
 void	Channels::DeleteClientsFromAllowedToInviteList( Clients *client )

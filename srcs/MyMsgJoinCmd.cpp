@@ -35,7 +35,7 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 					SendMsgBackWithPrefix(*this, msg_sent);
 					chan->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 					MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
-					UseOfNamesCmd.parse_msg();
+					UseOfNamesCmd.ParseCmdInMyMsg(IRC_Server);
 					this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() + 1);
 					NamesCmd(IRC_Server, UseOfNamesCmd);
 				}
@@ -46,7 +46,7 @@ int		MyMsg::JoinCmd( MyServer *IRC_Server )
 					SendMsgBackWithPrefix(*this, msg_sent);
 					IRC_Server->GetChannelsByName(*it)->SendMsgToAllInChannels(this, msg_sent, this->_SentFrom);
 					MyMsg UseOfNamesCmd(this->_SentFrom, "NAMES " + *it);
-					UseOfNamesCmd.parse_msg();
+					UseOfNamesCmd.ParseCmdInMyMsg(IRC_Server);
 					this->GetClients()->SetChanLim(this->GetClients()->GetChanLim() + 1);
 					NamesCmd(IRC_Server, UseOfNamesCmd);
 					msg_sent = RPL_TOPIC(*this, *it, IRC_Server->GetChannelsByName(*it)->GetChannelstopic());

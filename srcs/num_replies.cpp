@@ -42,6 +42,7 @@ std::string RPL_MYINFO(MyMsg msg)
     std::string reply;
 
     reply = "004 " + msg.GetClients()->GetClientsNickname() + " " + ": \033[1;36m" + msg.GetClients()->GetServerName() + " \033[1;32mv1\033[0m";
+    reply += " Modes accessible : \033[1;35mi, w, o\033[0m";
     return (reply);
 }
 
