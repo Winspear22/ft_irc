@@ -31,18 +31,59 @@ MyMsg & MyMsg::operator=( MyMsg const & rhs )
 	return (*this);
 }
 
-
 MyMsg::~MyMsg( void )
 {
 	return ;
 }
 
-std::string MyMsg::GetMsg( void )
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
+
+void 					MyMsg::SetPrefix( std::string Prefix)
+{
+	this->Prefix = Prefix;
+}
+
+void 					MyMsg::SetCmd( std::string Cmd )
+{
+	this->Command = toupper_striing( Cmd );
+}
+
+void					MyMsg::SetCmdExistence( int CmdStatus )
+{
+	this->_DoesCmdExist = CmdStatus;
+}
+
+void 					MyMsg::SetParams( std::string Params )
+{
+	this->Params.push_back(Params);
+}
+
+void 					MyMsg::SetParams2(std::vector<std::string> params)
+{
+	this->Params = params;
+}
+
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
+
+std::string 			MyMsg::GetMsg( void )
 {
 	return (this->_Message);
 }
 
-std::string MyMsg::GetPrefix( void )
+std::string				 MyMsg::GetCmd( void )
+{
+	return (this->Command);
+}
+
+Clients					*MyMsg::GetClients( void )
+{
+	return (this->_SentFrom);
+}
+
+std::string 			MyMsg::GetPrefix( void )
 {
 	std::string tmp = "";
 
@@ -62,22 +103,15 @@ std::string MyMsg::GetPrefix( void )
 	return (this->Prefix);
 }
 
-std::string MyMsg::GetCmd( void )
+int						MyMsg::GetCmdExistence( void )
 {
-	return (this->Command);
+	return (this->_DoesCmdExist);
 }
 
-Clients	*MyMsg::GetClients( void )
-{
-	return (this->_SentFrom);
-}
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-void MyMsg::SetPrefix( std::string Prefix)
-{
-	this->Prefix = Prefix;
-}
-
-std::string toupper_striing( std::string cmd )
+std::string 			toupper_striing( std::string cmd )
 {
 	int i;
 	std::string capitalized_str;
@@ -88,29 +122,7 @@ std::string toupper_striing( std::string cmd )
 	return (capitalized_str);
 }
 
-void MyMsg::SetCmd( std::string Cmd )
-{
-	this->Command = toupper_striing( Cmd );
-}
-
-int	MyMsg::GetCmdExistence( void )
-{
-	return (this->_DoesCmdExist);
-}
-
-void	MyMsg::SetCmdExistence( int CmdStatus )
-{
-	this->_DoesCmdExist = CmdStatus;
-}
-
-void MyMsg::SetParams( std::string Params )
-{
-	this->Params.push_back(Params);
-}
-
-
-/*verifier la pertinence de cette fct par rapport au RFC car il y'a un bail avec la grammaire des commandes : 1 chifres et 3 lettres*/
-int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
+int						MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector<std::string> cmd_list )
 {
 	std::vector<std::string>::iterator 	it;
 	int									i;
@@ -141,7 +153,7 @@ int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector
 	return (SUCCESS);
 }
 
-int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
+int						MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 {
 	std::string intro_new_nick;
 
@@ -156,12 +168,11 @@ int		MyMsg::ValidateClientsConnections( MyServer *IRC_Server )
 	intro_new_nick = "\033[1;35mIntroducing new nick \033[1;37m" + this->_SentFrom->_Nickname + "\033[0m";
 	SendMsgBackWithPrefix(*this, intro_new_nick);
 	this->MotdCmd();
-	//IRC_Server->SetCurrentClientsNb(IRC_Server->GetCurrentClientsNb() + 1);
 	std::cout << CYAN << "Client currently connected : " << IRC_Server->GetCurrentClientsNb()  << std::endl;
 	return (SUCCESS);
 }
 
-bool MyMsg::Check_command(std::string str)
+bool 					MyMsg::Check_command(std::string str)
 {
 	if (str.size() == 0)
 		return false;
@@ -182,13 +193,7 @@ bool MyMsg::Check_command(std::string str)
 	return true;
 }
 
-
-void MyMsg::SetParams2(std::vector<std::string> params)
-{
-	this->Params = params;
-}
-
-bool	MyMsg::parse_msg(void)
+bool					MyMsg::parse_msg(void)
 {
 	const char *delim = " ";
 	char*	tmp = strdup(this->_Message.c_str());

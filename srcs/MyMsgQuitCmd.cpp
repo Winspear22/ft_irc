@@ -8,14 +8,14 @@ int			MyMsg::QuitCmd( MyServer *IRC_Server )
 	int											fd;
 
 	fd = this->_SentFrom->GetClientsFd();
-	msg_sent = "QUIT"; //message renvoyé selon le RFC modern.ircdocs.horse
+	msg_sent = "QUIT";
 	i = -1;
 	if (this->Params.empty())
-		msg_sent = msg_sent +  " " + ":Client quit";  //message renvoyé selon si le Client n'a pas spécifié de raison
+		msg_sent = msg_sent +  " " + ":Client quit";
 	if (this->Params.size() >= 1)
 	{
 		while (++i < this->Params.size())
-			msg_sent = msg_sent + " " + this->Params[i]; // message renvoyé si le client a spécifié une raison
+			msg_sent = msg_sent + " " + this->Params[i];
 	}
 	it = IRC_Server->channels_list.begin();
 	while (it != IRC_Server->channels_list.end())

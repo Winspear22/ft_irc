@@ -24,7 +24,6 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 	}
 	else
 	{
-		// KILL PART
 		msg_sent = ":" + this->Params.at(0) + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsHostname() + " ";
 		msg_sent += "KILL " + this->Params.at(0);
 		if (this->Params.size() > 1)
@@ -38,12 +37,9 @@ void		MyMsg::KillCmd( MyServer *IRC_Server )
 		if (ret_send == ERROR_SERVER)
 			return (loop_errors_handlers_msg(ERROR_SEND));
 		IRC_Server->SetUnavailableNickname(this->Params.at(0));
-		
-		// QUIT PART
 		MyMsg msg(IRC_Server->GetClientsThroughName(this->Params.at(0)), "QUIT killed by " + this->_SentFrom->GetClientsNickname());
 		msg.parse_msg();
 		msg.QuitCmd(IRC_Server);
-		// TO DO //Mettre a jour la liste des users dans les chans qui ont vu un client se faire kill
 		std::map<Channels*, std::string>::iterator it_chan;
 		std::map<Clients*, int>::iterator it_client;
 		it_chan = IRC_Server->channels_list.begin();

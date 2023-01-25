@@ -38,11 +38,10 @@ int		check_serveur_creation(MyServer & Irc_Serveur)
 		return (errors_handlers_msg(ERROR_SOCKET_BINDING));
 	if (Irc_Serveur.ListenToSockedFd() == ERROR_LISTENING)
 		return (errors_handlers_msg(ERROR_LISTENING));
-	if (Irc_Serveur.SetSocketFdToNonBlocking(Irc_Serveur.GetSocketFd()) == ERROR_NONBLOCKING)
-		return (errors_handlers_msg(ERROR_NONBLOCKING));
+	//if (Irc_Serveur.SetSocketFdToNonBlocking(Irc_Serveur.GetSocketFd()) == ERROR_NONBLOCKING)
+	//	return (errors_handlers_msg(ERROR_NONBLOCKING));
 	return (SUCCESS);
 }
-
 
 void	WelcomeOnTheServer( void )
 {
@@ -59,7 +58,6 @@ void	WelcomeOnTheServer( void )
 	std::cout << BLUE << "Naben-za" << NORMAL << std::endl;
 	std::cout << YELLOW "Adaloui" << NORMAL << std::endl;
 }
-
 
 int main(int argc, char **argv)
 {

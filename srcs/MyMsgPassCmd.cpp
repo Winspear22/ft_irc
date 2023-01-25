@@ -1,16 +1,11 @@
 # include "num_replies.hpp"
 
-/*LA COMMANDE PASS QUI VERIFIE LA VERACITE DU PASS*/
-/*ON CHECK EN PREMIER SI LE PASS EST VIDE
-EN SECOND SI LE PASS EST MAUVAIS
-EN TROISIEME SI LE PASSE A DEJA ETE RENSEIGNE
-ET ENFIN ON VALIDE SI TOUT VA BIEN*/
 int		MyMsg::PassCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 	std::vector<std::string>::iterator it;
 	it = this->Params.begin();
-	if (this->Params.empty()) // Pas sûr de la deuxième condition
+	if (this->Params.empty())
 	{
 		msg_sent = ERR_NEEDMOREPARAMS(*this);
 		this->_SentFrom->SetClientsConnectionAuthorisation(YES);

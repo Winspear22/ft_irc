@@ -1,7 +1,6 @@
 # include "num_replies.hpp"
 
 int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
-//int	MyMsg::NickFormatCheck( std::string nickcheck )
 {
 	unsigned int 	i;
 	int 			j;
@@ -11,7 +10,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 	i = 1;
 	j = -1;
 	not_a_special_character = 0;
-	while (special_characters[++j]) // Je check si le premier est un character spé
+	while (special_characters[++j])
 	{
 		if (nickcheck->at(0) != special_characters[j])
 		{
@@ -27,7 +26,7 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 		return (FAILURE);
 	
 	not_a_special_character = 0;
-	while (i < nickcheck->size()) // je check si les 8 autres caractères sont autre choses qu'un alphanum + spé
+	while (i < nickcheck->size())
 	{
 		j = -1;
 		while (special_characters[++j])
@@ -47,7 +46,6 @@ int	MyMsg::NickFormatCheck( std::vector<std::string>::iterator nickcheck )
 	return (SUCCESS);
 }
 
-/*LA COMMANDE NICK QUI INITIALISE LE NICNAME*/
 int	MyMsg::NickCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
@@ -58,22 +56,22 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 	nick_format_check = this->Params.begin();
 	
 
-	if (this->Params.empty()) // Est-ce que rien n'a été mis --> NICK ""
+	if (this->Params.empty()) 
 	{
 		msg_sent = ERR_NONICKNAMEGIVEN();
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (this->Params.size() > 1) // Est-ce que plrs params ont été mis --> NICK popo lolo
+	else if (this->Params.size() > 1) 
 	{
 		msg_sent = ERR_NONICKNAMEGIVEN();
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (it->size() > 9 || it->size() == 0) // La taille du NICK est plus grand que 9 ou vide --> NICK lolololololo OU NICK ""
+	else if (it->size() > 9 || it->size() == 0) 
 	{
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (this->NickFormatCheck(nick_format_check) == FAILURE) // Format illégal du NICK --> NICK 1popo 
+	else if (this->NickFormatCheck(nick_format_check) == FAILURE)  
 	{
 		msg_sent = ERR_ERRONEUSNICKNAME(*this);
 		SendMsgBackWithPrefix(*this, msg_sent);
@@ -83,16 +81,16 @@ int	MyMsg::NickCmd( MyServer *IRC_Server )
 		msg_sent = ERR_UNAVAILRESOURCE(*it);
 		SendMsgBackToClients(*this, msg_sent);
 	}
-	else if (IRC_Server->GetClientsThroughName(*it) != NULL) // Verifier si le pseudo existe ou non --> NICK user42 NICK user42
+	else if (IRC_Server->GetClientsThroughName(*it) != NULL) 
 	{
 		msg_sent = ERR_NICKNAMEINUSE(*this, it);
 		SendMsgBackWithPrefix(*this, msg_sent);
 	}
-	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() == 0) // Tout va bien, alors je peux remplir le Nickname
+	else if (IRC_Server->GetClientsThroughName(*it) == NULL  && this->NickFormatCheck(nick_format_check) == SUCCESS && this->_SentFrom->_Nickname.size() == 0) 
 	{
 		this->_SentFrom->SetClientsNickname(*it);
 		msg_sent = "NICK ";
-		msg_sent = msg_sent + *it; // Ne pas oublier le \n pour signifier la fin du retour de cmd.
+		msg_sent = msg_sent + *it; 
 		SendMsgBackWithPrefix(*this, msg_sent);
 		this->_SentFrom->SetClientsConnectionNickCmd(YES);
 		if (this->_SentFrom->GetClientsConnectionUserCmd() == YES && this->_SentFrom->GetClientsConnectionNickCmd() == YES && this->_SentFrom->GetClientsConnectionAuthorisation() == YES \

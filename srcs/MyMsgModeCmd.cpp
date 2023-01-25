@@ -1,6 +1,5 @@
 # include "num_replies.hpp"
 
-
 int			MyMsg::ChanModeCmd( MyServer *IRC_Server )
 {
 	unsigned int i;

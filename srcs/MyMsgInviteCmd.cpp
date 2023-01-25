@@ -35,7 +35,6 @@ void		MyMsg::InviteCmd( MyServer *IRC_Server )
 	else
 	{
 		prefix = ":" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsNickname() + "!" + IRC_Server->GetClientsThroughName(this->Params.at(0))->GetClientsUsername() + "@" + IRC_Server->GetClientsThroughName(this->Params.at(0))->_Hostname;
-		//msg_sent = ":" + this->_SentFrom->_ServerName;
 		msg_sent = RPL_INVITING(*this, this->Params.at(1), this->Params.at(0));
 		SendMsgBackWithPrefix(*this, msg_sent);
 		prefix += " " + msg_sent;

@@ -85,7 +85,7 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 	else
 	{
 		char *tmp = strdup(msg.Params[0].c_str());
-		std::vector<std::string> channels = IRC_Server->SplitByEndline(tmp, ","); //changer ici vector->list
+		std::vector<std::string> channels = IRC_Server->SplitByEndline(tmp, ",");
 		std::vector<std::string>::iterator it = channels.begin();
 		free(tmp);
 		while (it != channels.end())
@@ -105,7 +105,7 @@ int			MyMsg::NamesCmd( MyServer *IRC_Server, MyMsg &msg )
 						{
 							if (IRC_Server->GetChannelsByName(*it)->GetChannelCreator() != NULL)
 							{
-								if (it2->first == IRC_Server->GetChannelsByName(*it)->GetChannelCreator()) //changer ici + fd
+								if (it2->first == IRC_Server->GetChannelsByName(*it)->GetChannelCreator())
 									msg_sent += "@";
 								msg_sent += it2->first->GetClientsNickname() + " ";
 							}

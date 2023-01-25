@@ -49,9 +49,6 @@ int errors_handlers_msg( int error_code )
 
 }
 
-/*DANS LE WHILE, POUR EVITER D'AVOIR DES RETURN QUI FONT SORTIR DE LA BOUCLE
-IL FAUR AVOIR DES FONCTIONS VOID POUR PAS AVOIR DE RETURN FAILURE QUI VONT NOUS
-SORTIR DE LA BOUCLE*/
 void loop_errors_handlers_msg( int error_code )
 {
 	if (error_code == ERROR_ACCEPT)
@@ -67,6 +64,4 @@ void loop_errors_handlers_msg( int error_code )
 
 return ;
 (void)error_code;
-//	if (error_code == TIMEOUT)
-//		std::cerr << RED << "Error." << WHITE << " Select(); " << RED << "has timeout and exceeded the 2 minutes delay."<< NORMAL << std::endl;
 }

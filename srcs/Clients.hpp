@@ -10,96 +10,92 @@ public:
 	Clients( int ClientFd, struct sockaddr_in _New_Address, std::string ServerName );
 	~Clients( void );
 
-	int			GetClientsFd( void );
-	std::string	GetServerName( void );
-	void		SetServerName( std::string ServerName);
-	std::string	GetClientsUsername( void );
-	void		SetClientsUsername( std::string username );
-	std::string	GetClientsMode( void );
-	void		SetClientsMode( std::string Mode );
-	std::string	GetClientsUnused( void );
-	void		SetClientsUnused( std::string Unused );
-	std::string	GetClientsRealname( void );
-	void		SetClientsRealname( std::string realname );
-	std::string	GetClientsNickname( void );
-	void		SetClientsNickname( std::string nickname );
-	std::string GetClientsHostname( void );
-	void		SetClientsHostname( std::string hostname );
-	std::string GetClientsHostAdress( void );
-	void		SetClientsHostAdress( std::string hostAdress );
-	int			GetClientsConnectionPermission( void );
-	void		SetClientsConnectionPermission( int PermissionStatus );
-	int			GetClientsConnectionAuthorisation( void );
-	void		SetClientsConnectionAuthorisation( int PermissionStatus );
-	int			GetClientsConnectionNickCmd( void );
-	void		SetClientsConnectionNickCmd( int PermissionStatus );
-	int			GetClientsConnectionUserCmd( void );
-	void		SetClientsConnectionUserCmd( int PermissionStatus );
-	std::string	GetClientsBuffer( void );
-	void		SetClientsBuffer( std::string );
-	int			GetClientsConnectionStatus( void );
-	void		SetClientsConnectionStatus( int status );
-	time_t		GetClientsLastPing( void );
-	void		SetClientsLastPing( time_t ping);
-	int			GetFirstMOTD( void );
-	void		SetFirstMOTD( int motd );
-	int			GetChanLim( void );
-	void		SetChanLim( int ChanLim );
+	void			resetTime(void);
+	std::string		_Nickname;
+	std::string		_Hostname;
+	std::string		_HostAdress;
+	std::string		_ServerName;
 
+	/*===========================================*/
+	/*             GETTERS AND SETTERS           */
+	/*--------------All the Setters--------------*/
 
+	void			SetFirstMOTD( int motd );
+	void			SetChanLim( int ChanLim );
+	void			SetClientsLastPing( time_t ping);
+	void			SetClientsMode( std::string Mode );
+	void			SetClientsBuffer( std::string buff);
+	void			SetClientsUnused( std::string Unused );
+	void			SetServerName( std::string ServerName);
+	void			SetClientsConnectionStatus( int status );
+	void			SetClientsMessage( std::string msg_recv );
+	void			SetClientsRealname( std::string realname );
+	void			SetClientsNickname( std::string nickname );
+	void			SetClientsHostname( std::string hostname );
+	void			SetClientsUsername( std::string username );
+	void			SetClientsHostAdress( std::string hostAdress );
+	void			SetClientsConnectionPermission( int PermissionStatus );
+	void			SetClientsConnectionAuthorisation( int PermissionStatus );
+	void			SetClientsConnectionNickCmd( int PermissionStatus );
+	void			SetClientsConnectionUserCmd( int PermissionStatus );
 
+	/*-------------------------------------------*/
+	/*--------------All the Getters--------------*/
 
-	std::string GetClientsMessage( void );
-	void		SetClientsMessage( std::string msg_recv );
-	int			DeleteClientsMode( char DeleteMode );
-	int			AddClientsMode( char AddMode );
+	int				GetChanLim( void );
+	int				GetFirstMOTD( void );
+	int				GetClientsFd( void );
+	int				GetClientsConnectionStatus( void );
+	int				GetClientsConnectionNickCmd( void );
+	int				GetClientsConnectionUserCmd( void );
+	int				GetClientsConnectionPermission( void );
+	int				GetClientsConnectionAuthorisation( void );
 
-/*A SUPPRIMER A LA FIN DU TEST*/
+	time_t			GetClientsLastPing( void );
 
-void	resetTime(void);
-std::string	_Nickname;
-std::string _Hostname;
-	std::string	_HostAdress;
-std::string _ServerName;
+	std::string		GetServerName( void );
+	std::string		GetClientsMode( void );
+	std::string		GetClientsUnused( void );
+	std::string 	GetClientsMessage( void );
+	std::string		GetClientsBuffer( void );
+	std::string		GetClientsRealname( void );
+	std::string		GetClientsNickname( void );
+	std::string 	GetClientsHostname( void );
+	std::string		GetClientsUsername( void );
+	std::string 	GetClientsHostAdress( void );
 
-/*========================*/
+	/*-------------------------------------------*/
+	/*===========================================*/
 
-
+	int				DeleteClientsMode( char DeleteMode );
+	int				AddClientsMode( char AddMode );
 
 private:
     Clients(/* ARG*/);
 	Clients( const Clients & copy );
 	Clients & operator=( const Clients & client );
-	int 		_ClientFd;
-	sockaddr_in _New_Address;
-//	std::string _ServerName;
-	std::string _Buffer;
 
-	/*Clients Identity*/
-	std::string	_Username;
-	std::string _Mode; // Sert à la commande MODE, il y'a 2 modes --> à voir plus tard lors de la prgmtion de MODE
-	std::string	_Unused; // ce paramètre n'est pas utilisé par les clients selon RFC
-	std::string _Realname;
-	//std::string	_Nickname;
-	//std::string _Hostname;
-	//std::string	_HostAdress;
-	time_t		_LastPing;
+	int				_ChanLim;
+	int 			_ClientFd;
+	int				_FirstMOTD;
+	int				_ConnectionStatus;
 
-	/*On utilise les deux derniers booléens car Nick et User peuvent être faits dans des ordres différents*/
-	/*Autrement : Authorisation + NICK + USER = Permission */
-	bool		_HasTheClientsBeenAccepted;   // Authorisation gbl pour Nick/User/Pass pour valider entièrement un user
-	bool		_HasTheClientsBeenAuthorized; // Authorisation pour le PWD
-	bool		_HasTheClientsNickBeenChosen; // Authorisation pour le Nick - NICK a bien fonctionné
-	bool		_HasTheClientsUserBeenChosen; // Authorisation pour le User - USER a bien fonctionné
-	int			_ConnectionStatus;
-	/*Clients Message*/
-	std::string	_ClientMessage;
-	int			_FirstMOTD;
-	int			_ChanLim;
+	time_t			_last_com;
+	time_t			_LastPing;
+	sockaddr_in 	_New_Address;
+
+	std::string 	_Mode; 
+	std::string 	_Buffer;
+	std::string		_Unused;
+	std::string		_Username;
+	std::string 	_Realname;
+	std::string		_ClientMessage;
+
+	bool			_HasTheClientsBeenAccepted;   
+	bool			_HasTheClientsBeenAuthorized; 
+	bool			_HasTheClientsNickBeenChosen; 
+	bool			_HasTheClientsUserBeenChosen; 
 	
-	/*A supprimer à la fin du test*/
-	time_t	_last_com;
-
-
 };
+
 # endif

@@ -5,7 +5,6 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 {
 	std::string msg_sent;
 
-
 	if (this->Params.empty())
 	{
 		msg_sent = ERR_NEEDMOREPARAMS2(*this);
@@ -38,6 +37,5 @@ int		MyMsg::WallopsCmd( MyServer *IRC_Server )
 			it++;
 		}
 	}
-	/*PAS DE ERR_NOPRIVS - CAR TOUS LES OPER ONT LES MEMES DROITS*/
 	return (SUCCESS);
 }

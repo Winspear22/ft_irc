@@ -10,7 +10,6 @@ MyServer::MyServer( void )
 	return ;
 }
 
-
 MyServer::MyServer( int port, std::string password ): _port(port), _password(password), _server_status(SERVER_ON)
 {
 	std::cout << GREEN << "MyServer Constructor called." << NORMAL << std::endl;
@@ -165,7 +164,7 @@ int			MyServer::CreateSocketFd( void )
 int			MyServer::SetSocketOptions( void )
 {
 	int			ret;
-	const int 	optname = 1; //l'option SO_REUSEADDR REQUIERT UN BOOLEEAN POUR FONCTIONNER, ON SET ALORS CET ARGUMENT A 1, DONC A VRAI, POUR QUE LA FCT MARCHE.
+	const int 	optname = 1;
 
 	ret = setsockopt(this->_socketfd, SOL_SOCKET, SO_REUSEADDR, &optname,  sizeof(int));
 	if (ret == ERROR_SERVER)
@@ -180,11 +179,7 @@ int			MyServer::BindSocketFd( void )
 	this->_sockadress.sin_port = htons(this->_port);
 	this->_sockadress.sin_family = AF_INET; 
 	this->_sockadress.sin_addr.s_addr = INADDR_ANY;
-	/*IL FAUT PROTEGER CETTE VARIABLE CAR INET_ADDR RENVOIT -1 EN CAS D'ECHEC ET -1 = 255.255.255.255 IP, IP UNIVERSELLE*/
-	//if (this->_sockadress.sin_addr.s_addr < 0)
-	//	return (ERROR_SOCKET_BINDING);
-	/*if ((this->_sockadress.sin_addr.s_addr = INADDR_ANY) < 0)
-		return (ERROR_SOCKET_BINDING);*/
+
 	ret = bind(this->_socketfd, (struct sockaddr *)&this->_sockadress, sizeof(this->_sockadress));
 	if (ret == ERROR_SERVER)
 		return (ERROR_SOCKET_BINDING);
@@ -216,7 +211,7 @@ int			MyServer::SetSocketFdToNonBlocking( int SocketFd )
 
 int			MyServer::SelectClients( void )
 {
-	int					ret_select; //return de select pour les erreurs
+	int					ret_select;
 	struct timeval		timeout;
 
 	memset(&timeout, 0, sizeof(struct timeval));
@@ -224,15 +219,15 @@ int			MyServer::SelectClients( void )
 	this->_fds_list = 0;
 	FD_ZERO(&this->ready_fds);
 	FD_SET(this->_socketfd, &this->ready_fds);
-	this->readfds = this->ready_fds; // je sais plus pk on fait ca 
+	this->readfds = this->ready_fds;
 	ret_select = select(this->_maximum_fds + 1, &this->readfds, NULL, NULL, &timeout);
 	if (ret_select == ERROR_SERVER)
 		loop_errors_handlers_msg(ERROR_SELECT);
 	if (ret_select == TIMEOUT)
 		loop_errors_handlers_msg(TIMEOUT);
-	while (this->_fds_list <= this->_maximum_fds) //on doit checker ce qui se passe sur tous les fds un par un
+	while (this->_fds_list <= this->_maximum_fds) 
 	{
-		if (FD_ISSET(this->_fds_list, &this->readfds)) // C'est un client qui a ete trouve
+		if (FD_ISSET(this->_fds_list, &this->readfds)) 
 		{
 			this->CreateClients();
 			FD_SET(this->_new_fd_nb, &this->ready_fds);
@@ -349,7 +344,7 @@ std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
 
 void		MyServer::RecvClientsMsg( int ClientsFd )
 {
-	char								recv_buffer[512 + 1]; // ON UTILISE 512 CAR C'EST LA LIM D'UN MESSAGE SELON LE RFC
+	char								recv_buffer[512 + 1];
 	char								*msg_buffer;
 	int									ret_rcv;
 	std::vector<std::string>			splitted_msg;
@@ -366,7 +361,7 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 	if (ret_rcv == ERROR_SERVER)
 		return (loop_errors_handlers_msg(ERROR_RECV));
 	else if (ret_rcv == ERROR_USER_DISCONNECTED)
-		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO);  // Cas où le client se deconnecte normalement, dans le cas où recv n'a rien reçu de la part d'un fd
+		this->GetClientsThroughSocketFd(ClientsFd)->SetClientsConnectionStatus(NO); 
 	else if (ret_rcv > 0 && (buf_str.rfind("\r") != buf_str.size() - 1) && (buf_str.rfind("\n") != buf_str.size() - 1))
 	{
 		std::cout << WHITE << "Incomplete new message : " << BLUE <<  buf_str << WHITE " from " << BLUE << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsNickname() << " socket n° " << this->GetClientsThroughSocketFd(ClientsFd)->GetClientsFd() \
@@ -393,12 +388,12 @@ void		MyServer::RecvClientsMsg( int ClientsFd )
 			str = tab_parse.begin();
 			if (str->at(0) == ':')
 			{
-				this->new_msg->Prefix = *str; //VERIFIER QUE LE SETTER MARCHE
+				this->new_msg->Prefix = *str; 
 				str++;
 			}
 			if (this->new_msg->CheckFormatCmd(str, this->_cmd_list) == SUCCESS)
 			{
-				this->new_msg->Command = *str; //essayer de trouver un moyen d'utiliser un setter
+				this->new_msg->Command = *str; 
 				str++;
 				this->new_msg->SetCmdExistence(CMD_EXISTS);
 			}

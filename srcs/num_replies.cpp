@@ -163,15 +163,15 @@ std::string RPL_NAMREPLY( MyMsg msg, std::string channames )
     return (reply);
 }
 
+
+
 std::string RPL_ENDOFNAMES( MyMsg msg, std::string channames )
 {
     std::string reply;
 
     reply = "366 " + msg.GetClients()->GetClientsNickname() + " " + channames + " :" + "End of /NAMES list";
     return (reply);
-}
-
-std::string RPL_TIME( MyMsg msg )
+}std::string RPL_TIME( MyMsg msg )
 {
     std::string reply;
     time_t 		tmp;
@@ -469,11 +469,11 @@ std::string ERR_USERNOTINCHANNEL(std::string client, std::string chan)
     return (reply);
 }
 
-std::string ERR_TOOMANYCHANNELS(std::string channame)
+std::string ERR_TOOMANYCHANNELS(MyMsg msg, std::string channame)
 {
     std::string reply;
 
-    reply = "405 " + channame + " :You have joined too much channels";
+    reply = "405 " + msg.GetClients()->GetClientsNickname() + " " + channame + " :You have joined too much channels";
 
     return (reply);
 }
