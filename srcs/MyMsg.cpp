@@ -67,11 +67,6 @@ std::string MyMsg::GetCmd( void )
 	return (this->Command);
 }
 
-/*std::string MyMsg::GetParams( void )
-{
-	return (this->_Params);
-}*/
-
 Clients	*MyMsg::GetClients( void )
 {
 	return (this->_SentFrom);
@@ -126,11 +121,11 @@ int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector
 	j = 0;
 	if (cmd->empty())
 		return (FAILURE);
-	if (isdigit(cmd->at(0)) != SUCCESS && cmd->size() == 3)
+	if (isdigit(cmd->at(0)) != 0 && cmd->size() == 3)
 	{
 		while (i < 3)
 		{
-			if (isdigit(cmd->at(i)) != SUCCESS)
+			if (isdigit(cmd->at(i)) == 0)
 				return (FAILURE);
 			i++;
 		}
@@ -138,7 +133,7 @@ int			MyMsg::CheckFormatCmd( std::vector<std::string>::iterator cmd, std::vector
 	}
 	while (j < cmd->size())
 	{
-		if (isalpha(cmd->at(i)) == SUCCESS)
+		if (isalpha(cmd->at(j)) == 0)
 			return (FAILURE);
 		j++;
 	}

@@ -250,6 +250,37 @@ int			MyServer::SelectClients( void )
 	return (SUCCESS);
 }
 
+void			MyServer::CreateClients( void )
+{
+	int				client_created_fd;
+	Clients			*client_created;
+	struct sockaddr	client_addr;
+	socklen_t		sizeofsockaddr;
+	int				ret_fcntl;
+	
+	sizeofsockaddr = sizeof(client_addr);
+	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
+	ret_fcntl = SetSocketFdToNonBlocking(client_created_fd);
+	if (ret_fcntl == ERROR_SERVER)
+		return (loop_errors_handlers_msg(ERROR_NONBLOCKING));
+	if (client_created_fd == ERROR_SERVER)
+		return (loop_errors_handlers_msg(ERROR_ACCEPT));
+	else
+	{
+		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
+		this->clients_list.insert(std::make_pair(client_created, client_created_fd));
+		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
+		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
+		if (this->GetCurrentClientsNb() > 8)
+		{
+			client_created->SetClientsConnectionStatus(NO);
+			return ;
+		}
+		this->_new_fd_nb = client_created_fd;
+		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
+	}
+}
+
 int			MyServer::DeleteAFKClients( void )
 {
 	std::map<Clients*, int>::iterator	it;
@@ -298,37 +329,6 @@ int			MyServer::DeleteChannelsWithoutClients( void )
 		it++;
 	}
 	return (SUCCESS);
-}
-
-void			MyServer::CreateClients( void )
-{
-	int				client_created_fd;
-	Clients			*client_created;
-	struct sockaddr	client_addr;
-	socklen_t		sizeofsockaddr;
-	int				ret_fcntl;
-	
-	sizeofsockaddr = sizeof(client_addr);
-	client_created_fd = accept(this->_socketfd, &client_addr, &sizeofsockaddr);
-	ret_fcntl = SetSocketFdToNonBlocking(client_created_fd);
-	if (ret_fcntl == ERROR_SERVER)
-		return (loop_errors_handlers_msg(ERROR_NONBLOCKING));
-	if (client_created_fd == ERROR_SERVER)
-		return (loop_errors_handlers_msg(ERROR_ACCEPT));
-	else
-	{
-		client_created = new Clients(client_created_fd, *reinterpret_cast<struct sockaddr_in*>(&client_addr), "MyServerName");
-		this->clients_list.insert(std::make_pair(client_created, client_created_fd));
-		this->SetCurrentClientsNb(this->GetCurrentClientsNb() + 1);
-		std::cout << YELLOW << "Current nb of Clients BEFORE QUIT : " << WHITE << this->GetCurrentClientsNb() << NORMAL << std::endl;
-		if (this->GetCurrentClientsNb() > 8)
-		{
-			client_created->SetClientsConnectionStatus(NO);
-			return ;
-		}
-		this->_new_fd_nb = client_created_fd;
-		std::cout << YELLOW << "A new client connected to the server. He holds the fd n° " << WHITE << client_created_fd << NORMAL << std::endl;
-	}
 }
 
 std::vector<std::string> MyServer::SplitByEndline(char *str, const char *delim)
